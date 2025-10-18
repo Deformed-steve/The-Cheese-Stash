@@ -1,0 +1,83 @@
+@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@500&display=swap');
+
+body {
+  font-family: "Kanit", sans-serif;
+  margin: 0;
+  background: linear-gradient(135deg, #001f3f, #0074D9);
+  color: white;
+  text-align: center;
+  overflow-x: hidden;
+}
+
+header {
+  padding: 2rem 0 1rem;
+  position: relative;
+  z-index: 2;
+}
+
+h1 {
+  margin: 0;
+  font-size: 2.2rem;
+}
+
+p {
+  margin: 0.3rem 0 1.5rem;
+  opacity: 0.8;
+}
+
+#search {
+  padding: 0.6rem 1rem;
+  border-radius: 12px;
+  border: none;
+  outline: none;
+  width: 60%;
+  max-width: 400px;
+  font-size: 1rem;
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  text-align: center;
+}
+
+.games-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.5rem;
+  padding: 2rem;
+  position: relative;
+  z-index: 2;
+}
+
+.game {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 0.5rem;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.game:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+}
+
+.game img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.game-title {
+  display: block;
+  margin-top: 0.6rem;
+  font-size: 1.1rem;
+  color: #fff;
+}
+
+#particles-js {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
