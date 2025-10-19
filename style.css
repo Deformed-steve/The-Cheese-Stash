@@ -52,7 +52,13 @@ p {
   border-radius: 16px;
   padding: 0.5rem;
   transition: transform 0.25s ease, box-shadow 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 280px; /* fixed height for all game boxes */
+  box-sizing: border-box;
 }
+
 
 .game:hover {
   transform: scale(1.05);
