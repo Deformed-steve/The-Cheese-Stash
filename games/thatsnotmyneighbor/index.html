@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, user-scalable=no">
 <title>That's not my neighbor</title>
-	<base href="https://cdn.jsdelivr.net/gh/Deformed-steve/webgames-@main/That's%20Not%20My%20Neighbor/">
+
 <style>
 body {
 	touch-action: none;
@@ -104,6 +104,14 @@ body {
 	</div>
 	<div id="status-notice" class="godot" style="display: none;"></div>
 </div>
+
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('headers.js', { scope: './' })
+    .then(() => console.log('Service worker registered.'))
+    .catch(err => console.warn('Service worker failed:', err));
+}
+</script>
 
 <script src="That's not my neighbor.js"></script>
 
