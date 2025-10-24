@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
+		<title>DOGWALK</title>
+		<style>
+html, body, #canvas {
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+body {
+	color: white;
+	background-color: black;
+	overflow: hidden;
+	touch-action: none;
+}
+
+#canvas {
+	display: block;
+}
+
+#canvas:focus {
+	outline: none;
+}
+
+#status, #status-splash, #status-progress {
+	position: absolute;
+	left: 0;
+	right: 0;
+}
+
+#status, #status-splash {
+	top: 0;
+	bottom: 0;
+}
+
+#status {
+	background-color: #242424;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	visibility: hidden;
+}
+
+#status-splash {
+	max-height: 100%;
+	max-width: 100%;
+	margin: auto;
+}
+
+#status-splash.show-image--false {
+	display: none;
+}
+
+#status-splash.fullsize--true {
+	height: 100%;
+	width: 100%;
+	object-fit: contain;
+}
+
+#status-splash.use-filter--false {
+	image-rendering: pixelated;
+}
+
+#status-progress, #status-notice {
+	display: none;
+}
+
+#status-progress {
+	bottom: 10%;
+	width: 50%;
+	margin: 0 auto;
+}
+
+#status-notice {
+	background-color: #5b3943;
+	border-radius: 0.5rem;
+	border: 1px solid #9b3943;
+	color: #e0e0e0;
+	font-family: 'Noto Sans', 'Droid Sans', Arial, sans-serif;
+	line-height: 1.3;
+	margin: 0 2rem;
+	overflow: hidden;
+	padding: 1rem;
+	text-align: center;
+	z-index: 1;
+}
+		</style>
+		<link id="-gd-engine-icon" rel="icon" type="image/png" href="DOGWALK.icon.png" />
+<link rel="apple-touch-icon" href="DOGWALK.apple-touch-icon.png"/>
+
+	</head>
+	<body>
+		<canvas id="canvas">
+			Your browser does not support the canvas tag.
+		</canvas>
+
+		<noscript>
+			Your browser does not support JavaScript.
+		</noscript>
+
+		<div id="status">
+			<img id="status-splash" class="show-image--false fullsize--false use-filter--false" src="DOGWALK.png" alt="">
+			<progress id="status-progress"></progress>
+			<div id="status-notice"></div>
+		</div>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('headers.js', { scope: './' })
+    .then(() => console.log('Service worker registered.'))
+    .catch(err => console.warn('Service worker failed:', err));
+}
+</script>
+<script src="DOGWALK.js"></script>
+<script>
+const GODOT_CONFIG = {
+  "args": [],
+  "canvasResizePolicy": 2,
+  "ensureCrossOriginIsolationHeaders": true,
+  "executable": "DOGWALK",
+  "experimentalVK": false,
+  "fileSizes": { "DOGWALK.pck": 0, "DOGWALK.wasm": 52126319 },
+  "focusCanvas": true,
+  "gdextensionLibs": []
+};
+
+const GODOT_THREADS_ENABLED = false;
+const engine = new Engine(GODOT_CONFIG);
+
+(async function () {
+  const statusOverlay = document.getElementById('status');
+  const statusProgress = document.getElementById('status-progress');
+  const statusNotice = document.getElementById('status-notice');
+
+  let initializing = true;
+  let statusMode = '';
+
+  function setStatusMode(mode) {
+    if (statusMode === mode || !initializing) return;
+    if (mode === 'hidden') {
+      statusOverlay.remove();
+      initializing = false;
+      return;
+    }
+    statusOverlay.style.visibility = 'visible';
+    statusProgress.style.display = mode === 'progress' ? 'block' : 'none';
+    statusNotice.style.display = mode === 'notice' ? 'block' : 'none';
+    statusMode = mode;
+  }
+
+  function setStatusNotice(text) {
+    statusNotice.textContent = text;
+  }
+
+  function displayFailureNotice(err) {
+    console.error(err);
+    setStatusNotice(err.message || err || 'Unknown error.');
+    setStatusMode('notice');
+    initializing = false;
+  }
+
+  const missing = Engine.getMissingFeatures({ threads: GODOT_THREADS_ENABLED });
+  if (missing.length) {
+    displayFailureNotice('Missing features:\n' + missing.join('\n'));
+    return;
+  }
+
+  setStatusMode('progress');
+
+
+  function formatBytes(bytes) {
+    const gb = 1024 ** 3;
+    const mb = 1024 ** 2;
+    if (bytes >= gb) return (bytes / gb).toFixed(2) + ' GB';
+    return (bytes / mb).toFixed(2) + ' MB';
+  }
+
+  async function loadAllParts() {
+    const totalParts = 133;
+    const parts = [];
+    let downloaded = 0;
+    let totalExpected = 0;
+
+    for (let i = 1; i <= totalParts; i++) {
+      const partName = `DOGWALK.pck.part${i}`;
+      const response = await fetch(partName);
+      if (!response.ok) throw new Error(`Failed to fetch ${partName}`);
+      const contentLength = parseInt(response.headers.get('Content-Length') || '0', 10);
+      totalExpected += contentLength;
+      const buf = await response.arrayBuffer();
+      parts.push(buf);
+      downloaded += buf.byteLength;
+
+      const percent = totalExpected ? (downloaded / totalExpected * 100).toFixed(1) : ((i / totalParts) * 100).toFixed(1);
+      setStatusNotice(`Downloading: ${formatBytes(downloaded)} / ${formatBytes(totalExpected || downloaded)} (${percent}%)`);
+      statusProgress.value = i;
+      statusProgress.max = totalParts;
+    }
+
+
+    const totalLength = parts.reduce((sum, buf) => sum + buf.byteLength, 0);
+    const merged = new Uint8Array(totalLength);
+    let offset = 0;
+    for (const buf of parts) {
+      merged.set(new Uint8Array(buf), offset);
+      offset += buf.byteLength;
+    }
+    return merged.buffer;
+  }
+
+  try {
+    const mergedBuffer = await loadAllParts();
+
+    const originalFetch = window.fetch;
+    window.fetch = async (url, options) => {
+      if (url.endsWith('DOGWALK.pck')) {
+        return new Response(mergedBuffer, {
+          status: 200,
+          headers: { 'Content-Type': 'application/octet-stream' }
+        });
+      }
+      return originalFetch(url, options);
+    };
+
+    await engine.startGame({
+      onProgress: (current, total) => {
+        if (current && total) {
+          const percent = ((current / total) * 100).toFixed(1);
+          setStatusNotice(`Loading Game: ${formatBytes(current)} / ${formatBytes(total)} (${percent}%)`);
+          statusProgress.value = current;
+          statusProgress.max = total;
+        }
+      },
+    });
+
+    setStatusMode('hidden');
+  } catch (err) {
+    displayFailureNotice(err);
+  }
+})();
+</script>
+
+
+	</body>
+</html>
+
