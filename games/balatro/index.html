@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, minimum-scale=1, maximum-scale=1">
+  <title>Balatro</title>
+  <link rel="stylesheet" type="text/css" href="theme/love.css">
+</head>
+<body>
+
+  <center>
+    <div>
+      <h1>Balatro</h1>
+      <canvas id="loadingCanvas" oncontextmenu="event.preventDefault()" width="800" height="600"></canvas>
+      <canvas id="canvas" oncontextmenu="event.preventDefault()"></canvas>
+    </div>
+  </center>
+
+  <script type="text/javascript">
+    function goFullScreen() {
+      const canvas = document.getElementById("canvas");
+      if (canvas.requestFullscreen) canvas.requestFullscreen();
+      else if (canvas.webkitRequestFullscreen) canvas.webkitRequestFullscreen();
+      else if (canvas.mozRequestFullScreen) canvas.mozRequestFullScreen();
+    }
+
+    function resizeCanvas() {
+      const canvas = document.getElementById("canvas");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    window.addEventListener("resize", resizeCanvas);
+    window.addEventListener("load", () => {
+      resizeCanvas();
+      goFullScreen();
+    });
+
+    var loadingContext = document.getElementById('loadingCanvas').getContext('2d');
+    function drawLoadingText(text) {
+      const canvas = loadingContext.canvas;
+      loadingContext.fillStyle = "rgb(142, 195, 227)";
+      loadingContext.fillRect(0, 0, canvas.width, canvas.height);
+      loadingContext.font = '2em arial';
+      loadingContext.textAlign = 'center';
+      loadingContext.fillStyle = "rgb(11, 86, 117)";
+      loadingContext.fillText(text, canvas.width / 2, canvas.height / 2);
+      loadingContext.fillText("Ported with Emscripten.", canvas.width / 2, canvas.height / 4);
+      loadingContext.fillText("Powered By LÖVE.", canvas.width / 2, canvas.height / 4 * 3);
+    }
+
+    var Module = {
+      arguments: ["./game.love"],
+      INITIAL_MEMORY: 268435456,
+      printErr: console.error.bind(console),
+      canvas: document.getElementById('canvas'),
+      setStatus: function(text) {
+        if (text) drawLoadingText(text);
+        else if (Module.remainingDependencies === 0) {
+          document.getElementById('loadingCanvas').style.display = 'none';
+          document.getElementById('canvas').style.visibility = 'visible';
+        }
+      },
+      totalDependencies: 0,
+      remainingDependencies: 0,
+      monitorRunDependencies: function(left) {
+        this.remainingDependencies = left;
+        this.totalDependencies = Math.max(this.totalDependencies, left);
+        Module.setStatus(left ? 'Preparing... (' + (this.totalDependencies-left) + '/' + this.totalDependencies + ')' : 'All downloads complete.');
+      }
+    };
+
+    Module.setStatus('Downloading...');
+    window.onerror = function() {
+      Module.setStatus('Exception thrown, see console');
+    };
+
+    function applicationLoad() { Love(Module); }
+  </script>
+  <script src="game.js"></script>
+  <script async src="love.js" onload="applicationLoad()"></script>
+</body>
+</html>
