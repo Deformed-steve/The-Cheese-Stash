@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Cheese Stash</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/particles.js"></script>
+</head>
+<body>
+  <header>
+    <h1>🧀 The Cheese Stash 🧀</h1>
+    <p>Unblocked Games — Pc-games for free! you can request in my discord.</p>
+    <input type="text" id="search" placeholder="Search games..." />
+  </header>
+
+  <main class="games-container" id="game-list">
+<div class="game" data-name="Back">
+  <a href="index.html" target="_blank">
+    <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/logo.png" alt="People Playground" class="game-thumbnail" />
+    <span class="game-title">Back</span>
+  </a>
+</div>
+<div class="game" data-name="A-i">
+  <a href="apps/a-i/index.html" target="_blank">
+    <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/ai.png" alt="People Playground" class="game-thumbnail" />
+    <span class="game-title">Cheesy AI</span>
+  </a>
+</div>
+<div class="game" data-name="Ruffle">
+  <a href="apps/ruffle/index.html" target="_blank">
+    <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/Ruffle.png" alt="People Playground" class="game-thumbnail" />
+    <span class="game-title">Ruffle</span>
+  </a>
+</div>
+ </main>
+
+
+  <div id="particles-js"></div>
+  <script src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/script.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const baseLocal = `${window.location.origin}/img/`;
+  const baseCDN = "https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/";
+  const cacheKey = "imageAvailabilityCache_v1";
+  const cache = JSON.parse(localStorage.getItem(cacheKey) || "{}");
+
+  document.querySelectorAll("img.game-thumbnail").forEach(img => {
+    const fileName = img.src.split("/").pop();
+    const localUrl = baseLocal + fileName;
+    const cdnUrl = baseCDN + fileName;
+
+    if (cache[fileName] === "local") {
+      img.src = localUrl;
+      return;
+    }
+    if (cache[fileName] === "cdn") {
+      img.src = cdnUrl;
+      return;
+    }
+
+    // test and cache result
+    fetch(localUrl, { method: "HEAD" })
+      .then(res => {
+        if (res.ok) {
+          img.src = localUrl;
+          cache[fileName] = "local";
+        } else {
+          img.src = cdnUrl;
+          cache[fileName] = "cdn";
+        }
+        localStorage.setItem(cacheKey, JSON.stringify(cache));
+      })
+      .catch(() => {
+        img.src = cdnUrl;
+        cache[fileName] = "cdn";
+        localStorage.setItem(cacheKey, JSON.stringify(cache));
+      });
+  });
+});
+</script>
+
+  <footer>
+    <p>&copy; 2025 The Cheese Stash. All rights reserved.</p>
+  <p>Credits: Me obv, bobbywx for art/logo</p>
+</body>
+</html>
