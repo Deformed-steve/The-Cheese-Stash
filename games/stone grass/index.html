@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Stone Grass: Mowing Simulator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    html, body { margin: 0; height: 100%; background: #000; }
+    #unityContainer { width: 100%; height: 100%; }
+  </style>
+</head>
+<body>
+  <div id="unityContainer"></div>
+  <script>
+    var buildUrl = "";
+    var config = {
+      dataUrl: buildUrl + "5339d669eb849446a68aba9a48d61098.data.br",
+      frameworkUrl: buildUrl + "9f98a295b940d80834f1bfc1792d2663.framework.js.br",
+      codeUrl: buildUrl + "8e12edaf08bc00cba646a7df97480baf.wasm.br",
+      streamingAssetsUrl: "StreamingAssets",
+      companyName: "CrazyGames",
+      productName: "Stone Grass: Mowing Simulator",
+      productVersion: "1.0"
+    };
+
+    var script = document.createElement("script");
+    script.src = buildUrl + "e40682cd4a2e8826aa72fb3216daf773.loader.js";
+    script.onload = () => {
+      createUnityInstance(document.querySelector("#unityContainer"), config)
+        .then(() => console.log("Game loaded."))
+        .catch(err => console.error(err));
+    };
+    document.body.appendChild(script);
+  </script>
+</body>
+</html>
