@@ -7,21 +7,6 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/style.css" />
   <script src="https://cdn.jsdelivr.net/npm/particles.js"></script>
 </head>
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const container = document.getElementById("game-list");
-  const games = Array.from(container.querySelectorAll(".game"));
-
-  games.sort((a, b) => {
-    const nameA = a.querySelector(".game-title").textContent.trim().toLowerCase();
-    const nameB = b.querySelector(".game-title").textContent.trim().toLowerCase();
-    return nameA.localeCompare(nameB);
-  });
-
-  games.forEach(game => container.appendChild(game));
-});
-</script>
-
 <body>
   <header>
     <h1>🧀 The Cheese Stash 🧀</h1>
@@ -52,27 +37,11 @@ document.addEventListener("DOMContentLoaded", () => {
   </a>
 </div>
 
- </div>
-      <div class="game" data-name="Super Mario Bros ">
-      <a href="games/supermariobros/index.html" target="_blank">
-        <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/supermariobros.png" alt="People Playground" class="game-thumbnail" />
-        <span class="game-title">Super Mario Bros</span>
-      </a>
-    </div>
-
     </div>
       <div class="game" data-name="Super Mario Bros 2.">
       <a href="games/supermariobros2/index.html" target="_blank">
         <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/supermariobros2.png" alt="People Playground" class="game-thumbnail" />
         <span class="game-title">Super Mario Bros 2.</span>
-      </a>
-    </div>
-
-    </div>
-      <div class="game" data-name="Stone Grass: Mowing Simulator">
-      <a href="games/stone grass/index.html" target="_blank">
-        <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/stonegrass.png" alt="People Playground" class="game-thumbnail" />
-        <span class="game-title">Stone Grass: Mowing Simulator</span>
       </a>
     </div>
 
@@ -91,12 +60,6 @@ document.addEventListener("DOMContentLoaded", () => {
       </a>
     </div>
 
-    <div class="game" data-name="Crossy Road">
-      <a href="games/crossyroad/index.html" target="_blank">
-        <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/Crossy Road.png" alt="Granny" class="game-thumbnail" />
-        <span class="game-title">Crossy Road</span>
-      </a>
-    </div>
 
     <div class="game" data-name="Granny 2">
       <a href="games/granny2/index.html" target="_blank">
@@ -234,16 +197,6 @@ document.addEventListener("DOMContentLoaded", () => {
         <span class="game-title">Slender The 8 Pages</span>
       </a>
     </div>
-
-</div>
-      <div class="game" data-name="retrobowl">
-      <a href="games/retrobowl/index.html" target="_blank">
-        <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/retrobowl.png" alt="People Playground" class="game-thumbnail" />
-        <span class="game-title">Retrobowl</span>
-      </a>
-    </div>
-
-
 
     <div class="game" data-name="The Oregon Trail">
       <a href="games/theoregontrail/" target="_blank">
