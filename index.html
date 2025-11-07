@@ -25,6 +25,43 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 
 <body>
+  <div id="lockscreen" style="position:fixed;inset:0;z-index:9999;background:#0b0b0b;display:flex;flex-direction:column;align-items:center;justify-content:center;color:white;font-family:sans-serif;">
+  <h2>Enter Password</h2>
+  <input type="password" id="passInput" placeholder="Password..." style="padding:10px;border:none;border-radius:5px;outline:none;margin-top:10px;">
+  <button id="submitPass" style="margin-top:10px;padding:8px 16px;border:none;border-radius:5px;cursor:pointer;">Enter</button>
+  <p id="errorMsg" style="color:red;display:none;margin-top:10px;">TRY AGAIN</p>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+  const correctPass = "cheesemasterrulez"; // change this
+  const lock = document.getElementById("lockscreen");
+  const input = document.getElementById("passInput");
+  const btn = document.getElementById("submitPass");
+  const err = document.getElementById("errorMsg");
+
+  // check cookie first
+  if (document.cookie.includes("accessGranted=true")) {
+    lock.remove();
+    return;
+  }
+
+  btn.addEventListener("click",()=>{
+    if(input.value === correctPass){
+      document.cookie = "accessGranted=true; path=/; max-age=" + 60*60*24*30; // 30 days
+      lock.remove();
+    } else {
+      err.style.display = "block";
+    }
+  });
+
+  input.addEventListener("keypress",e=>{
+    if(e.key==="Enter") btn.click();
+  });
+});
+</script>
+
+
   <header>
     <h1>🧀 The Cheese Stash 🧀</h1>
     <p>Unblocked Games — Pc-games for free! you can request in my discord.</p>
@@ -59,10 +96,26 @@ document.addEventListener("DOMContentLoaded", () => {
     <span class="game-title">Bloon's Tower Defense 5</span>
   </a>
 </div>
+
+ <div class="game" data-name="Schoolboy Runaway">
+  <a href="games/runaway/index.html" target="_blank">
+    <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/Schoolboy Runaway.png" alt="People Playground" class="game-thumbnail" />
+    <span class="game-title">Schoolboy Runaway</span>
+  </a>
+</div>
+
       <div class="game" data-name="Super Mario Bros 1.">
       <a href="games/supermariobros/index.html" target="_blank">
         <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/supermariobros.png" alt="People Playground" class="game-thumbnail" />
         <span class="game-title">Super Mario Bros 1.</span>
+      </a>
+      </div>
+
+      
+      <div class="game" data-name="Cookie Clicker">
+      <a href="games/cookieclicker/index.html" target="_blank">
+        <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/Cookie Clicker.png" alt="People Playground" class="game-thumbnail" />
+        <span class="game-title">Cookie Clicker</span>
       </a>
       </div>
 
