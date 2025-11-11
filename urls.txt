@@ -1,0 +1,5 @@
+ixleducationforkids1.vercel.app
+ixleducationforkids2.vercel.app
+ixleducationforkids3.vercel.app
+ixleducationforkids4.vercel.app
+ixleducationforkids5.vercel.app
