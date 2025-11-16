@@ -63,6 +63,13 @@ document.addEventListener("DOMContentLoaded",()=>{
   });
 });
 </script>
+<script>
+  const cursor = document.getElementById("customCursor");
+
+  document.addEventListener("mousemove", (e) => {
+    cursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+  });
+</script>
 
 
   <header>
