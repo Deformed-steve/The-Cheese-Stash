@@ -4,434 +4,542 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>The Cheese Stash</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/style.css" />
-  <script src="https://cdn.jsdelivr.net/npm/particles.js"></script>
-</head>
-<meta name="google-adsense-account" content="ca-pub-2206020823906967">
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2206020823906967"
-     crossorigin="anonymous"></script>
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const gameList = document.getElementById("game-list");
-  const games = Array.from(gameList.getElementsByClassName("game"));
-
-  // Sort by the inner text of .game-title (case-insensitive)
-  games.sort((a, b) => {
-    const titleA = a.querySelector(".game-title").textContent.toLowerCase();
-    const titleB = b.querySelector(".game-title").textContent.toLowerCase();
-    return titleA.localeCompare(titleB);
-  });
-
-  // Re-append them in sorted order
-  games.forEach(game => gameList.appendChild(game));
-});
-</script>
-
-<body>
-  <div id="lockscreen" style="position:fixed;inset:0;z-index:9999;background:#0b0b0b;display:flex;flex-direction:column;align-items:center;justify-content:center;color:white;font-family:sans-serif;">
-  <h2>Enter Password</h2>
-  <input type="password" id="passInput" placeholder="Password..." style="padding:10px;border:none;border-radius:5px;outline:none;margin-top:10px;">
-  <button id="submitPass" style="margin-top:10px;padding:8px 16px;border:none;border-radius:5px;cursor:pointer;">Enter</button>
-  <p id="errorMsg" style="color:red;display:none;margin-top:10px;">TRY AGAIN</p>
-</div>
-
-<script>
-document.addEventListener("DOMContentLoaded",()=>{
-  const correctPass = "cheesemasterrulez"; // change this
-  const lock = document.getElementById("lockscreen");
-  const input = document.getElementById("passInput");
-  const btn = document.getElementById("submitPass");
-  const err = document.getElementById("errorMsg");
-
-  // check cookie first
-  if (document.cookie.includes("accessGranted=true")) {
-    lock.remove();
-    return;
-  }
-
-  btn.addEventListener("click",()=>{
-    if(input.value === correctPass){
-      document.cookie = "accessGranted=true; path=/; max-age=" + 60*60*24*30; // 30 days
-      lock.remove();
-    } else {
-      err.style.display = "block";
+  <meta name="google-adsense-account" content="ca-pub-2206020823906967">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2206020823906967" crossorigin="anonymous"></script>
+  
+  <style>
+    :root {
+      --primary: #ff9800;
+      --primary-dark: #e68900;
+      --secondary: #4caf50;
+      --dark: #1a1a1a;
+      --darker: #0f0f0f;
+      --light: #f5f5f5;
+      --gray: #333;
+      --card-bg: rgba(30, 30, 30, 0.8);
+      --card-hover: rgba(40, 40, 40, 0.9);
     }
-  });
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+      color: var(--light);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    
+    #particles-js {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+    
+    header {
+      text-align: center;
+      padding: 2rem 1rem;
+      background: rgba(10, 10, 10, 0.7);
+      backdrop-filter: blur(10px);
+      border-bottom: 2px solid var(--primary);
+      position: relative;
+      z-index: 10;
+    }
+    
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
+      color: var(--primary);
+      text-shadow: 0 0 10px rgba(255, 152, 0, 0.5);
+    }
+    
+    header p {
+      font-size: 1.2rem;
+      margin-bottom: 1.5rem;
+      opacity: 0.9;
+    }
+    
+    #search {
+      padding: 0.8rem 1.2rem;
+      border: none;
+      border-radius: 50px;
+      width: 90%;
+      max-width: 500px;
+      font-size: 1rem;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
+    }
+    
+    #search:focus {
+      outline: none;
+      background: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 0 15px rgba(255, 152, 0, 0.3);
+    }
+    
+    #search::placeholder {
+      color: rgba(255, 255, 255, 0.6);
+    }
+    
+    .games-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+      padding: 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    
+    .game {
+      background: var(--card-bg);
+      border-radius: 15px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .game:hover {
+      transform: translateY(-10px);
+      background: var(--card-hover);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+      border-color: var(--primary);
+    }
+    
+    .game a {
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      height: 100%;
+    }
+    
+    .game-thumbnail {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.3s ease;
+    }
+    
+    .game:hover .game-thumbnail {
+      transform: scale(1.05);
+    }
+    
+    .game-title {
+      display: block;
+      padding: 1rem;
+      font-weight: 600;
+      font-size: 1.1rem;
+      text-align: center;
+      background: rgba(0, 0, 0, 0.5);
+    }
+    
+    footer {
+      text-align: center;
+      padding: 2rem;
+      background: rgba(10, 10, 10, 0.7);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      margin-top: 2rem;
+    }
+    
+    footer p {
+      margin: 0.5rem 0;
+      opacity: 0.8;
+    }
+    
+    #lockscreen {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-family: sans-serif;
+    }
+    
+    #lockscreen h2 {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      color: var(--primary);
+    }
+    
+    #passInput {
+      padding: 12px 15px;
+      border: none;
+      border-radius: 8px;
+      outline: none;
+      margin-top: 10px;
+      width: 250px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      font-size: 1rem;
+    }
+    
+    #submitPass {
+      margin-top: 15px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background: var(--primary);
+      color: white;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+    
+    #submitPass:hover {
+      background: var(--primary-dark);
+      transform: scale(1.05);
+    }
+    
+    #errorMsg {
+      color: #ff5252;
+      display: none;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    
+    .no-results {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 3rem;
+      font-size: 1.2rem;
+      opacity: 0.7;
+    }
+    
+    @media (max-width: 768px) {
+      .games-container {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        padding: 1rem;
+        gap: 1rem;
+      }
+      
+      h1 {
+        font-size: 2.2rem;
+      }
+      
+      header p {
+        font-size: 1rem;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .games-container {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      }
+      
+      .game-thumbnail {
+        height: 120px;
+      }
+      
+      .game-title {
+        font-size: 0.9rem;
+        padding: 0.8rem 0.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="lockscreen">
+    <h2>Enter Password</h2>
+    <input type="password" id="passInput" placeholder="Password...">
+    <button id="submitPass">Enter</button>
+    <p id="errorMsg">TRY AGAIN</p>
+  </div>
 
-  input.addEventListener("keypress",e=>{
-    if(e.key==="Enter") btn.click();
-  });
-});
-</script>
-<script>
-  const cursor = document.getElementById("customCursor");
-
-  document.addEventListener("mousemove", (e) => {
-    cursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
-  });
-</script>
-
+  <div id="particles-js"></div>
 
   <header>
     <h1>🧀 The Cheese Stash 🧀</h1>
-    <p>Unblocked Games — Pc-games for free! you can request in my discord.</p>
+    <p>Unblocked Games — PC games for free! You can request games in my Discord.</p>
     <input type="text" id="search" placeholder="Search games..." />
   </header>
 
   <main class="games-container" id="game-list">
-    <div class="game" data-name="That's Not My Neighbor">
-      <a href="games/thatsnotmyneighbor/index.html" target="_blank">
-        <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/thatsnotmyneighbor.png" alt="That's Not My Neighbor" class="game-thumbnail" />
-        <span class="game-title">That's Not My Neighbor</span>
-      </a>
-    </div>
-
-<div class="game" data-name="apps">
-  <a href="a.html" target="_blank">
-    <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/logo.png" alt="People Playground" class="game-thumbnail" />
-    <span class="game-title">apps</span>
-  </a>
-</div>
-
-
- <div class="game" data-name="People Playground">
-  <a href="games/peopleplayground/index.html" target="_blank">
-    <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/peopleplayground.png" alt="People Playground" class="game-thumbnail" />
-    <span class="game-title">People Playground</span>
-  </a>
-</div>
- <div class="game" data-name="bloonstd5">
-  <a href="games/bloonstd5/index.html" target="_blank">
-    <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/bloonstd5.png" alt="People Playground" class="game-thumbnail" />
-    <span class="game-title">Bloon's Tower Defense 5</span>
-  </a>
-</div>
-
-<div class="game" data-name="bloonstd5">
-  <a href="games/bloonstd5/index.html" target="_blank">
-    <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/bloonstd5.png" alt="People Playground" class="game-thumbnail" />
-    <span class="game-title">Bloon's Tower Defense 5</span>
-  </a>
-</div>
-<div class="game" data-name="Roblox">
-  <a href="games/Roblox/index.html" target="_blank">
-    <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/Roblox.png" alt="People Playground" class="game-thumbnail" />
-    <span class="game-title">Roblox</span>
-  </a>
-</div>
-
- <div class="game" data-name="Family life">
-  <a href="games/family life/index.html" target="_blank">
-    <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/Family life.png" alt="People Playground" class="game-thumbnail" />
-    <span class="game-title">Family life</span>
-  </a>
-</div>
-
- <div class="game" data-name="Schoolboy Runaway">
-  <a href="games/runaway/index.html" target="_blank">
-    <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/Schoolboy Runaway.png" alt="People Playground" class="game-thumbnail" />
-    <span class="game-title">Schoolboy Runaway</span>
-  </a>
-</div>
-
-      <div class="game" data-name="Super Mario Bros 1.">
-      <a href="games/supermariobros/index.html" target="_blank">
-        <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/supermariobros.png" alt="People Playground" class="game-thumbnail" />
-        <span class="game-title">Super Mario Bros 1.</span>
-      </a>
-      </div>
-
-      
-      <div class="game" data-name="Cookie Clicker">
-      <a href="games/cookieclicker/index.html" target="_blank">
-        <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/Cookie Clicker.png" alt="People Playground" class="game-thumbnail" />
-        <span class="game-title">Cookie Clicker</span>
-      </a>
-      </div>
-
-    </div>
-      <div class="game" data-name="Super Mario Bros 2.">
-      <a href="games/supermariobros2/index.html" target="_blank">
-        <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/supermariobros2.png" alt="People Playground" class="game-thumbnail" />
-        <span class="game-title">Super Mario Bros 2.</span>
-      </a>
-    </div>
-
-        </div>
-      <div class="game" data-name="Super Mario Bros 3.">
-      <a href="games/supermariobros3/index.html" target="_blank">
-        <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/supermariobros3.png" alt="People Playground" class="game-thumbnail" />
-        <span class="game-title">Super Mario Bros 3.</span>
-      </a>
-    </div>
-
-    <div class="game" data-name="Granny">
-      <a href="games/granny/index.html" target="_blank">
-        <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/granny.png" alt="Granny" class="game-thumbnail" />
-        <span class="game-title">Granny</span>
-      </a>
-    </div>
-
-
-    <div class="game" data-name="Granny 2">
-      <a href="games/granny2/index.html" target="_blank">
-        <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/granny2.png" alt="Granny 2" class="game-thumbnail" />
-        <span class="game-title">Granny 2</span>
-      </a>
-    </div>
-
-    <div class="game" data-name="Five Nights at Freddy's">
-      <a href="games/fnaf1/index.html" target="_blank">
-        <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/fnaf1.png" alt="Five Nights at Freddy's" class="game-thumbnail" />
-        <span class="game-title">Five Nights at Freddy's</span>
-      </a>
-    </div>
-
-    <div class="game" data-name="Five Nights at Freddy's 2">
-      <a href="games/fnaf2/index.html" target="_blank">
-        <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/fnaf2.png" alt="Five Nights at Freddy's 2" class="game-thumbnail" />
-        <span class="game-title">Five Nights at Freddy's 2</span>
-      </a>
-    </div>
-
-    <div class="game" data-name="Five Nights at Freddy's 3">
-      <a href="games/fnaf3/index.html" target="_blank">
-        <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/fnaf3.png" alt="Five Nights at Freddy's 3" class="game-thumbnail" />
-        <span class="game-title">Five Nights at Freddy's 3</span>
-      </a>
-    </div>
-
-    <div class="game" data-name="Five Nights at Freddy's 4">
-      <a href="games/fnaf4/index.html" target="_blank">
-        <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/fnaf4.png" alt="Five Nights at Freddy's 4" class="game-thumbnail" />
-        <span class="game-title">Five Nights at Freddy's 4</span>
-      </a>
-    </div>
-
- </div>
-       <div class="game" data-name="Fnaf Ultimate Custom Night">
-      <a href="games/customnight/index.html" target="_blank" rel="noopener noreferrer">
-        <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/ucn.png" alt="Geometry Dash" class="game-thumbnail" />
-        <span class="game-title">Fnaf Ultimate Custom Night</span>
-      </a>
-    </div>
-
-     </div>
-       <div class="game" data-name="Balatro">
-      <a href="games/balatro/index.html" target="_blank" rel="noopener noreferrer">
-        <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/balatro.png" alt="Geometry Dash" class="game-thumbnail" />
-        <span class="game-title">Balatro</span>
-      </a>
-    </div>
-
-      <div class="game" data-name="Webfishing">
-      <a href="games/Webfishing/index.html" target="_blank">
-        <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/Webfishing.png" alt="Bendy and the Ink Machine" class="game-thumbnail" />
-        <span class="game-title">Webfishing</span>
-      </a>
-    </div>
-
-    <div class="game" data-name="Bendy and the Ink Machine">
-      <a href="games/bendy/index.html" target="_blank">
-        <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/bendy.png" alt="Bendy and the Ink Machine" class="game-thumbnail" />
-        <span class="game-title">Bendy and the Ink Machine</span>
-      </a>
-    </div>
-
-   <div class="game" data-name="stone-grass-mowing-simulator">
-      <a href="games/stonegrass/index.html" target="_blank">
-        <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/stone-grass-mowing-simulator.png" alt="Bendy and the Ink Machine" class="game-thumbnail" />
-        <span class="game-title">stone-grass-mowing-simulator</span>
-      </a>
-    </div>
-
-     <div class="game" data-name="A bite at freddy's">
-      <a href="games/biteatfreddys/ABaF.html" target="_blank">
-        <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/bite.png" alt="Bendy and the Ink Machine" class="game-thumbnail" />
-        <span class="game-title">A bite at freddy's</span>
-      </a>
-       </div>
-
-     <div class="game" data-name="Jelly Drift">
-      <a href="games/jellydrift/index.html" target="_blank">
-        <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/Jelly Drift.png" alt="Bendy and the Ink Machine" class="game-thumbnail" />
-        <span class="game-title">Jelly Drift - dani</span>
-      </a>
-       </div>
-
- <div class="game" data-name="IntelliSphere">
-      <a href="games/intellisphere/IntelliSphere.html" target="_blank">
-        <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/IntelliSphere.png" alt="Bendy and the Ink Machine" class="game-thumbnail" />
-        <span class="game-title">IntelliSphere</span>
-      </a>
- </div>
-  <div class="game" data-name="Legend Of Zelda, Majora's Mask">
-      <a href="games/majorasmask/index.html" target="_blank">
-        <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/Legend Of Zelda, Majora's Mask.png" alt="Bendy and the Ink Machine" class="game-thumbnail" />
-        <span class="game-title">Legend Of Zelda, Majora's Mask</span>
-      </a>
- </div>
-    <div class="game" data-name="Bergentruck201x">
-      <a href="games/Bergentruck201x/BERGENTRUCK_201X.html" target="_blank">
-        <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/Bergentruck201x.png" alt="Bendy and the Ink Machine" class="game-thumbnail" />
-        <span class="game-title">Bergentruck201x</span>
-      </a>
-    </div>
-         <div class="game" data-name="rush">
-      <a href="games/rush/rush.html" target="_blank">
-        <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/rush.png" alt="Bendy and the Ink Machine" class="game-thumbnail" />
-        <span class="game-title">Bl-ood Rush</span>
-      </a>
-    </div>
-
- <div class="game" data-name="Wheelielife">
-      <a href="games/Wheelielife/Wheelie Life (1).html" target="_blank">
-        <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/Wheelielife.png" alt="Bad Parenting 1" class="game-thumbnail" />
-        <span class="game-title">Wheelielife</span>
-      </a>
-    </div>
-    <div class="game" data-name="Libre TrainSim">
-      <a href="games/trainsim/Libre TrainSim.html" target="_blank">
-        <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/Libre TrainSim.png" alt="Cuphead" class="game-thumbnail" />
-        <span class="game-title">Libre TrainSim</span>
-      </a>
-    </div>
-
-    <div class="game" data-name="Cuphead">
-      <a href="games/cuphead/index.html" target="_blank">
-        <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/cuphead.png" alt="Cuphead" class="game-thumbnail" />
-        <span class="game-title">Cuphead</span>
-      </a>
-    </div>
- <div class="game" data-name="dogwalk">
-      <a href="games/Dogwalk/DOGWALK.html" target="_blank">
-        <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/dogwalk.png" alt="Five Nights at Freddy's 2" class="game-thumbnail" />
-        <span class="game-title">Dogwalk</span>
-      </a>
-    </div>
-
-    <div class="game" data-name="Getting Over It with Bennett Foddy">
-      <a href="games/gettingoverit/index.html" target="_blank">
-        <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/gettingoverit.png" alt="Getting Over It" class="game-thumbnail" />
-        <span class="game-title">Getting Over It</span>
-      </a>
-    </div>
-
-    <div class="game" data-name="Minecraft 1.8.8">
-      <a href="games/minecraft188/index.html" target="_blank">
-        <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/minecraft188.png" alt="Minecraft 1.8.8" class="game-thumbnail" />
-        <span class="game-title">Minecraft 1.8.8</span>
-      </a>
-    </div>
-
-    <div class="game" data-name="Slender The 8 Pages">
-      <a href="games/slender/index.html" target="_blank">
-        <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/slender.png" alt="Slender" class="game-thumbnail" />
-        <span class="game-title">Slender The 8 Pages</span>
-      </a>
-    </div>
-
-    <div class="game" data-name="The Oregon Trail">
-      <a href="games/theoregontrail/" target="_blank">
-        <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/oregontrail.png" alt="The Oregon Trail" class="game-thumbnail" />
-        <span class="game-title">The Oregon Trail</span>
-      </a>
-    </div>
-
-    <div class="game" data-name="Tiny Fishing">
-      <a href="games/tinyfishing/index.html" target="_blank">
-        <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/tinyfishing.png" alt="Tiny Fishing" class="game-thumbnail" />
-        <span class="game-title">Tiny Fishing</span>
-      </a>
-    </div>
-          <div class="game" data-name="Baldi's Basics">
-      <a href="games/baldisbasics/Baldi's Basics Godot.html" target="_blank" rel="noopener noreferrer">
-        <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/baldisbasics.png" alt="Geometry Dash" class="game-thumbnail" />
-        <span class="game-title">Baldi's Basics</span>
-      </a>
-    </div>
-
-    <div class="game" data-name="Tomb Of The Mask">
-      <a href="games/tombofthemask/index.html" target="_blank">
-        <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/tombofthemask.png" alt="Tomb Of The Mask" class="game-thumbnail" />
-        <span class="game-title">Tomb Of The Mask</span>
-      </a>
-
-    </div>
-       <div class="game" data-name="Geometry Dash">
-      <a href="games/geometrydash/index.html" target="_blank" rel="noopener noreferrer">
-        <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/geometrydash.png" alt="Geometry Dash" class="game-thumbnail" />
-        <span class="game-title">Geometry Dash</span>
-      </a>
-    </div>
-
-<div class="game" data-name="1v1.lol">
-  <a href="games/1v1.lol/index.html" target="_blank" rel="noopener noreferrer">
-    <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/1v1lol.png" alt="1v1.lol" class="game-thumbnail" />
-    <span class="game-title">1v1.lol</span>
-  </a>
-</div> 
-
-    <div class="game" data-name="Amanda the Adventurer">
-      <a href="games/amanda/index.html" target="_blank">
-        <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/amanda.png" alt="Amanda the Adventurer" class="game-thumbnail" />
-        <span class="game-title">Amanda the Adventurer</span>
-      </a>
-    </div>
-      <div class="game" data-name="Yohoho.io">
-      <a href="games/pirategame/index.html" target="_blank">
-        <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/pirategame.jpeg" alt="Amanda the Adventurer" class="game-thumbnail" />
-        <span class="game-title">Yohoho.io</span>
-      </a>
-    </div>
+    <!-- Games will be dynamically inserted here -->
   </main>
-
-  <div id="particles-js"></div>
-  <script src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/script.js"></script>
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const baseLocal = `${window.location.origin}/img/`;
-  const baseCDN = "https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/";
-  const cacheKey = "imageAvailabilityCache_v1";
-  const cache = JSON.parse(localStorage.getItem(cacheKey) || "{}");
-
-  document.querySelectorAll("img.game-thumbnail").forEach(img => {
-    const fileName = img.src.split("/").pop();
-    const localUrl = baseLocal + fileName;
-    const cdnUrl = baseCDN + fileName;
-
-    if (cache[fileName] === "local") {
-      img.src = localUrl;
-      return;
-    }
-    if (cache[fileName] === "cdn") {
-      img.src = cdnUrl;
-      return;
-    }
-
-    // test and cache result
-    fetch(localUrl, { method: "HEAD" })
-      .then(res => {
-        if (res.ok) {
-          img.src = localUrl;
-          cache[fileName] = "local";
-        } else {
-          img.src = cdnUrl;
-          cache[fileName] = "cdn";
-        }
-        localStorage.setItem(cacheKey, JSON.stringify(cache));
-      })
-      .catch(() => {
-        img.src = cdnUrl;
-        cache[fileName] = "cdn";
-        localStorage.setItem(cacheKey, JSON.stringify(cache));
-      });
-  });
-});
-</script>
 
   <footer>
     <p>&copy; 2025 The Cheese Stash. All rights reserved.</p>
-  <p>Credits: Me obv, bobbywx for art/logo</p>
+    <p>Credits: Me obv, bobbywx for art/logo</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  <script>
+    // Password protection
+    document.addEventListener("DOMContentLoaded", () => {
+      const correctPass = "cheesemasterrulez";
+      const lock = document.getElementById("lockscreen");
+      const input = document.getElementById("passInput");
+      const btn = document.getElementById("submitPass");
+      const err = document.getElementById("errorMsg");
+
+      // Check cookie first
+      if (document.cookie.includes("accessGranted=true")) {
+        lock.remove();
+        initializeSite();
+        return;
+      }
+
+      btn.addEventListener("click", () => {
+        if (input.value === correctPass) {
+          document.cookie = "accessGranted=true; path=/; max-age=" + 60*60*24*30; // 30 days
+          lock.remove();
+          initializeSite();
+        } else {
+          err.style.display = "block";
+        }
+      });
+
+      input.addEventListener("keypress", e => {
+        if (e.key === "Enter") btn.click();
+      });
+    });
+
+    // Initialize the site after password check
+    function initializeSite() {
+      // Initialize particles.js with new settings
+      particlesJS("particles-js", {
+        particles: {
+          number: {
+            value: 80,
+            density: {
+              enable: true,
+              value_area: 800
+            }
+          },
+          color: {
+            value: ["#ff9800", "#4caf50", "#ffffff"]
+          },
+          shape: {
+            type: ["circle", "triangle", "polygon"],
+            stroke: {
+              width: 0,
+              color: "#000000"
+            },
+            polygon: {
+              nb_sides: 6
+            }
+          },
+          opacity: {
+            value: 0.5,
+            random: true,
+            anim: {
+              enable: true,
+              speed: 1,
+              opacity_min: 0.1,
+              sync: false
+            }
+          },
+          size: {
+            value: 3,
+            random: true,
+            anim: {
+              enable: true,
+              speed: 4,
+              size_min: 0.3,
+              sync: false
+            }
+          },
+          line_linked: {
+            enable: true,
+            distance: 150,
+            color: "#ff9800",
+            opacity: 0.2,
+            width: 1
+          },
+          move: {
+            enable: true,
+            speed: 2,
+            direction: "none",
+            random: true,
+            straight: false,
+            out_mode: "out",
+            bounce: false,
+            attract: {
+              enable: false,
+              rotateX: 600,
+              rotateY: 1200
+            }
+          }
+        },
+        interactivity: {
+          detect_on: "canvas",
+          events: {
+            onhover: {
+              enable: true,
+              mode: "grab"
+            },
+            onclick: {
+              enable: true,
+              mode: "push"
+            },
+            resize: true
+          },
+          modes: {
+            grab: {
+              distance: 140,
+              line_linked: {
+                opacity: 0.5
+              }
+            },
+            push: {
+              particles_nb: 4
+            }
+          }
+        },
+        retina_detect: true
+      });
+
+      // Game data
+      const games = [
+        { name: "That's Not My Neighbor", url: "games/thatsnotmyneighbor/index.html", img: "thatsnotmyneighbor.png" },
+        { name: "Apps", url: "a.html", img: "logo.png" },
+        { name: "People Playground", url: "games/peopleplayground/index.html", img: "peopleplayground.png" },
+        { name: "Bloon's Tower Defense 5", url: "games/bloonstd5/index.html", img: "bloonstd5.png" },
+        { name: "Roblox", url: "games/Roblox/index.html", img: "Roblox.png" },
+        { name: "Family Life", url: "games/family life/index.html", img: "Family life.png" },
+        { name: "Schoolboy Runaway", url: "games/runaway/index.html", img: "Schoolboy Runaway.png" },
+        { name: "Super Mario Bros 1", url: "games/supermariobros/index.html", img: "supermariobros.png" },
+        { name: "Cookie Clicker", url: "games/cookieclicker/index.html", img: "Cookie Clicker.png" },
+        { name: "Super Mario Bros 2", url: "games/supermariobros2/index.html", img: "supermariobros2.png" },
+        { name: "Super Mario Bros 3", url: "games/supermariobros3/index.html", img: "supermariobros3.png" },
+        { name: "Granny", url: "games/granny/index.html", img: "granny.png" },
+        { name: "Granny 2", url: "games/granny2/index.html", img: "granny2.png" },
+        { name: "Five Nights at Freddy's", url: "games/fnaf1/index.html", img: "fnaf1.png" },
+        { name: "Five Nights at Freddy's 2", url: "games/fnaf2/index.html", img: "fnaf2.png" },
+        { name: "Five Nights at Freddy's 3", url: "games/fnaf3/index.html", img: "fnaf3.png" },
+        { name: "Five Nights at Freddy's 4", url: "games/fnaf4/index.html", img: "fnaf4.png" },
+        { name: "Fnaf Ultimate Custom Night", url: "games/customnight/index.html", img: "ucn.png" },
+        { name: "Balatro", url: "games/balatro/index.html", img: "balatro.png" },
+        { name: "Webfishing", url: "games/Webfishing/index.html", img: "Webfishing.png" },
+        { name: "Bendy and the Ink Machine", url: "games/bendy/index.html", img: "bendy.png" },
+        { name: "Stone Grass Mowing Simulator", url: "games/stonegrass/index.html", img: "stone-grass-mowing-simulator.png" },
+        { name: "A Bite at Freddy's", url: "games/biteatfreddys/ABaF.html", img: "bite.png" },
+        { name: "Jelly Drift", url: "games/jellydrift/index.html", img: "Jelly Drift.png" },
+        { name: "IntelliSphere", url: "games/intellisphere/IntelliSphere.html", img: "IntelliSphere.png" },
+        { name: "Legend Of Zelda, Majora's Mask", url: "games/majorasmask/index.html", img: "Legend Of Zelda, Majora's Mask.png" },
+        { name: "Bergentruck201x", url: "games/Bergentruck201x/BERGENTRUCK_201X.html", img: "Bergentruck201x.png" },
+        { name: "Blood Rush", url: "games/rush/rush.html", img: "rush.png" },
+        { name: "Wheelie Life", url: "games/Wheelielife/Wheelie Life (1).html", img: "Wheelielife.png" },
+        { name: "Libre TrainSim", url: "games/trainsim/Libre TrainSim.html", img: "Libre TrainSim.png" },
+        { name: "Cuphead", url: "games/cuphead/index.html", img: "cuphead.png" },
+        { name: "Dogwalk", url: "games/Dogwalk/DOGWALK.html", img: "dogwalk.png" },
+        { name: "Getting Over It", url: "games/gettingoverit/index.html", img: "gettingoverit.png" },
+        { name: "Minecraft 1.8.8", url: "games/minecraft188/index.html", img: "minecraft188.png" },
+        { name: "Slender The 8 Pages", url: "games/slender/index.html", img: "slender.png" },
+        { name: "The Oregon Trail", url: "games/theoregontrail/", img: "oregontrail.png" },
+        { name: "Tiny Fishing", url: "games/tinyfishing/index.html", img: "tinyfishing.png" },
+        { name: "Baldi's Basics", url: "games/baldisbasics/Baldi's Basics Godot.html", img: "baldisbasics.png" },
+        { name: "Tomb Of The Mask", url: "games/tombofthemask/index.html", img: "tombofthemask.png" },
+        { name: "Geometry Dash", url: "games/geometrydash/index.html", img: "geometrydash.png" },
+        { name: "1v1.lol", url: "games/1v1.lol/index.html", img: "1v1lol.png" },
+        { name: "Amanda the Adventurer", url: "games/amanda/index.html", img: "amanda.png" },
+        { name: "Yohoho.io", url: "games/pirategame/index.html", img: "pirategame.jpeg" }
+      ];
+
+      // Sort games alphabetically
+      games.sort((a, b) => a.name.localeCompare(b.name));
+
+      // Render games
+      const gameList = document.getElementById("game-list");
+      
+      games.forEach(game => {
+        const gameElement = document.createElement("div");
+        gameElement.className = "game";
+        gameElement.dataset.name = game.name;
+        
+        gameElement.innerHTML = `
+          <a href="${game.url}" target="_blank">
+            <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/${game.img}" alt="${game.name}" class="game-thumbnail" />
+            <span class="game-title">${game.name}</span>
+          </a>
+        `;
+        
+        gameList.appendChild(gameElement);
+      });
+
+      // Search functionality
+      const searchInput = document.getElementById("search");
+      
+      searchInput.addEventListener("input", () => {
+        const searchTerm = searchInput.value.toLowerCase();
+        const gameElements = document.querySelectorAll(".game");
+        let visibleCount = 0;
+        
+        gameElements.forEach(game => {
+          const gameName = game.dataset.name.toLowerCase();
+          if (gameName.includes(searchTerm)) {
+            game.style.display = "block";
+            visibleCount++;
+          } else {
+            game.style.display = "none";
+          }
+        });
+        
+        // Show no results message if needed
+        let noResults = document.querySelector(".no-results");
+        if (visibleCount === 0 && !noResults) {
+          noResults = document.createElement("div");
+          noResults.className = "no-results";
+          noResults.textContent = "No games found matching your search.";
+          gameList.appendChild(noResults);
+        } else if (visibleCount > 0 && noResults) {
+          noResults.remove();
+        }
+      });
+
+      // Image caching system
+      const baseLocal = `${window.location.origin}/img/`;
+      const baseCDN = "https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/";
+      const cacheKey = "imageAvailabilityCache_v2";
+      const cache = JSON.parse(localStorage.getItem(cacheKey) || "{}");
+
+      document.querySelectorAll("img.game-thumbnail").forEach(img => {
+        const fileName = img.src.split("/").pop();
+        const localUrl = baseLocal + fileName;
+        const cdnUrl = baseCDN + fileName;
+
+        if (cache[fileName] === "local") {
+          img.src = localUrl;
+          return;
+        }
+        if (cache[fileName] === "cdn") {
+          img.src = cdnUrl;
+          return;
+        }
+
+        // Test and cache result
+        fetch(localUrl, { method: "HEAD" })
+          .then(res => {
+            if (res.ok) {
+              img.src = localUrl;
+              cache[fileName] = "local";
+            } else {
+              img.src = cdnUrl;
+              cache[fileName] = "cdn";
+            }
+            localStorage.setItem(cacheKey, JSON.stringify(cache));
+          })
+          .catch(() => {
+            img.src = cdnUrl;
+            cache[fileName] = "cdn";
+            localStorage.setItem(cacheKey, JSON.stringify(cache));
+          });
+      });
+    }
+  </script>
 </body>
 </html>

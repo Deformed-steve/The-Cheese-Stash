@@ -3,97 +3,448 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>The Cheese Stash</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/style.css" />
-  <script src="https://cdn.jsdelivr.net/npm/particles.js"></script>
+  <title>Apps - The Cheese Stash</title>
+  <meta name="google-adsense-account" content="ca-pub-2206020823906967">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2206020823906967" crossorigin="anonymous"></script>
+  
+  <style>
+    :root {
+      --primary: #ff9800;
+      --primary-dark: #e68900;
+      --secondary: #4caf50;
+      --dark: #1a1a1a;
+      --darker: #0f0f0f;
+      --light: #f5f5f5;
+      --gray: #333;
+      --card-bg: rgba(30, 30, 30, 0.8);
+      --card-hover: rgba(40, 40, 40, 0.9);
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+      color: var(--light);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    
+    #particles-js {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+    
+    header {
+      text-align: center;
+      padding: 2rem 1rem;
+      background: rgba(10, 10, 10, 0.7);
+      backdrop-filter: blur(10px);
+      border-bottom: 2px solid var(--primary);
+      position: relative;
+      z-index: 10;
+    }
+    
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
+      color: var(--primary);
+      text-shadow: 0 0 10px rgba(255, 152, 0, 0.5);
+    }
+    
+    header p {
+      font-size: 1.2rem;
+      margin-bottom: 1.5rem;
+      opacity: 0.9;
+    }
+    
+    #search {
+      padding: 0.8rem 1.2rem;
+      border: none;
+      border-radius: 50px;
+      width: 90%;
+      max-width: 500px;
+      font-size: 1rem;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
+    }
+    
+    #search:focus {
+      outline: none;
+      background: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 0 15px rgba(255, 152, 0, 0.3);
+    }
+    
+    #search::placeholder {
+      color: rgba(255, 255, 255, 0.6);
+    }
+    
+    .apps-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+      padding: 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    
+    .app {
+      background: var(--card-bg);
+      border-radius: 15px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .app:hover {
+      transform: translateY(-10px);
+      background: var(--card-hover);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+      border-color: var(--primary);
+    }
+    
+    .app a {
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      height: 100%;
+    }
+    
+    .app-thumbnail {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.3s ease;
+    }
+    
+    .app:hover .app-thumbnail {
+      transform: scale(1.05);
+    }
+    
+    .app-title {
+      display: block;
+      padding: 1rem;
+      font-weight: 600;
+      font-size: 1.1rem;
+      text-align: center;
+      background: rgba(0, 0, 0, 0.5);
+    }
+    
+    .app-description {
+      display: block;
+      padding: 0.5rem 1rem 1rem;
+      font-size: 0.9rem;
+      text-align: center;
+      opacity: 0.8;
+    }
+    
+    footer {
+      text-align: center;
+      padding: 2rem;
+      background: rgba(10, 10, 10, 0.7);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      margin-top: 2rem;
+    }
+    
+    footer p {
+      margin: 0.5rem 0;
+      opacity: 0.8;
+    }
+    
+    .no-results {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 3rem;
+      font-size: 1.2rem;
+      opacity: 0.7;
+    }
+    
+    @media (max-width: 768px) {
+      .apps-container {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        padding: 1rem;
+        gap: 1rem;
+      }
+      
+      h1 {
+        font-size: 2.2rem;
+      }
+      
+      header p {
+        font-size: 1rem;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .apps-container {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      }
+      
+      .app-thumbnail {
+        height: 120px;
+      }
+      
+      .app-title {
+        font-size: 0.9rem;
+        padding: 0.8rem 0.5rem;
+      }
+      
+      .app-description {
+        font-size: 0.8rem;
+        padding: 0.5rem 0.5rem 0.8rem;
+      }
+    }
+  </style>
 </head>
 <body>
+  <div id="particles-js"></div>
+
   <header>
     <h1>🧀 The Cheese Stash 🧀</h1>
-    <p>Unblocked Games — Pc-games for free! you can request in my discord.</p>
-    <input type="text" id="search" placeholder="Search games..." />
+    <p>Useful Apps & Tools — Free utilities for your browsing needs!</p>
+    <input type="text" id="search" placeholder="Search apps..." />
   </header>
 
-  <main class="games-container" id="game-list">
-<div class="game" data-name="Back">
-  <a href="index.html" target="_blank">
-    <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/logo.png" alt="People Playground" class="game-thumbnail" />
-    <span class="game-title">Back</span>
-  </a>
-</div>
-<div class="game" data-name="A-i">
-  <a href="apps/a-i/index.html" target="_blank">
-    <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/ai.png" alt="People Playground" class="game-thumbnail" />
-    <span class="game-title">Cheesy AI</span>
-  </a>
-</div>
-<div class="game" data-name="Music">
-  <a href="apps/tidal/index.html" target="_blank">
-    <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/Music.png" alt="People Playground" class="game-thumbnail" />
-    <span class="game-title">Music</span>
-  </a>
-</div>
-<div class="game" data-name="Browser">
-  <a href="apps/browser/browse.html" target="_blank">
-    <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/browser.png" alt="People Playground" class="game-thumbnail" />
-    <span class="game-title">Browser</span>
-  </a>
-</div>
-<div class="game" data-name="Ruffle">
-  <a href="apps/ruffle/index.html" target="_blank">
-    <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/Ruffle.png" alt="People Playground" class="game-thumbnail" />
-    <span class="game-title">Ruffle</span>
-  </a>
-</div>
- </main>
-
-
-  <div id="particles-js"></div>
-  <script src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/script.js"></script>
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const baseLocal = `${window.location.origin}/img/`;
-  const baseCDN = "https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/";
-  const cacheKey = "imageAvailabilityCache_v1";
-  const cache = JSON.parse(localStorage.getItem(cacheKey) || "{}");
-
-  document.querySelectorAll("img.game-thumbnail").forEach(img => {
-    const fileName = img.src.split("/").pop();
-    const localUrl = baseLocal + fileName;
-    const cdnUrl = baseCDN + fileName;
-
-    if (cache[fileName] === "local") {
-      img.src = localUrl;
-      return;
-    }
-    if (cache[fileName] === "cdn") {
-      img.src = cdnUrl;
-      return;
-    }
-
-    // test and cache result
-    fetch(localUrl, { method: "HEAD" })
-      .then(res => {
-        if (res.ok) {
-          img.src = localUrl;
-          cache[fileName] = "local";
-        } else {
-          img.src = cdnUrl;
-          cache[fileName] = "cdn";
-        }
-        localStorage.setItem(cacheKey, JSON.stringify(cache));
-      })
-      .catch(() => {
-        img.src = cdnUrl;
-        cache[fileName] = "cdn";
-        localStorage.setItem(cacheKey, JSON.stringify(cache));
-      });
-  });
-});
-</script>
+  <main class="apps-container" id="app-list">
+    <!-- Apps will be dynamically inserted here -->
+  </main>
 
   <footer>
     <p>&copy; 2025 The Cheese Stash. All rights reserved.</p>
-  <p>Credits: Me obv, bobbywx for art/logo</p>
+    <p>Credits: Me obv, bobbywx for art/logo</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  <script>
+    // Initialize the site
+    document.addEventListener("DOMContentLoaded", () => {
+      // Initialize particles.js with new settings
+      particlesJS("particles-js", {
+        particles: {
+          number: {
+            value: 80,
+            density: {
+              enable: true,
+              value_area: 800
+            }
+          },
+          color: {
+            value: ["#ff9800", "#4caf50", "#ffffff"]
+          },
+          shape: {
+            type: ["circle", "triangle", "polygon"],
+            stroke: {
+              width: 0,
+              color: "#000000"
+            },
+            polygon: {
+              nb_sides: 6
+            }
+          },
+          opacity: {
+            value: 0.5,
+            random: true,
+            anim: {
+              enable: true,
+              speed: 1,
+              opacity_min: 0.1,
+              sync: false
+            }
+          },
+          size: {
+            value: 3,
+            random: true,
+            anim: {
+              enable: true,
+              speed: 4,
+              size_min: 0.3,
+              sync: false
+            }
+          },
+          line_linked: {
+            enable: true,
+            distance: 150,
+            color: "#ff9800",
+            opacity: 0.2,
+            width: 1
+          },
+          move: {
+            enable: true,
+            speed: 2,
+            direction: "none",
+            random: true,
+            straight: false,
+            out_mode: "out",
+            bounce: false,
+            attract: {
+              enable: false,
+              rotateX: 600,
+              rotateY: 1200
+            }
+          }
+        },
+        interactivity: {
+          detect_on: "canvas",
+          events: {
+            onhover: {
+              enable: true,
+              mode: "grab"
+            },
+            onclick: {
+              enable: true,
+              mode: "push"
+            },
+            resize: true
+          },
+          modes: {
+            grab: {
+              distance: 140,
+              line_linked: {
+                opacity: 0.5
+              }
+            },
+            push: {
+              particles_nb: 4
+            }
+          }
+        },
+        retina_detect: true
+      });
+
+      // App data
+      const apps = [
+        { 
+          name: "Back to Games", 
+          url: "index.html", 
+          img: "logo.png",
+          description: "Return to the main games page"
+        },
+        { 
+          name: "Cheesy AI", 
+          url: "apps/a-i/index.html", 
+          img: "ai.png",
+          description: "AI assistant powered by cheese technology"
+        },
+        { 
+          name: "Music Player", 
+          url: "apps/tidal/index.html", 
+          img: "Music.png",
+          description: "Stream your favorite tunes"
+        },
+        { 
+          name: "Browser", 
+          url: "apps/browser/browse.html", 
+          img: "browser.png",
+          description: "Lightweight web browser"
+        },
+        { 
+          name: "Ruffle", 
+          url: "apps/ruffle/index.html", 
+          img: "Ruffle.png",
+          description: "Flash emulator for classic content"
+        }
+      ];
+
+      // Render apps
+      const appList = document.getElementById("app-list");
+      
+      apps.forEach(app => {
+        const appElement = document.createElement("div");
+        appElement.className = "app";
+        appElement.dataset.name = app.name;
+        
+        appElement.innerHTML = `
+          <a href="${app.url}" target="_blank">
+            <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/${app.img}" alt="${app.name}" class="app-thumbnail" />
+            <span class="app-title">${app.name}</span>
+            <span class="app-description">${app.description}</span>
+          </a>
+        `;
+        
+        appList.appendChild(appElement);
+      });
+
+      // Search functionality
+      const searchInput = document.getElementById("search");
+      
+      searchInput.addEventListener("input", () => {
+        const searchTerm = searchInput.value.toLowerCase();
+        const appElements = document.querySelectorAll(".app");
+        let visibleCount = 0;
+        
+        appElements.forEach(app => {
+          const appName = app.dataset.name.toLowerCase();
+          if (appName.includes(searchTerm)) {
+            app.style.display = "block";
+            visibleCount++;
+          } else {
+            app.style.display = "none";
+          }
+        });
+        
+        // Show no results message if needed
+        let noResults = document.querySelector(".no-results");
+        if (visibleCount === 0 && !noResults) {
+          noResults = document.createElement("div");
+          noResults.className = "no-results";
+          noResults.textContent = "No apps found matching your search.";
+          appList.appendChild(noResults);
+        } else if (visibleCount > 0 && noResults) {
+          noResults.remove();
+        }
+      });
+
+      // Image caching system
+      const baseLocal = `${window.location.origin}/img/`;
+      const baseCDN = "https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/";
+      const cacheKey = "imageAvailabilityCache_v2";
+      const cache = JSON.parse(localStorage.getItem(cacheKey) || "{}");
+
+      document.querySelectorAll("img.app-thumbnail").forEach(img => {
+        const fileName = img.src.split("/").pop();
+        const localUrl = baseLocal + fileName;
+        const cdnUrl = baseCDN + fileName;
+
+        if (cache[fileName] === "local") {
+          img.src = localUrl;
+          return;
+        }
+        if (cache[fileName] === "cdn") {
+          img.src = cdnUrl;
+          return;
+        }
+
+        // Test and cache result
+        fetch(localUrl, { method: "HEAD" })
+          .then(res => {
+            if (res.ok) {
+              img.src = localUrl;
+              cache[fileName] = "local";
+            } else {
+              img.src = cdnUrl;
+              cache[fileName] = "cdn";
+            }
+            localStorage.setItem(cacheKey, JSON.stringify(cache));
+          })
+          .catch(() => {
+            img.src = cdnUrl;
+            cache[fileName] = "cdn";
+            localStorage.setItem(cacheKey, JSON.stringify(cache));
+          });
+      });
+    });
+  </script>
 </body>
 </html>
