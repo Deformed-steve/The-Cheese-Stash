@@ -1,0 +1,6 @@
+{
+	"code": "UNKNOWN",
+	"id": "error.Error",
+	"message": "Header was not specified.",
+	"stack": "Error: Header was not specified.\n    at readHeaders (/home/customer/v4/node_modules/@tomphttp/bare-server-node/dist/V1.js:35:19)\n    at tunnelRequest (/home/customer/v4/node_modules/@tomphttp/bare-server-node/dist/V1.js:150:33)\n    at Server.routeRequest (/home/customer/v4/node_modules/@tomphttp/bare-server-node/dist/BareServer.js:120:34)\n    at Server.<anonymous> (file:///home/customer/v4/src/server.js:340:10)\n    at Server.emit (node:events:519:28)\n    at Server.<anonymous> (/home/customer/.nvm/versions/node/v22.20.0/lib/node_modules/pm2/node_modules/@pm2/io/build/main/metrics/httpMetrics.js:167:33)\n    at parserOnIncoming (node:_http_server:1173:12)\n    at HTTPParser.parserOnHeadersComplete (node:_http_common:121:17)"
+}
