@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="stylesheet" href="banner.css">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Apps - The Cheese Stash</title>
@@ -216,6 +217,17 @@
     <p>Useful Apps & Tools — Free utilities for your browsing needs!</p>
     <input type="text" id="search" placeholder="Search apps..." />
   </header>
+  <nav class="side-nav right-nav">
+  <a href="index.html" class="nav-icon" title="Games">
+    <img src="/icons/games.svg" alt="Games">
+  </a>
+  <a href="a.html" class="nav-icon" title="Apps">
+    <img src="/icons/apps.svg" alt="Apps">
+  </a>
+  <a href="apps/browser/browse.html" class="nav-icon" title="Browse">
+    <img src="/icons/browse.svg" alt="Browse">
+  </a>
+</nav>
 
   <main class="apps-container" id="app-list">
     <!-- Apps will be dynamically inserted here -->
@@ -375,6 +387,7 @@
         
         appList.appendChild(appElement);
       });
+      
 
       // Search functionality
       const searchInput = document.getElementById("search");

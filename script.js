@@ -20,5 +20,25 @@ search.addEventListener("input", () => {
   games.forEach(game => {
     const name = game.dataset.name.toLowerCase();
     game.style.display = name.includes(term) ? "block" : "none";
+    // Change this to your own URL
+const socket = new WebSocket(`wss://${window.location.host}/ws`);
+
+socket.onopen = () => {
+  console.log("WebSocket connected!");
+  socket.send("Hello from client!");
+};
+
+socket.onmessage = (event) => {
+  console.log("Message from server:", event.data);
+};
+
+socket.onclose = () => {
+  console.log("WebSocket closed");
+};
+
+socket.onerror = (err) => {
+  console.error("WebSocket error:", err);
+};
+
   });
 });
