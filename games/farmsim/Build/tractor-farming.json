@@ -1,0 +1,9 @@
+{
+"TOTAL_MEMORY": 268435456,
+"dataUrl": "tractor-farming.data.unityweb",
+"asmCodeUrl": "tractor-farming.asm.code.unityweb",
+"asmMemoryUrl": "tractor-farming.asm.memory.unityweb",
+"asmFrameworkUrl": "tractor-farming.asm.framework.unityweb",
+"splashScreenStyle": "Dark",
+"backgroundColor": "#222C36"
+}
