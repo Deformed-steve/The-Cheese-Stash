@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>egg</title>
+  <style>
+    html,body{height:100%;margin:0}
+    #embedFrame{
+      width:100%;
+      height:100%;
+      border:0;
+      display:block;
+    }
+    /* optional: hide scrollbar if the embedded page uses it */
+    ::-webkit-scrollbar{display:none}
+  </style>
+</head>
+<body>
+  <!-- Fallback link in case iframe is blocked -->
+  <a id="fallback" href="/embed.html#https://deformed-steve.github.io/vy/" style="display:none">
+    Open embedded page
+  </a>
+
+  <script>
+    // Create and insert the iframe when the DOM is ready
+    document.addEventListener('DOMContentLoaded', function () {
+      const src = '/embed.html#https://deformed-steve.github.io/vy/';
+      try {
+        const iframe = document.createElement('iframe');
+        iframe.id = 'embedFrame';
+        iframe.src = src;
+        // If you need the embed to be able to go fullscreen:
+        iframe.allow = 'fullscreen';
+        // append to body
+        document.body.appendChild(iframe);
+      } catch (e) {
+        // If iframe creation is blocked, reveal the fallback link
+        document.getElementById('fallback').style.display = 'inline-block';
+        console.error('Failed to create iframe:', e);
+      }
+    });
+  </script>
+</body>
+</html>
