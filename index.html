@@ -646,6 +646,65 @@
           });
       });
     }
+    // Sigma iframe easter egg
+    let cCount = 0;
+    let lastCTime = 0;
+    
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'c' || e.key === 'C') {
+        const currentTime = Date.now();
+        
+        // Reset count if more than 1 second between presses
+        if (currentTime - lastCTime > 1000) {
+          cCount = 0;
+        }
+        
+        cCount++;
+        lastCTime = currentTime;
+        
+        // If 3 C presses in rapid succession
+        if (cCount >= 3) {
+          cCount = 0; // Reset for future use
+          
+          // Create fullscreen iframe
+          const iframe = document.createElement('iframe');
+          iframe.src = 'sigma.html';
+          iframe.style.position = 'fixed';
+          iframe.style.top = '0';
+          iframe.style.left = '0';
+          iframe.style.width = '100vw';
+          iframe.style.height = '100vh';
+          iframe.style.border = 'none';
+          iframe.style.zIndex = '99999';
+          iframe.style.background = 'white';
+          
+          // Add close button
+          const closeBtn = document.createElement('button');
+          closeBtn.innerHTML = '×';
+          closeBtn.style.position = 'fixed';
+          closeBtn.style.top = '20px';
+          closeBtn.style.right = '20px';
+          closeBtn.style.zIndex = '100000';
+          closeBtn.style.background = 'var(--primary)';
+          closeBtn.style.color = 'white';
+          closeBtn.style.border = 'none';
+          closeBtn.style.borderRadius = '50%';
+          closeBtn.style.width = '50px';
+          closeBtn.style.height = '50px';
+          closeBtn.style.fontSize = '24px';
+          closeBtn.style.cursor = 'pointer';
+          closeBtn.style.boxShadow = '0 2px 10px rgba(0,0,0,0.3)';
+          
+          closeBtn.addEventListener('click', () => {
+            iframe.remove();
+            closeBtn.remove();
+          });
+          
+          document.body.appendChild(iframe);
+          document.body.appendChild(closeBtn);
+        }
+      }
+    });
   </script>
 </body>
 </html>

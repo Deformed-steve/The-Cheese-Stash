@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Cheese Stash</title>
+  <meta name="google-adsense-account" content="ca-pub-2206020823906967">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2206020823906967" crossorigin="anonymous"></script>
+
+  <style>
+    :root {
+      --primary: #ff9800;
+      --primary-dark: #e68900;
+      --secondary: #4caf50;
+      --dark: #1a1a1a;
+      --darker: #0f0f0f;
+      --light: #f5f5f5;
+      --gray: #333;
+      --card-bg: rgba(30, 30, 30, 0.8);
+      --card-hover: rgba(40, 40, 40, 0.9);
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+      color: var(--light);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    
+    #particles-js {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+    
+    header {
+      text-align: center;
+      padding: 2rem 1rem;
+      background: rgba(10, 10, 10, 0.7);
+      backdrop-filter: blur(10px);
+      border-bottom: 2px solid var(--primary);
+      position: relative;
+      z-index: 10;
+    }
+    
+.side-nav.right-nav {
+  right: 20px;
+  left: auto;
+}
+
+.side-nav {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  background: var(--card-bg);
+  padding: 15px 10px;
+  border-radius: 15px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 100;
+}
+
+.nav-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.7);
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.nav-icon:hover {
+  color: var(--primary);
+  background: rgba(255, 152, 0, 0.1);
+  transform: scale(1.1);
+}
+
+.nav-icon img {
+  width: 28px;
+  height: 28px;
+  filter: brightness(0.8);
+  transition: all 0.3s ease;
+}
+
+.nav-icon:hover img {
+  filter: brightness(1);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .side-nav {
+    padding: 12px 8px;
+    gap: 12px;
+  }
+  
+  .nav-icon {
+    width: 45px;
+    height: 45px;
+  }
+  
+  .nav-icon img {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+@media (max-width: 480px) {
+  .side-nav {
+    padding: 10px 6px;
+    gap: 10px;
+  }
+  
+  .nav-icon {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .nav-icon img {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
+      color: var(--primary);
+      text-shadow: 0 0 10px rgba(255, 152, 0, 0.5);
+    }
+    
+    header p {
+      font-size: 1.2rem;
+      margin-bottom: 1.5rem;
+      opacity: 0.9;
+    }
+    
+    #search {
+      padding: 0.8rem 1.2rem;
+      border: none;
+      border-radius: 50px;
+      width: 90%;
+      max-width: 500px;
+      font-size: 1rem;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
+    }
+    
+    #search:focus {
+      outline: none;
+      background: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 0 15px rgba(255, 152, 0, 0.3);
+    }
+    
+    #search::placeholder {
+      color: rgba(255, 255, 255, 0.6);
+    }
+    
+    .games-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+      padding: 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    
+    .game {
+      background: var(--card-bg);
+      border-radius: 15px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .game:hover {
+      transform: translateY(-10px);
+      background: var(--card-hover);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+      border-color: var(--primary);
+    }
+    
+    .game a {
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      height: 100%;
+    }
+    
+    .game-thumbnail {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.3s ease;
+    }
+    
+    .game:hover .game-thumbnail {
+      transform: scale(1.05);
+    }
+    
+    .game-title {
+      display: block;
+      padding: 1rem;
+      font-weight: 600;
+      font-size: 1.1rem;
+      text-align: center;
+      background: rgba(0, 0, 0, 0.5);
+    }
+    
+    footer {
+      text-align: center;
+      padding: 2rem;
+      background: rgba(10, 10, 10, 0.7);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      margin-top: 2rem;
+    }
+    
+    footer p {
+      margin: 0.5rem 0;
+      opacity: 0.8;
+    }
+    
+    #lockscreen {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-family: sans-serif;
+    }
+    
+    #lockscreen h2 {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      color: var(--primary);
+    }
+    
+    #passInput {
+      padding: 12px 15px;
+      border: none;
+      border-radius: 8px;
+      outline: none;
+      margin-top: 10px;
+      width: 250px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      font-size: 1rem;
+    }
+    
+    #submitPass {
+      margin-top: 15px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background: var(--primary);
+      color: white;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+    
+    #submitPass:hover {
+      background: var(--primary-dark);
+      transform: scale(1.05);
+    }
+    
+    #errorMsg {
+      color: #ff5252;
+      display: none;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    
+    .no-results {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 3rem;
+      font-size: 1.2rem;
+      opacity: 0.7;
+    }
+    
+    @media (max-width: 768px) {
+      .games-container {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        padding: 1rem;
+        gap: 1rem;
+      }
+      
+      h1 {
+        font-size: 2.2rem;
+      }
+      
+      header p {
+        font-size: 1rem;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .games-container {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      }
+      
+      .game-thumbnail {
+        height: 120px;
+      }
+      
+      .game-title {
+        font-size: 0.9rem;
+        padding: 0.8rem 0.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="lockscreen">
+    <h2>Enter Password</h2>
+    <input type="password" id="passInput" placeholder="Password...">
+    <button id="submitPass">Enter</button>
+    <p id="errorMsg">TRY AGAIN</p>
+  </div>
+
+  <div id="particles-js"></div>
+
+  <header>
+    <h1>🧀 The Cheese Stash 🧀</h1>
+    <p>Unblocked Games — PC games for free! You can request games in my Discord.</p>
+    <input type="text" id="search" placeholder="Search games..." />
+  </header>
+<!-- Add this right after the <header> closing tag -->
+<nav class="side-nav right-nav">
+  <a href="index.html" class="nav-icon" title="Games">
+    <img src="/icons/games.svg" alt="Games">
+  </a>
+  <a href="a.html" class="nav-icon" title="Apps">
+    <img src="/icons/apps.svg" alt="Apps">
+  </a>
+  <a href="apps/browser/browse.html" class="nav-icon" title="Browse">
+    <img src="/icons/browse.svg" alt="Browse">
+  </a>
+</nav>
+  <main class="games-container" id="game-list">
+    <!-- Games will be dynamically inserted here -->
+  </main>
+
+  <footer>
+    <p>&copy; 2025 The Cheese Stash. All rights reserved.</p>
+    <p>Credits: Me obv, bobbywx for art/logo</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  <script>
+    // Password protection (no cookies)
+    document.addEventListener("DOMContentLoaded", () => {
+      const correctPass = "cheesemasterrulez";
+      const lock = document.getElementById("lockscreen");
+      const input = document.getElementById("passInput");
+      const btn = document.getElementById("submitPass");
+      const err = document.getElementById("errorMsg");
+
+      btn.addEventListener("click", () => {
+        if (input.value === correctPass) {
+          lock.remove();
+          initializeSite();
+        } else {
+          err.style.display = "block";
+        }
+      });
+
+      input.addEventListener("keypress", e => {
+        if (e.key === "Enter") btn.click();
+      });
+    });
+
+    // Initialize the site after password check
+    function initializeSite() {
+      // Initialize particles.js with new settings
+      particlesJS("particles-js", {
+        particles: {
+          number: {
+            value: 80,
+            density: {
+              enable: true,
+              value_area: 800
+            }
+          },
+          color: {
+            value: ["#ff9800", "#4caf50", "#ffffff"]
+          },
+          shape: {
+            type: ["circle", "triangle", "polygon"],
+            stroke: {
+              width: 0,
+              color: "#000000"
+            },
+            polygon: {
+              nb_sides: 6
+            }
+          },
+          opacity: {
+            value: 0.5,
+            random: true,
+            anim: {
+              enable: true,
+              speed: 1,
+              opacity_min: 0.1,
+              sync: false
+            }
+          },
+          size: {
+            value: 3,
+            random: true,
+            anim: {
+              enable: true,
+              speed: 4,
+              size_min: 0.3,
+              sync: false
+            }
+          },
+          line_linked: {
+            enable: true,
+            distance: 150,
+            color: "#ff9800",
+            opacity: 0.2,
+            width: 1
+          },
+          move: {
+            enable: true,
+            speed: 2,
+            direction: "none",
+            random: true,
+            straight: false,
+            out_mode: "out",
+            bounce: false,
+            attract: {
+              enable: false,
+              rotateX: 600,
+              rotateY: 1200
+            }
+          }
+        },
+        interactivity: {
+          detect_on: "canvas",
+          events: {
+            onhover: {
+              enable: true,
+              mode: "grab"
+            },
+            onclick: {
+              enable: true,
+              mode: "push"
+            },
+            resize: true
+          },
+          modes: {
+            grab: {
+              distance: 140,
+              line_linked: {
+                opacity: 0.5
+              }
+            },
+            push: {
+              particles_nb: 4
+            }
+          }
+        },
+        retina_detect: true
+      });
+
+      // Game data
+      const games = [
+        { name: "NZ:P", url: "games/nzp/", img: "nzp.png" }
+      ];
+
+      // Sort games alphabetically
+      games.sort((a, b) => a.name.localeCompare(b.name));
+
+      // Render games
+      const gameList = document.getElementById("game-list");
+      
+      games.forEach(game => {
+        const gameElement = document.createElement("div");
+        gameElement.className = "game";
+        gameElement.dataset.name = game.name;
+        
+        gameElement.innerHTML = `
+          <a href="${game.url}">
+            <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/${game.img}" alt="${game.name}" class="game-thumbnail" />
+            <span class="game-title">${game.name}</span>
+          </a>
+        `;
+        
+        gameList.appendChild(gameElement);
+      });
+
+      // Search functionality
+      const searchInput = document.getElementById("search");
+      
+      searchInput.addEventListener("input", () => {
+        const searchTerm = searchInput.value.toLowerCase();
+        const gameElements = document.querySelectorAll(".game");
+        let visibleCount = 0;
+        
+        gameElements.forEach(game => {
+          const gameName = game.dataset.name.toLowerCase();
+          if (gameName.includes(searchTerm)) {
+            game.style.display = "block";
+            visibleCount++;
+          } else {
+            game.style.display = "none";
+          }
+        });
+        
+        // Show no results message if needed
+        let noResults = document.querySelector(".no-results");
+        if (visibleCount === 0 && !noResults) {
+          noResults = document.createElement("div");
+          noResults.className = "no-results";
+          noResults.textContent = "No games found matching your search.";
+          gameList.appendChild(noResults);
+        } else if (visibleCount > 0 && noResults) {
+          noResults.remove();
+        }
+      });
+
+      // Image caching system
+      const baseLocal = `${window.location.origin}/img/`;
+      const baseCDN = "https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/";
+      const cacheKey = "imageAvailabilityCache_v2";
+      const cache = JSON.parse(localStorage.getItem(cacheKey) || "{}");
+
+      document.querySelectorAll("img.game-thumbnail").forEach(img => {
+        const fileName = img.src.split("/").pop();
+        const localUrl = baseLocal + fileName;
+        const cdnUrl = baseCDN + fileName;
+
+        if (cache[fileName] === "local") {
+          img.src = localUrl;
+          return;
+        }
+        if (cache[fileName] === "cdn") {
+          img.src = cdnUrl;
+          return;
+        }
+
+        // Test and cache result
+        fetch(localUrl, { method: "HEAD" })
+          .then(res => {
+            if (res.ok) {
+              img.src = localUrl;
+              cache[fileName] = "local";
+            } else {
+              img.src = cdnUrl;
+              cache[fileName] = "cdn";
+            }
+            localStorage.setItem(cacheKey, JSON.stringify(cache));
+          })
+          .catch(() => {
+            img.src = cdnUrl;
+            cache[fileName] = "cdn";
+            localStorage.setItem(cacheKey, JSON.stringify(cache));
+          });
+      });
+    }
+  </script>
+</body>
+</html>
