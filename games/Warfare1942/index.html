@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Warfare 1942</title>
+  <link rel="shortcut icon" href="TemplateData/favicon.ico">
+  <link rel="stylesheet" href="TemplateData/style.css">
+</head>
+
+<body class="dark">
+  <div id="unity-container" class="unity-desktop">
+    <canvas id="unity-canvas"></canvas>
+  </div>
+  <div id="loading-cover" style="display:none;">
+    <div id="unity-loading-bar">
+      <div id="unity-progress-bar-empty" style="display: none;">
+        <div id="unity-progress-bar-full"></div>
+      </div>
+      <div class="spinner"></div>
+    </div>
+  </div>
+
+<script>
+  const hideFullScreenButton = "";
+  const buildUrl = "Build";
+  const loaderUrl = buildUrl + "/WarfareWeb84.loader.js";
+
+  // List your parts here (exact filenames)
+  const dataParts = [
+    "data_part_0000.part",
+    "data_part_0001.part",
+    "data_part_0002.part",
+    "data_part_0003.part",
+    "data_part_0004.part",
+    "data_part_0005.part",
+    "data_part_0006.part",
+    "data_part_0007.part",
+    "data_part_0008.part",
+    "data_part_0009.part",
+    "data_part_0010.part",
+    "data_part_0011.part",
+    "data_part_0012.part"
+  ];
+
+  async function loadUnityData() {
+    const buffers = [];
+
+    for (let part of dataParts) {
+      const res = await fetch(buildUrl + "/" + part);
+      buffers.push(await res.arrayBuffer());
+    }
+
+    // Combine into one file
+    let total = buffers.reduce((a, b) => a + b.byteLength, 0);
+    let merged = new Uint8Array(total);
+
+    let offset = 0;
+    for (let buf of buffers) {
+      merged.set(new Uint8Array(buf), offset);
+      offset += buf.byteLength;
+    }
+
+    return new Blob([merged], { type: "application/octet-stream" });
+  }
+
+  const container = document.querySelector("#unity-container");
+  const canvas = document.querySelector("#unity-canvas");
+  const loadingCover = document.querySelector("#loading-cover");
+  const progressBarEmpty = document.querySelector("#unity-progress-bar-empty");
+  const progressBarFull = document.querySelector("#unity-progress-bar-full");
+  const spinner = document.querySelector('.spinner');
+
+  loadingCover.style.display = "";
+
+  let myGameInstance = null;
+
+  const script = document.createElement("script");
+  script.src = loaderUrl;
+
+  script.onload = async () => {
+    const dataBlob = await loadUnityData();
+    const dataUrl = URL.createObjectURL(dataBlob);
+
+    const config = {
+      dataUrl: dataUrl,
+      frameworkUrl: buildUrl + "/WarfareWeb84.framework.js.unityweb",
+      codeUrl: buildUrl + "/WarfareWeb84.wasm.unityweb",
+      streamingAssetsUrl: "StreamingAssets",
+      companyName: "Fahrenheit Dev",
+      productName: "Warfare 1942",
+      productVersion: "0.9.5",
+    };
+
+    createUnityInstance(canvas, config, (progress) => {
+      spinner.style.display = "none";
+      progressBarEmpty.style.display = "";
+      progressBarFull.style.width = `${100 * progress}%`;
+    }).then((unityInstance) => {
+      myGameInstance = unityInstance;
+      loadingCover.style.display = "none";
+    }).catch((message) => {
+      alert(message);
+    });
+  };
+
+  document.body.appendChild(script);
+</script>
+
+</body>
+
+</html>
