@@ -180,7 +180,8 @@
         InitYSDK();
         async function InitYSDK() {
             try {
-                if (LocalHost()) return;
+                        if (LocalHost())
+                StartUnityInstance_IfUnloaded();
 
                 console.log('Init Yandex SDK');
                 ysdk = await YaGames.init();
