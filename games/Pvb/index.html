@@ -7,6 +7,35 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
 <link rel="stylesheet" href="./style.css"/>
 <!-- Yandex Games SDK -->
+ <script>
+// Only create the dummy if YSDK doesn't already exist
+window.YaGames = {
+    init() {
+        return Promise.resolve({
+            features: {
+                LoadingAPI: {
+                    ready() { console.log("Dummy LoadingAPI.ready()"); }
+                }
+            },
+            auth: {
+                getProfileData() { return Promise.resolve(null); },
+                login() { return Promise.resolve(null); },
+            },
+            environment: {
+                i18n: {
+                    locale: "en"
+                }
+            },
+            feedback: { canReview: () => Promise.resolve({ value: false }) },
+            adv: {
+                showFullscreenAdv: async () => console.log("Dummy fullscreen ad"),
+                showRewardedVideo: async () => console.log("Dummy rewarded ad"),
+            }
+        });
+    }
+};
+</script>
+
 <script src="sdk.js"></script>
 <style>
         /* Убираем выделение по нажатию клавиш */
