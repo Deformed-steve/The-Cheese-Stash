@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cheese OS v6.6 | The Social Update</title>
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <style>
+        :root {
+            --bg-teal: #008080;
+            --win-gray: #c0c0c0;
+            --win-blue: #000080;
+            --win-blue-light: #1084d0;
+            
+            /* Discord / CheeseCord Palette */
+            --dc-dark: #36393f;
+            --dc-darker: #2f3136;
+            --dc-darkest: #202225;
+            --dc-light: #40444b;
+            --dc-accent: #5865f2;
+            --dc-green: #3ba55c;
+            --dc-red: #ed4245;
+            --dc-text: #dcddde;
+            --dc-text-muted: #72767d;
+        }
+
+        * { box-sizing: border-box; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; font-family: 'Tahoma', sans-serif; }
+
+        /* --- 3D INTERFACE --- */
+        #crosshair { position: absolute; top: 50%; left: 50%; width: 14px; height: 14px; border: 1px solid rgba(255,255,255,0.8); border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; z-index: 10; mix-blend-mode: difference; }
+        #hud { position: absolute; bottom: 20px; left: 20px; color: #0f0; background: rgba(0,0,0,0.8); padding: 15px; border-left: 5px solid #0f0; font-family: monospace; z-index: 5; pointer-events: none; }
+
+        /* --- MONITOR SYSTEM --- */
+        #monitor-wrapper {
+            display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 1100px; height: 800px; background: var(--bg-teal); border: 18px solid #222;
+            border-radius: 12px; box-shadow: 0 0 150px rgba(0,0,0,1); z-index: 100; overflow: hidden;
+        }
+
+        /* --- DESKTOP --- */
+        #desktop { width: 100%; height: calc(100% - 40px); display: grid; grid-template-columns: repeat(auto-fill, 100px); grid-template-rows: repeat(auto-fill, 110px); grid-auto-flow: column; padding: 30px; gap: 15px; }
+        .icon { width: 85px; height: 95px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; text-shadow: 2px 2px 3px #000; cursor: pointer; border: 1px solid transparent; }
+        .icon:hover { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); }
+        .icon span { font-size: 42px; filter: drop-shadow(2px 2px 2px #000); }
+        .icon label { font-size: 11px; margin-top: 6px; font-weight: bold; text-align: center; }
+
+        /* --- WINDOW MANAGER --- */
+        .window { position: absolute; background: var(--win-gray); border: 2px outset #fff; box-shadow: 5px 5px 25px rgba(0,0,0,0.6); display: none; flex-direction: column; min-width: 250px; }
+        .win-header { background: linear-gradient(90deg, var(--win-blue), var(--win-blue-light)); height: 30px; display: flex; align-items: center; justify-content: space-between; padding: 0 10px; color: white; font-weight: bold; font-size: 13px; cursor: move; }
+        .win-body { flex: 1; padding: 0; overflow: hidden; background: #2f3136; color: #fff; position: relative; display: flex; flex-direction: column; }
+        .win-controls { display: flex; gap: 4px; }
+        .win-btn { width: 22px; height: 20px; background: var(--win-gray); border: 1px outset #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #000; font-size: 12px; font-weight: bold; }
+        .win-btn:active { border-style: inset; padding: 1px 0 0 1px; }
+
+        /* --- TASKBAR --- */
+        #taskbar { position: absolute; bottom: 0; width: 100%; height: 40px; background: var(--win-gray); border-top: 2px solid #fff; display: flex; align-items: center; padding: 0 10px; z-index: 1001; }
+        #start-btn { height: 30px; padding: 0 12px; background: var(--win-gray); border: 2px outset #fff; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        #clock { margin-left: auto; border: 2px inset #fff; padding: 0 15px; height: 30px; display: flex; align-items: center; font-family: 'Courier New', monospace; font-weight: bold; font-size: 16px; background: #bbb; color: #000; }
+
+        /* --- APP STYLES --- */
+        /* Common */
+        canvas { display: block; background: #000; margin: 0 auto; image-rendering: pixelated; }
+        textarea { width: 100%; height: 90%; border: 2px inset #fff; font-family: serif; resize: none; color: black; background: white; padding: 5px; }
+
+        /* CheeseCord Specifics */
+        .dc-app { display: flex; width: 100%; height: 100%; font-family: 'Segoe UI', sans-serif; font-size: 14px; color: var(--dc-text); }
+        .dc-sidebar-mini { width: 70px; background: var(--dc-darkest); display: flex; flex-direction: column; align-items: center; padding-top: 10px; gap: 10px; }
+        .dc-sidebar-main { width: 220px; background: var(--dc-darker); display: flex; flex-direction: column; }
+        .dc-chat-area { flex: 1; background: var(--dc-dark); display: flex; flex-direction: column; position: relative; }
+        
+        .dc-icon { width: 48px; height: 48px; border-radius: 50%; background: var(--dc-dark); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; position: relative; overflow: hidden; }
+        .dc-icon:hover { border-radius: 16px; background: var(--dc-accent); }
+        .dc-icon img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .dc-friend-item { padding: 10px; margin: 5px 10px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 10px; }
+        .dc-friend-item:hover { background: var(--dc-light); }
+        .dc-friend-item.active { background: rgba(88, 101, 242, 0.3); color: #fff; }
+        
+        .dc-user-panel { height: 55px; background: #25272b; margin-top: auto; display: flex; align-items: center; padding: 0 10px; gap: 8px; }
+        .dc-avatar-small { width: 32px; height: 32px; border-radius: 50%; background: var(--dc-accent); position: relative; }
+        .dc-status-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--dc-green); position: absolute; bottom: -2px; right: -2px; border: 2px solid #25272b; }
+        
+        .dc-chat-msgs { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+        .dc-msg { display: flex; gap: 15px; }
+        .dc-msg-content h4 { margin: 0 0 5px 0; font-size: 15px; cursor: pointer; }
+        .dc-msg-content h4:hover { text-decoration: underline; }
+        .dc-msg-text { font-size: 14px; line-height: 1.4; color: #dcddde; }
+        .dc-input-box { padding: 15px; }
+        .dc-input { width: 100%; background: var(--dc-light); border: none; padding: 12px; border-radius: 8px; color: white; outline: none; }
+
+        /* Call Overlay */
+        .dc-call-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10; display: none; flex-direction: column; }
+        .dc-call-grid { flex: 1; display: flex; justify-content: center; align-items: center; gap: 20px; padding: 20px; flex-wrap: wrap; }
+        .dc-call-user { width: 200px; height: 200px; background: var(--dc-darker); border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; border: 2px solid transparent; }
+        .dc-call-user.speaking { border-color: var(--dc-green); }
+        .dc-call-avatar { width: 80px; height: 80px; border-radius: 50%; background: var(--dc-accent); margin-bottom: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        
+        /* Stream Overlay on Avatar */
+        .dc-stream-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); border-radius: 8px; display: none; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; z-index: 5; }
+        .dc-stream-overlay:hover { background: rgba(0,0,0,0.6); }
+        .dc-video-feed { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; background: #000; border-radius: 8px; display: none; z-index: 2; }
+
+        .dc-call-controls { height: 70px; background: #18191c; display: flex; justify-content: center; align-items: center; gap: 15px; }
+        .dc-ctrl-btn { width: 50px; height: 50px; border-radius: 50%; border: none; background: var(--dc-light); color: white; cursor: pointer; font-size: 20px; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
+        .dc-ctrl-btn:hover { background: #555; }
+        .dc-ctrl-btn.active { background: white; color: black; }
+        .dc-ctrl-btn.danger { background: var(--dc-red); }
+        .dc-ctrl-btn.danger:hover { background: #c03537; }
+
+        /* Incoming Call Popup */
+        .dc-popup { position: absolute; top: 20px; right: 20px; width: 250px; background: var(--dc-darkest); padding: 15px; border-radius: 8px; border: 1px solid var(--dc-green); box-shadow: 0 5px 20px rgba(0,0,0,0.5); z-index: 100; display: none; }
+        
+        /* Settings Modal */
+        .dc-modal { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 50; display: none; align-items: center; justify-content: center; }
+        .dc-modal-box { width: 400px; background: var(--dc-dark); padding: 20px; border-radius: 8px; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        .dc-color-picker { display: flex; gap: 10px; margin-top: 10px; }
+        .dc-color-opt { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; }
+        .dc-color-opt.selected { border-color: white; }
+
+        /* Minesweeper & Others */
+        .mine-grid { display: grid; grid-template-columns: repeat(10, 25px); gap: 1px; background: #888; border: 3px inset #fff; margin: 0 auto; width: fit-content; }
+        .mine-cell { width: 25px; height: 25px; background: #c0c0c0; border: 2px outset #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; font-family: monospace; font-size: 16px; color: black; }
+        .mine-cell.open { border: 1px solid #999; background: #ccc; }
+        
+        /* Camera App */
+        .cam-wrapper { display: flex; flex-direction: column; height: 100%; background: #111; }
+        video#cam-feed { width: 100%; flex: 1; background: #000; object-fit: cover; }
+        .cam-controls { height: 50px; display: flex; justify-content: center; align-items: center; gap: 15px; background: #222; }
+        .shutter-btn { width: 40px; height: 40px; border-radius: 50%; background: #fff; border: 4px solid #888; cursor: pointer; }
+        .shutter-btn:active { background: #ccc; }
+    </style>
+</head>
+<body>
+
+    <div id="crosshair"></div>
+    <div id="hud">
+        [W,A,S,D] Move | [MOUSE] Look<br>
+        [CLICK] Interaction / Power On PC<br>
+        [ESC] Release Cursor / Exit OS
+    </div>
+
+    <div id="monitor-wrapper">
+        <div id="desktop"></div>
+        <div id="taskbar">
+            <div id="start-btn" onclick="kernel.launch('terminal')"><b>🧀 Start</b></div>
+            <div id="clock">19:30:00</div>
+        </div>
+    </div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/",
+                "@tweenjs/tween.js": "https://unpkg.com/@tweenjs/tween.js@23.1.1/dist/tween.esm.js"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
+        import * as TWEEN from '@tweenjs/tween.js';
+
+        // --- 1. 3D WORLD ENGINE ---
+        let scene, camera, renderer, controls, clock = new THREE.Clock();
+        let pScreen, isSitting = false;
+
+        function init3D() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0a0a0a);
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 10, 30);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            const light = new THREE.PointLight(0xffffff, 100, 100);
+            light.position.set(0, 15, 10);
+            scene.add(light);
+            scene.add(new THREE.AmbientLight(0x404040));
+
+            // Desk & PC Setup
+            const desk = new THREE.Mesh(new THREE.BoxGeometry(25, 1, 12), new THREE.MeshStandardMaterial({color: 0x3d2b1f}));
+            desk.position.y = 5;
+            scene.add(desk);
+
+            const mon = new THREE.Mesh(new THREE.BoxGeometry(12, 8, 1), new THREE.MeshStandardMaterial({color: 0x1a1a1a}));
+            mon.position.set(0, 10, -2);
+            scene.add(mon);
+
+            pScreen = new THREE.Mesh(new THREE.PlaneGeometry(11.2, 7.2), new THREE.MeshBasicMaterial({color: 0x000000}));
+            pScreen.position.set(0, 10, -1.48);
+            scene.add(pScreen);
+
+            const pwr = new THREE.Mesh(new THREE.SphereGeometry(0.3), new THREE.MeshStandardMaterial({color: 0xff0000}));
+            pwr.position.set(8, 6, 2);
+            pwr.name = "POWER_BUTTON";
+            scene.add(pwr);
+
+            controls = new PointerLockControls(camera, document.body);
+            document.addEventListener('mousedown', (e) => {
+                if(!isSitting) {
+                    const ray = new THREE.Raycaster();
+                    ray.setFromCamera({x:0, y:0}, camera);
+                    const hits = ray.intersectObjects(scene.children);
+                    if(hits.length > 0 && hits[0].object.name === "POWER_BUTTON") {
+                        bootSequence();
+                    } else {
+                        controls.lock();
+                    }
+                }
+            });
+            animate();
+        }
+
+        function bootSequence() {
+            isSitting = true;
+            controls.unlock();
+            new TWEEN.Tween(camera.position).to({x:0, y:10, z:7}, 1500).easing(TWEEN.Easing.Quadratic.InOut)
+                .onUpdate(() => camera.lookAt(0, 10, -2))
+                .onComplete(() => {
+                    document.getElementById('monitor-wrapper').style.display = 'block';
+                    pScreen.material.color.setHex(0x008080);
+                    kernel.init();
+                }).start();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            TWEEN.update();
+            renderer.render(scene, camera);
+            if(isSitting) kernel.tick(clock.getDelta());
+        }
+
+        init3D();
+
+        // --- 2. KERNEL & APPS ---
+        window.kernel = {
+            running: false,
+            procs: new Map(),
+            zCounter: 1000,
+            fs: JSON.parse(localStorage.getItem('cheese_v6_fs')) || { 'readme.txt': 'Welcome to Cheese OS v6.6\nDiscord Clone with Customization and Calls added!' },
+
+            init: () => {
+                if(kernel.running) return;
+                kernel.running = true;
+                const desktop = document.getElementById('desktop');
+                const apps = [
+                    {id: 'cheesecord', name: 'CheeseCord', icon: '💬'},
+                    {id: 'mines', name: 'Minesweeper', icon: '💣'},
+                    {id: 'pong', name: 'Pong', icon: '🏓'},
+                    {id: 'breakout', name: 'Breakout', icon: '🧱'},
+                    {id: 'camera', name: 'Camera', icon: '📷'},
+                    {id: 'notepad', name: 'Notepad', icon: '📝'},
+                    {id: 'explorer', name: 'Files', icon: '📁'},
+                    {id: 'terminal', name: 'Terminal', icon: '📟'}
+                ];
+                apps.forEach(a => {
+                    const d = document.createElement('div');
+                    d.className = 'icon';
+                    d.onclick = () => kernel.launch(a.id);
+                    d.innerHTML = `<span>${a.icon}</span><label>${a.name}</label>`;
+                    desktop.appendChild(d);
+                });
+            },
+
+            tick: (dt) => {
+                const now = new Date();
+                document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB');
+                kernel.procs.forEach(p => { if(p.onTick) p.onTick(dt); });
+            },
+
+            launch: (id) => {
+                if(kernel.procs.has(id)) { kernel.focus(id); return; }
+                const app = APP_DATA[id];
+                const win = document.createElement('div');
+                win.id = `win-${id}`;
+                win.className = 'window';
+                win.style.width = (app.w || 400) + 'px';
+                win.style.height = (app.h || 'auto') + 'px';
+                win.style.left = (50 + (kernel.procs.size * 30)) + 'px';
+                win.style.top = (50 + (kernel.procs.size * 30)) + 'px';
+                win.style.display = 'flex';
+                win.style.zIndex = ++kernel.zCounter;
+
+                win.innerHTML = `
+                    <div class="win-header" id="head-${id}">
+                        <span>${app.name}</span>
+                        <div class="win-controls">
+                            <div class="win-btn" onclick="kernel.kill('${id}')">X</div>
+                        </div>
+                    </div>
+                    <div class="win-body ${app.bodyCls || ''}" id="body-${id}">${app.html}</div>
+                `;
+                document.getElementById('monitor-wrapper').appendChild(win);
+                kernel.makeDraggable(win, id);
+                const proc = { id, win, onTick: null };
+                kernel.procs.set(id, proc);
+                if(app.init) app.init(proc);
+            },
+
+            kill: (id) => {
+                const el = document.getElementById(`win-${id}`);
+                if(el) el.remove();
+                if(id === 'cheesecord' && window.discordState) { 
+                    // Optional: Destroy peer on close, or leave running background? 
+                    // For safety, we close call media tracks.
+                    if(window.discordState.localStream) {
+                        window.discordState.localStream.getTracks().forEach(t=>t.stop());
+                    }
+                }
+                kernel.procs.delete(id);
+            },
+
+            focus: (id) => { document.getElementById(`win-${id}`).style.zIndex = ++kernel.zCounter; },
+            makeDraggable: (el, id) => {
+                const head = document.getElementById(`head-${id}`);
+                let x=0, y=0, x1=0, y1=0;
+                head.onmousedown = (e) => {
+                    x1 = e.clientX; y1 = e.clientY;
+                    document.onmousemove = (ev) => {
+                        x = x1 - ev.clientX; y = y1 - ev.clientY;
+                        x1 = ev.clientX; y1 = ev.clientY;
+                        el.style.top = (el.offsetTop - y) + "px";
+                        el.style.left = (el.offsetLeft - x) + "px";
+                    };
+                    document.onmouseup = () => document.onmousemove = null;
+                };
+                el.onmousedown = () => kernel.focus(id);
+            }
+        };
+
+        // --- 3. APP REGISTRY ---
+        const APP_DATA = {
+
+            // --- CHEESECORD V2 (DISCORD CLONE) ---
+            cheesecord: {
+                name: "CheeseCord", w: 800, h: 550,
+                html: `
+                    <div id="dc-popup" class="dc-popup">
+                        <div style="font-weight:bold; margin-bottom:10px;">📞 Incoming Call</div>
+                        <div id="dc-popup-name">Unknown</div>
+                        <div style="display:flex; gap:10px; margin-top:10px;">
+                            <button class="dc-btn" style="background:var(--dc-green); color:white; border:none; padding:5px; flex:1" onclick="window.dcAnswer()">Answer</button>
+                            <button class="dc-btn" style="background:var(--dc-red); color:white; border:none; padding:5px; flex:1" onclick="window.dcReject()">Decline</button>
+                        </div>
+                    </div>
+
+                    <div id="dc-settings" class="dc-modal">
+                        <div class="dc-modal-box">
+                            <h2>User Settings</h2>
+                            <label>Username</label>
+                            <input id="dc-set-name" class="dc-input" style="margin-bottom:10px;">
+                            <label>Avatar Color</label>
+                            <div class="dc-color-picker" id="dc-color-pick">
+                                <div class="dc-color-opt" style="background:#5865f2" onclick="window.dcSetColor('#5865f2')"></div>
+                                <div class="dc-color-opt" style="background:#ed4245" onclick="window.dcSetColor('#ed4245')"></div>
+                                <div class="dc-color-opt" style="background:#3ba55c" onclick="window.dcSetColor('#3ba55c')"></div>
+                                <div class="dc-color-opt" style="background:#faa61a" onclick="window.dcSetColor('#faa61a')"></div>
+                                <div class="dc-color-opt" style="background:#eb459e" onclick="window.dcSetColor('#eb459e')"></div>
+                            </div>
+                            <br>
+                            <button class="dc-btn" style="padding:10px; background:var(--dc-accent); color:white; border:none;" onclick="window.dcSaveSettings()">Save Changes</button>
+                            <button class="dc-btn" style="padding:10px; background:transparent; color:white; border:none;" onclick="document.getElementById('dc-settings').style.display='none'">Cancel</button>
+                        </div>
+                    </div>
+
+                    <div class="dc-app">
+                        <div class="dc-sidebar-mini">
+                            <div class="dc-icon" title="Home">🧀</div>
+                            <hr style="width:50%; border:1px solid #444">
+                            <div class="dc-icon" style="background:#36393f">+</div>
+                        </div>
+
+                        <div class="dc-sidebar-main">
+                            <div style="padding:15px; border-bottom:1px solid #202225; font-weight:bold;">CheeseCord</div>
+                            <div style="padding:10px;">
+                                <input id="dc-add-code" placeholder="Enter Friend ID" class="dc-input" style="font-size:12px; height:30px;">
+                                <button onclick="window.dcAddFriend()" style="width:100%; margin-top:5px; background:var(--dc-green); border:none; color:white; cursor:pointer; padding:5px; border-radius:3px;">Add Friend</button>
+                            </div>
+                            <div style="font-size:11px; font-weight:bold; color:#8e9297; padding:10px 10px 5px 10px;">DIRECT MESSAGES</div>
+                            <div id="dc-friend-list" style="flex:1; overflow-y:auto;"></div>
+                            
+                            <div class="dc-user-panel">
+                                <div class="dc-avatar-small" id="dc-my-avatar"><div class="dc-status-dot"></div></div>
+                                <div style="flex:1; overflow:hidden;">
+                                    <div style="font-weight:bold; font-size:13px;" id="dc-my-name">Loading...</div>
+                                    <div style="font-size:10px; color:#b9bbbe; cursor:pointer;" id="dc-my-id" onclick="navigator.clipboard.writeText(this.innerText); alert('ID Copied')">#0000</div>
+                                </div>
+                                <div style="cursor:pointer;" onclick="document.getElementById('dc-settings').style.display='flex'">⚙️</div>
+                            </div>
+                        </div>
+
+                        <div class="dc-chat-area">
+                            <div id="dc-call-ui" class="dc-call-overlay">
+                                <div class="dc-call-grid">
+                                    <div class="dc-call-user">
+                                        <div class="dc-call-avatar" id="dc-call-av-me"></div>
+                                        <b id="dc-call-name-me">Me</b>
+                                        <video id="dc-vid-local" class="dc-video-feed" muted autoplay></video>
+                                    </div>
+                                    <div class="dc-call-user">
+                                        <div class="dc-call-avatar" id="dc-call-av-them"></div>
+                                        <b id="dc-call-name-them">Friend</b>
+                                        <div id="dc-watch-overlay" class="dc-stream-overlay" onclick="window.dcWatchStream()">
+                                            <span style="font-size:24px;">📺</span>
+                                            <span style="font-weight:bold; margin-top:5px;">Watch Stream</span>
+                                        </div>
+                                        <video id="dc-vid-remote" class="dc-video-feed" autoplay></video>
+                                    </div>
+                                </div>
+                                <div class="dc-call-controls">
+                                    <button class="dc-ctrl-btn" onclick="window.dcToggleMic()" id="btn-mic">🎙️</button>
+                                    <button class="dc-ctrl-btn" onclick="window.dcToggleDeafen()" id="btn-deaf">🎧</button>
+                                    <button class="dc-ctrl-btn" onclick="window.dcShareCam()" id="btn-cam">📷</button>
+                                    <button class="dc-ctrl-btn" onclick="window.dcShareScreen()" id="btn-scr">🖥️</button>
+                                    <button class="dc-ctrl-btn danger" onclick="window.dcHangup()">📞</button>
+                                </div>
+                            </div>
+
+                            <div style="height:50px; border-bottom:1px solid #26272d; display:flex; align-items:center; padding:0 20px; justify-content:space-between;">
+                                <div style="font-weight:bold; display:flex; align-items:center; gap:10px;">
+                                    <span style="font-size:20px; color:#8e9297;">@</span>
+                                    <span id="dc-header-name">Select a Friend</span>
+                                </div>
+                                <div id="dc-header-icons" style="display:none; gap:15px; color:#b9bbbe;">
+                                    <span style="cursor:pointer;" title="Start Voice Call" onclick="window.dcStartCall()">📞</span>
+                                </div>
+                            </div>
+
+                            <div id="dc-msg-feed" class="dc-chat-msgs"></div>
+                            
+                            <div class="dc-input-box">
+                                <input id="dc-msg-input" class="dc-input" placeholder="Message @Friend" onkeypress="if(event.key==='Enter') window.dcSend()">
+                            </div>
+                        </div>
+                    </div>
+                `,
+                init: (p) => {
+                    // --- SETUP STATE ---
+                    let userSettings = JSON.parse(localStorage.getItem('cheese_dc_user')) || { 
+                        name: 'User_' + Math.floor(Math.random()*999), 
+                        color: '#5865f2' 
+                    };
+
+                    if(!window.discordState) {
+                        window.discordState = {
+                            peer: new Peer(),
+                            me: userSettings,
+                            friends: {}, // { id: { conn, name, color, msgs: [] } }
+                            activeFriend: null,
+                            callState: 'idle', // idle, calling, connected
+                            localStream: null,
+                            remoteStream: null,
+                            mediaConn: null, // The P2P media connection
+                            screenConn: null // Secondary P2P for screen
+                        };
+
+                        const ds = window.discordState;
+
+                        // -- PeerJS Events --
+                        ds.peer.on('open', (id) => {
+                            document.getElementById('dc-my-id').innerText = id;
+                            document.getElementById('dc-my-name').innerText = ds.me.name;
+                            document.getElementById('dc-my-avatar').style.background = ds.me.color;
+                            document.getElementById('dc-call-av-me').style.background = ds.me.color;
+                        });
+
+                        ds.peer.on('connection', (conn) => { handleDataConn(conn); });
+
+                        ds.peer.on('call', (call) => {
+                            // Logic: If metadata says 'screen', it's a stream add-on
+                            if(call.metadata && call.metadata.type === 'screen') {
+                                call.answer(); // auto answer screen share
+                                call.on('stream', (stream) => {
+                                    const vid = document.getElementById('dc-vid-remote');
+                                    vid.srcObject = stream;
+                                    // Don't show yet, wait for user to click "Watch"
+                                    document.getElementById('dc-watch-overlay').style.display = 'flex';
+                                });
+                            } else {
+                                // It's a regular call (Voice)
+                                // We don't auto-answer voice, handled via data signal first usually
+                                // But for simplicity, we assume 'Answer' button was clicked which triggered getUserMedia
+                                // Wait, if we use peer.call() directly, we need to answer.
+                                // In this flow: Data 'call_request' -> User clicks Answer -> we send 'call_accept' -> Caller initiates peer.call
+                                call.answer(ds.localStream);
+                                call.on('stream', (remStream) => {
+                                    // Audio stream
+                                    const aud = document.createElement('audio');
+                                    aud.srcObject = remStream;
+                                    aud.autoplay = true;
+                                    ds.remoteStream = remStream;
+                                });
+                                ds.mediaConn = call;
+                            }
+                        });
+                    }
+
+                    const ds = window.discordState;
+
+                    // --- FUNCTIONS ---
+
+                    function handleDataConn(conn) {
+                        if(!ds.friends[conn.peer]) {
+                            ds.friends[conn.peer] = { conn: conn, name: 'Unknown', color:'#gray', msgs:[] };
+                        }
+                        const f = ds.friends[conn.peer];
+
+                        conn.on('open', () => {
+                            conn.send({ type: 'handshake', name: ds.me.name, color: ds.me.color });
+                            renderFriends();
+                        });
+
+                        conn.on('data', (data) => {
+                            if(data.type === 'handshake') {
+                                f.name = data.name; f.color = data.color;
+                                renderFriends();
+                            }
+                            if(data.type === 'msg') {
+                                f.msgs.push({ u: f.name, c: f.color, txt: data.txt });
+                                if(ds.activeFriend === conn.peer) renderChat();
+                            }
+                            // Call Signaling
+                            if(data.type === 'call_request') {
+                                if(ds.callState !== 'idle') {
+                                    conn.send({type: 'call_busy'});
+                                } else {
+                                    document.getElementById('dc-popup').style.display = 'block';
+                                    document.getElementById('dc-popup-name').innerText = f.name;
+                                    ds.incomingCallID = conn.peer;
+                                }
+                            }
+                            if(data.type === 'call_accept') {
+                                // User accepted, start media
+                                startMediaCall(conn.peer);
+                            }
+                            if(data.type === 'call_reject') {
+                                alert("Call Declined");
+                                resetCallUI();
+                            }
+                            if(data.type === 'hangup') {
+                                resetCallUI();
+                            }
+                            if(data.type === 'stream_notify') {
+                                // They started sharing screen/cam
+                                document.getElementById('dc-watch-overlay').style.display = 'flex';
+                                document.getElementById('dc-watch-overlay').innerHTML = `<span style="font-size:24px;">📺</span><span style="font-weight:bold;">Watch ${data.mode}</span>`;
+                            }
+                            if(data.type === 'stream_stop') {
+                                document.getElementById('dc-watch-overlay').style.display = 'none';
+                                document.getElementById('dc-vid-remote').style.display = 'none';
+                            }
+                        });
+                    }
+
+                    // --- UI ACTIONS ---
+
+                    window.dcAddFriend = () => {
+                        const id = document.getElementById('dc-add-code').value;
+                        if(id && id !== ds.peer.id) {
+                            const conn = ds.peer.connect(id);
+                            handleDataConn(conn);
+                            document.getElementById('dc-add-code').value = '';
+                        }
+                    };
+
+                    window.dcSend = () => {
+                        const txt = document.getElementById('dc-msg-input').value;
+                        if(!txt || !ds.activeFriend) return;
+                        const f = ds.friends[ds.activeFriend];
+                        f.conn.send({type: 'msg', txt: txt});
+                        f.msgs.push({ u: ds.me.name, c: ds.me.color, txt: txt });
+                        renderChat();
+                        document.getElementById('dc-msg-input').value = '';
+                    };
+
+                    function renderFriends() {
+                        const list = document.getElementById('dc-friend-list');
+                        list.innerHTML = '';
+                        Object.keys(ds.friends).forEach(fid => {
+                            const f = ds.friends[fid];
+                            const el = document.createElement('div');
+                            el.className = `dc-friend-item ${ds.activeFriend===fid ? 'active':''}`;
+                            el.innerHTML = `<div class="dc-avatar-small" style="background:${f.color}"></div> <span>${f.name}</span>`;
+                            el.onclick = () => {
+                                ds.activeFriend = fid;
+                                document.getElementById('dc-header-name').innerText = f.name;
+                                document.getElementById('dc-header-icons').style.display = 'flex';
+                                renderFriends();
+                                renderChat();
+                            };
+                            list.appendChild(el);
+                        });
+                    }
+
+                    function renderChat() {
+                        const feed = document.getElementById('dc-msg-feed');
+                        feed.innerHTML = '';
+                        const msgs = ds.friends[ds.activeFriend].msgs;
+                        msgs.forEach(m => {
+                            const d = document.createElement('div');
+                            d.className = 'dc-msg';
+                            d.innerHTML = `
+                                <div class="dc-avatar-small" style="background:${m.c}; width:40px; height:40px;"></div>
+                                <div class="dc-msg-content">
+                                    <h4>${m.u}</h4>
+                                    <div class="dc-msg-text">${m.txt}</div>
+                                </div>
+                            `;
+                            feed.appendChild(d);
+                        });
+                        feed.scrollTop = feed.scrollHeight;
+                    }
+
+                    // --- SETTINGS ---
+                    window.dcSetColor = (c) => {
+                        document.querySelectorAll('.dc-color-opt').forEach(d => d.classList.remove('selected'));
+                        // Visual selection logic would go here
+                        ds.tempColor = c;
+                    };
+                    window.dcSaveSettings = () => {
+                        const newName = document.getElementById('dc-set-name').value;
+                        if(newName) ds.me.name = newName;
+                        if(ds.tempColor) ds.me.color = ds.tempColor;
+                        localStorage.setItem('cheese_dc_user', JSON.stringify(ds.me));
+                        // Update UI
+                        document.getElementById('dc-my-name').innerText = ds.me.name;
+                        document.getElementById('dc-my-avatar').style.background = ds.me.color;
+                        document.getElementById('dc-settings').style.display = 'none';
+                        // Resend handshake to friends
+                        Object.values(ds.friends).forEach(f => f.conn.send({type:'handshake', name:ds.me.name, color:ds.me.color}));
+                    };
+
+                    // --- CALLING LOGIC ---
+
+                    window.dcStartCall = () => {
+                        if(!ds.activeFriend) return;
+                        const f = ds.friends[ds.activeFriend];
+                        f.conn.send({type: 'call_request'});
+                        // UI: Calling...
+                        enterCallUI(ds.activeFriend);
+                    };
+
+                    window.dcAnswer = async () => {
+                        document.getElementById('dc-popup').style.display = 'none';
+                        const callerId = ds.incomingCallID;
+                        const f = ds.friends[callerId];
+                        f.conn.send({type: 'call_accept'});
+                        
+                        // Get Mic
+                        ds.localStream = await navigator.mediaDevices.getUserMedia({audio: true});
+                        enterCallUI(callerId);
+                    };
+
+                    window.dcReject = () => {
+                        document.getElementById('dc-popup').style.display = 'none';
+                        if(ds.incomingCallID && ds.friends[ds.incomingCallID]) {
+                            ds.friends[ds.incomingCallID].conn.send({type: 'call_reject'});
+                        }
+                    };
+
+                    async function startMediaCall(fid) {
+                        // Initiator gets mic then calls
+                        ds.localStream = await navigator.mediaDevices.getUserMedia({audio: true});
+                        const call = ds.peer.call(fid, ds.localStream);
+                        ds.mediaConn = call;
+                        call.on('stream', (remStream) => {
+                            // Audio
+                            const aud = document.createElement('audio');
+                            aud.srcObject = remStream;
+                            aud.autoplay = true;
+                            ds.remoteStream = remStream;
+                        });
+                    }
+
+                    function enterCallUI(fid) {
+                        ds.callState = 'connected';
+                        const f = ds.friends[fid];
+                        document.getElementById('dc-call-ui').style.display = 'flex';
+                        document.getElementById('dc-call-name-me').innerText = ds.me.name;
+                        document.getElementById('dc-call-av-me').style.background = ds.me.color;
+                        document.getElementById('dc-call-name-them').innerText = f.name;
+                        document.getElementById('dc-call-av-them').style.background = f.color;
+                    }
+
+                    window.dcHangup = () => {
+                        const f = ds.friends[ds.activeFriend || ds.incomingCallID];
+                        if(f) f.conn.send({type: 'hangup'});
+                        resetCallUI();
+                    };
+
+                    function resetCallUI() {
+                        ds.callState = 'idle';
+                        document.getElementById('dc-call-ui').style.display = 'none';
+                        document.getElementById('dc-vid-local').srcObject = null;
+                        document.getElementById('dc-vid-remote').srcObject = null;
+                        document.getElementById('dc-watch-overlay').style.display = 'none';
+                        
+                        if(ds.localStream) ds.localStream.getTracks().forEach(t=>t.stop());
+                        if(ds.mediaConn) ds.mediaConn.close();
+                        if(ds.screenConn) ds.screenConn.close();
+                        ds.localStream = null;
+                    }
+
+                    // --- IN-CALL CONTROLS ---
+
+                    window.dcToggleMic = () => {
+                        if(ds.localStream) {
+                            const trk = ds.localStream.getAudioTracks()[0];
+                            trk.enabled = !trk.enabled;
+                            document.getElementById('btn-mic').classList.toggle('danger');
+                        }
+                    };
+                    
+                    window.dcToggleDeafen = () => {
+                        // Hacky way: mute the created audio element in DOM (not tracked here perfectly) 
+                        // Simplified: Toggle button visual
+                        document.getElementById('btn-deaf').classList.toggle('danger');
+                    };
+
+                    window.dcShareScreen = async () => {
+                        // Initiate secondary call with screen stream
+                        try {
+                            const stream = await navigator.mediaDevices.getDisplayMedia({video:true});
+                            // Show local preview
+                            const vid = document.getElementById('dc-vid-local');
+                            vid.style.display = 'block';
+                            vid.srcObject = stream;
+                            
+                            // Call peer with this stream
+                            const f = ds.friends[ds.activeFriend || ds.incomingCallID];
+                            const call = ds.peer.call(ds.activeFriend || ds.incomingCallID, stream, {metadata: {type: 'screen'}});
+                            ds.screenConn = call;
+                            
+                            // Notify peer to show "Watch" button
+                            f.conn.send({type: 'stream_notify', mode: 'Screen'});
+                            
+                            document.getElementById('btn-scr').classList.add('active');
+                            
+                            stream.getVideoTracks()[0].onended = () => {
+                                // Stop sharing
+                                call.close();
+                                vid.style.display = 'none';
+                                f.conn.send({type: 'stream_stop'});
+                                document.getElementById('btn-scr').classList.remove('active');
+                            };
+                        } catch(e) { console.error(e); }
+                    };
+
+                    window.dcShareCam = async () => {
+                        try {
+                            const stream = await navigator.mediaDevices.getUserMedia({video:true});
+                            const vid = document.getElementById('dc-vid-local');
+                            vid.style.display = 'block';
+                            vid.srcObject = stream;
+                            
+                            const f = ds.friends[ds.activeFriend || ds.incomingCallID];
+                            const call = ds.peer.call(ds.activeFriend || ds.incomingCallID, stream, {metadata: {type: 'screen'}}); // reuse logic
+                            ds.screenConn = call;
+                            f.conn.send({type: 'stream_notify', mode: 'Camera'});
+                            document.getElementById('btn-cam').classList.add('active');
+                        } catch(e) {}
+                    };
+                    
+                    window.dcWatchStream = () => {
+                        document.getElementById('dc-watch-overlay').style.display = 'none';
+                        document.getElementById('dc-vid-remote').style.display = 'block';
+                    };
+                }
+            },
+
+            // --- OLDER APPS (UNCHANGED) ---
+            mines: {
+                name: "Minesweeper", w: 290, h: 320,
+                html: `<div style="padding:10px; background:#c0c0c0; text-align:center;"><button onclick="kernel.launch('mines')">🙂 Reset</button></div><div class="mine-grid" id="m-grid"></div>`,
+                init: (p) => {
+                    const grid = document.getElementById('m-grid');
+                    let cells = [], gameOver = false;
+                    const bombs = Array(100).fill(false);
+                    for(let i=0; i<12; i++) bombs[Math.floor(Math.random()*100)] = true;
+                    for(let i=0; i<100; i++) {
+                        const div = document.createElement('div'); div.className = 'mine-cell';
+                        div.onclick = () => {
+                            if(gameOver || div.classList.contains('open')) return;
+                            if(bombs[i]) { div.style.background='red'; div.innerHTML='💣'; alert('BOOM'); gameOver=true; }
+                            else { 
+                                let n = 0;
+                                const x=i%10, y=Math.floor(i/10);
+                                for(let dy=-1;dy<=1;dy++) for(let dx=-1;dx<=1;dx++) {
+                                    if(x+dx>=0 && x+dx<10 && y+dy>=0 && y+dy<10 && bombs[(y+dy)*10+(x+dx)]) n++;
+                                }
+                                div.className='mine-cell open'; if(n>0) { div.innerText=n; div.style.color=['','blue','green','red'][n]||'black'; }
+                            }
+                        };
+                        grid.appendChild(div);
+                    }
+                }
+            },
+            pong: {
+                name: "Pong", w: 420, h: 340,
+                html: `<canvas id="pong-cvs" width="400" height="300"></canvas>`,
+                init: (p) => {
+                    const ctx = document.getElementById('pong-cvs').getContext('2d');
+                    let ball = {x:200, y:150, vx:4, vy:4}, p2={y:110};
+                    p.onTick = () => {
+                        ball.x+=ball.vx; ball.y+=ball.vy;
+                        if(ball.y<0||ball.y>300) ball.vy*=-1;
+                        if(ball.x<0||ball.x>400) { ball.x=200; ball.vx*=-1; }
+                        if(ball.y>p2.y+40) p2.y+=3; else p2.y-=3; // AI
+                        ctx.fillStyle='black'; ctx.fillRect(0,0,400,300);
+                        ctx.fillStyle='white'; ctx.fillRect(380,p2.y,10,80); ctx.fillRect(ball.x,ball.y,10,10);
+                    };
+                }
+            },
+            breakout: {
+                name: "Breakout", w: 320, h: 440,
+                html: `<canvas id="brk-cvs" width="300" height="400"></canvas>`,
+                init: (p) => {
+                    const ctx = document.getElementById('brk-cvs').getContext('2d');
+                    let b={x:150,y:300,vx:3,vy:-3}, pd={x:125};
+                    let brks = Array(40).fill(1).map((_,i)=>({x:(i%8)*37+2, y:Math.floor(i/8)*20+30, s:1}));
+                    document.onkeydown = (e) => { if(e.key=='ArrowLeft') pd.x-=20; if(e.key=='ArrowRight') pd.x+=20; };
+                    p.onTick = () => {
+                        b.x+=b.vx; b.y+=b.vy;
+                        if(b.x<0||b.x>300) b.vx*=-1; if(b.y<0) b.vy*=-1;
+                        if(b.y>380 && b.x>pd.x && b.x<pd.x+50) b.vy*=-1;
+                        if(b.y>400) { b.x=150; b.y=300; b.vy=-3; }
+                        ctx.fillStyle='#111'; ctx.fillRect(0,0,300,400);
+                        ctx.fillStyle='cyan'; ctx.fillRect(pd.x,380,50,10);
+                        ctx.fillStyle='white'; ctx.beginPath(); ctx.arc(b.x,b.y,5,0,7); ctx.fill();
+                        brks.forEach(k=>{ 
+                            if(k.s){ 
+                                ctx.fillStyle='orange'; ctx.fillRect(k.x,k.y,35,18); 
+                                if(b.x>k.x && b.x<k.x+35 && b.y>k.y && b.y<k.y+18) { k.s=0; b.vy*=-1; }
+                            } 
+                        });
+                    }
+                }
+            },
+            camera: {
+                name: "Camera", w: 500, h: 450,
+                html: `<div class="cam-wrapper"><video id="cam-feed" autoplay></video><div class="cam-controls"><button onclick="window.startCam()">Power</button></div></div>`,
+                init: (p) => {
+                    window.startCam = async () => { document.getElementById('cam-feed').srcObject = await navigator.mediaDevices.getUserMedia({video:true}); };
+                }
+            },
+            notepad: {
+                name: "Cheese Notepad", w: 400,
+                html: `File: <input id="np-name" style="width:50%" value="note.txt"> <button onclick="window.saveFile()">Save</button><textarea id="np-box"></textarea>`,
+                init: (p) => {
+                    window.saveFile = () => { kernel.fs[document.getElementById('np-name').value] = document.getElementById('np-box').value; localStorage.setItem('cheese_v6_fs', JSON.stringify(kernel.fs)); alert('Saved.'); };
+                }
+            },
+            explorer: {
+                name: "File Explorer", w: 300, html: `<div id="explorer-list"></div>`,
+                init: (p) => {
+                    const l = document.getElementById('explorer-list');
+                    p.onTick = () => {
+                        l.innerHTML='';
+                        Object.keys(kernel.fs).forEach(k=>{
+                            const d=document.createElement('div'); d.innerText='📄 '+k; d.style.padding='5px'; d.style.borderBottom='1px solid #ccc';
+                            d.onclick=()=>{ kernel.launch('notepad'); setTimeout(()=>{ document.getElementById('np-name').value=k; document.getElementById('np-box').value=kernel.fs[k];},100); };
+                            l.appendChild(d);
+                        });
+                    }
+                }
+            },
+            terminal: {
+                name: "Root Console", bodyCls: "term-box", w: 500,
+                html: `CheeseOS v6.6 [root@cheese ~]# _`, init: (p) => {}
+            }
+        };
+    </script>
+</body>
+</html>
