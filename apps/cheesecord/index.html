@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Cheese OS v6.6 | The Social Update</title>
+    <title>Cheese OS v6.7 | The Social Update</title>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <style>
         :root {
@@ -75,9 +75,14 @@
         .dc-friend-item { padding: 10px; margin: 5px 10px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 10px; }
         .dc-friend-item:hover { background: var(--dc-light); }
         .dc-friend-item.active { background: rgba(88, 101, 242, 0.3); color: #fff; }
+        .dc-friend-item.unread { background: rgba(88, 101, 242, 0.15); border-left: 3px solid var(--dc-accent); }
+        .dc-friend-item.unread .unread-badge { display: block; }
+        
+        .unread-badge { display: none; position: absolute; right: 10px; background: var(--dc-accent); color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; display: flex; align-items: center; justify-content: center; }
         
         .dc-user-panel { height: 55px; background: #25272b; margin-top: auto; display: flex; align-items: center; padding: 0 10px; gap: 8px; }
-        .dc-avatar-small { width: 32px; height: 32px; border-radius: 50%; background: var(--dc-accent); position: relative; }
+        .dc-avatar-small { width: 32px; height: 32px; border-radius: 50%; position: relative; overflow: hidden; }
+        .dc-avatar-small img { width: 100%; height: 100%; object-fit: cover; }
         .dc-status-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--dc-green); position: absolute; bottom: -2px; right: -2px; border: 2px solid #25272b; }
         
         .dc-chat-msgs { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
@@ -88,12 +93,17 @@
         .dc-input-box { padding: 15px; }
         .dc-input { width: 100%; background: var(--dc-light); border: none; padding: 12px; border-radius: 8px; color: white; outline: none; }
 
+        /* Chat Background */
+        .dc-chat-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.1; pointer-events: none; z-index: 0; }
+        .dc-chat-bg-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(0,0,0,0.7), rgba(0,0,0,0.4)); pointer-events: none; z-index: 1; }
+
         /* Call Overlay */
         .dc-call-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10; display: none; flex-direction: column; }
         .dc-call-grid { flex: 1; display: flex; justify-content: center; align-items: center; gap: 20px; padding: 20px; flex-wrap: wrap; }
         .dc-call-user { width: 200px; height: 200px; background: var(--dc-darker); border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; border: 2px solid transparent; }
         .dc-call-user.speaking { border-color: var(--dc-green); }
-        .dc-call-avatar { width: 80px; height: 80px; border-radius: 50%; background: var(--dc-accent); margin-bottom: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .dc-call-avatar { width: 80px; height: 80px; border-radius: 50%; margin-bottom: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); overflow: hidden; }
+        .dc-call-avatar img { width: 100%; height: 100%; object-fit: cover; }
         
         /* Stream Overlay on Avatar */
         .dc-stream-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); border-radius: 8px; display: none; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; z-index: 5; }
@@ -113,9 +123,35 @@
         /* Settings Modal */
         .dc-modal { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 50; display: none; align-items: center; justify-content: center; }
         .dc-modal-box { width: 400px; background: var(--dc-dark); padding: 20px; border-radius: 8px; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
-        .dc-color-picker { display: flex; gap: 10px; margin-top: 10px; }
+        .dc-color-picker { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
         .dc-color-opt { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; }
         .dc-color-opt.selected { border-color: white; }
+        
+        /* Profile Picture Upload */
+        .dc-avatar-upload { margin: 15px 0; }
+        .dc-avatar-preview { width: 100px; height: 100px; border-radius: 50%; margin: 10px auto; overflow: hidden; border: 3px solid var(--dc-accent); }
+        .dc-avatar-preview img { width: 100%; height: 100%; object-fit: cover; }
+        
+        /* Background Settings */
+        .dc-bg-options { display: flex; gap: 10px; margin: 10px 0; flex-wrap: wrap; }
+        .dc-bg-option { width: 80px; height: 60px; border-radius: 5px; overflow: hidden; cursor: pointer; border: 2px solid transparent; }
+        .dc-bg-option.selected { border-color: var(--dc-accent); }
+        .dc-bg-option img { width: 100%; height: 100%; object-fit: cover; }
+        
+        /* Group Management */
+        .dc-group-modal { width: 500px; max-height: 80vh; overflow-y: auto; }
+        .dc-group-member { display: flex; align-items: center; justify-content: space-between; padding: 8px; border-bottom: 1px solid var(--dc-light); }
+        .dc-group-member select { background: var(--dc-dark); color: white; border: 1px solid var(--dc-light); padding: 3px; }
+        
+        /* Flappy Bird Game Overlay */
+        #flappy-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        #flappy-overlay .close-btn { position: absolute; top: 20px; right: 20px; background: var(--dc-red); color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 16px; }
+        #flappy-canvas { background: #4ec0ca; display: block; margin: 20px auto; border: 3px solid #333; }
+        .flappy-controls { margin-top: 20px; color: white; text-align: center; }
+        .flappy-controls button { background: var(--dc-accent); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; margin: 0 10px; }
+
+        /* Notification Badge */
+        .notification-badge { position: absolute; top: -5px; right: -5px; background: var(--dc-red); color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
 
         /* Minesweeper & Others */
         .mine-grid { display: grid; grid-template-columns: repeat(10, 25px); gap: 1px; background: #888; border: 3px inset #fff; margin: 0 auto; width: fit-content; }
@@ -128,6 +164,38 @@
         .cam-controls { height: 50px; display: flex; justify-content: center; align-items: center; gap: 15px; background: #222; }
         .shutter-btn { width: 40px; height: 40px; border-radius: 50%; background: #fff; border: 4px solid #888; cursor: pointer; }
         .shutter-btn:active { background: #ccc; }
+        
+        /* Group Call Styles */
+        .dc-call-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            padding: 20px;
+            overflow-y: auto;
+            max-height: calc(100% - 70px);
+        }
+        
+        .dc-call-user.speaking {
+            animation: pulse-border 2s infinite;
+        }
+        
+        @keyframes pulse-border {
+            0% { border-color: transparent; }
+            50% { border-color: var(--dc-green); }
+            100% { border-color: transparent; }
+        }
+        
+        .dc-group-call-info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            z-index: 20;
+        }
     </style>
 </head>
 <body>
@@ -144,6 +212,18 @@
         <div id="taskbar">
             <div id="start-btn" onclick="kernel.launch('terminal')"><b>🧀 Start</b></div>
             <div id="clock">19:30:00</div>
+        </div>
+    </div>
+
+    <!-- Flappy Bird Overlay -->
+    <div id="flappy-overlay">
+        <button class="close-btn" onclick="window.closeFlappy()">✕</button>
+        <h2 style="color: white; margin-bottom: 20px;">Flappy Cheese 🧀</h2>
+        <canvas id="flappy-canvas" width="288" height="512"></canvas>
+        <div class="flappy-controls">
+            <p>Click or press SPACE to flap</p>
+            <button onclick="window.startFlappy()">Start Game</button>
+            <button onclick="window.closeFlappy()">Close Game</button>
         </div>
     </div>
 
@@ -305,10 +385,11 @@
                 const el = document.getElementById(`win-${id}`);
                 if(el) el.remove();
                 if(id === 'cheesecord' && window.discordState) { 
-                    // Optional: Destroy peer on close, or leave running background? 
-                    // For safety, we close call media tracks.
                     if(window.discordState.localStream) {
                         window.discordState.localStream.getTracks().forEach(t=>t.stop());
+                    }
+                    if(window.discordState.groupCall) {
+                        window.dcEndGroupCall();
                     }
                 }
                 kernel.procs.delete(id);
@@ -335,9 +416,9 @@
         // --- 3. APP REGISTRY ---
         const APP_DATA = {
 
-            // --- CHEESECORD V2 (DISCORD CLONE) ---
+            // --- CHEESECORD V4.0 (WITH GROUP CALLING) ---
             cheesecord: {
-                name: "CheeseCord", w: 800, h: 550,
+                name: "CheeseCord", w: 900, h: 600,
                 html: `
                     <div id="dc-popup" class="dc-popup">
                         <div style="font-weight:bold; margin-bottom:10px;">📞 Incoming Call</div>
@@ -351,9 +432,16 @@
                     <div id="dc-settings" class="dc-modal">
                         <div class="dc-modal-box">
                             <h2>User Settings</h2>
+                            <div class="dc-avatar-upload">
+                                <div class="dc-avatar-preview" id="dc-avatar-preview">
+                                    <img id="dc-avatar-img" src="">
+                                </div>
+                                <input type="file" id="dc-avatar-input" accept="image/*" style="display:none;">
+                                <button onclick="document.getElementById('dc-avatar-input').click()" style="background:var(--dc-accent); color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer; width:100%; margin-top:5px;">Change Avatar</button>
+                            </div>
                             <label>Username</label>
-                            <input id="dc-set-name" class="dc-input" style="margin-bottom:10px;">
-                            <label>Avatar Color</label>
+                            <input id="dc-set-name" class="dc-input" style="margin-bottom:10px;" value="User">
+                            <label>Avatar Color (fallback)</label>
                             <div class="dc-color-picker" id="dc-color-pick">
                                 <div class="dc-color-opt" style="background:#5865f2" onclick="window.dcSetColor('#5865f2')"></div>
                                 <div class="dc-color-opt" style="background:#ed4245" onclick="window.dcSetColor('#ed4245')"></div>
@@ -362,29 +450,85 @@
                                 <div class="dc-color-opt" style="background:#eb459e" onclick="window.dcSetColor('#eb459e')"></div>
                             </div>
                             <br>
-                            <button class="dc-btn" style="padding:10px; background:var(--dc-accent); color:white; border:none;" onclick="window.dcSaveSettings()">Save Changes</button>
-                            <button class="dc-btn" style="padding:10px; background:transparent; color:white; border:none;" onclick="document.getElementById('dc-settings').style.display='none'">Cancel</button>
+                            <div style="display:flex; gap:10px;">
+                                <button class="dc-btn" style="padding:10px; background:var(--dc-accent); color:white; border:none; flex:1;" onclick="window.dcSaveSettings()">Save Changes</button>
+                                <button class="dc-btn" style="padding:10px; background:transparent; color:white; border:none; flex:1;" onclick="document.getElementById('dc-settings').style.display='none'">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="dc-group-modal" class="dc-modal">
+                        <div class="dc-modal-box dc-group-modal">
+                            <h2>Create Group</h2>
+                            <input id="dc-group-name" class="dc-input" placeholder="Group Name" style="margin-bottom:15px;">
+                            <div style="margin-bottom:10px; color:#b9bbbe;">Select members:</div>
+                            <div id="dc-group-members-list" style="max-height:300px; overflow-y:auto; margin:10px 0; border:1px solid var(--dc-light); border-radius:5px; padding:10px;">
+                                <!-- Friends will be added here -->
+                            </div>
+                            <div style="display:flex; gap:10px; margin-top:15px;">
+                                <button class="dc-btn" style="padding:10px; background:var(--dc-accent); color:white; border:none; flex:1;" onclick="window.dcCreateGroup()">Create Group</button>
+                                <button class="dc-btn" style="padding:10px; background:transparent; color:white; border:none; flex:1;" onclick="document.getElementById('dc-group-modal').style.display='none'">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="dc-group-call-modal" class="dc-modal">
+                        <div class="dc-modal-box">
+                            <h2>Start Group Call</h2>
+                            <div id="dc-group-call-members" style="max-height:300px; overflow-y:auto; margin:10px 0; border:1px solid var(--dc-light); border-radius:5px; padding:10px;">
+                                <!-- Group members will be added here -->
+                            </div>
+                            <div style="display:flex; gap:10px; margin-top:15px;">
+                                <button class="dc-btn" style="padding:10px; background:var(--dc-accent); color:white; border:none; flex:1;" onclick="window.dcStartGroupCall()">Start Call</button>
+                                <button class="dc-btn" style="padding:10px; background:transparent; color:white; border:none; flex:1;" onclick="document.getElementById('dc-group-call-modal').style.display='none'">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="dc-bg-modal" class="dc-modal">
+                        <div class="dc-modal-box">
+                            <h2>Chat Background</h2>
+                            <div style="margin-bottom:15px;">Select background for this chat:</div>
+                            <div class="dc-bg-options" id="dc-bg-options">
+                                <div class="dc-bg-option" style="background:#36393f" onclick="window.dcSetBackground('none')"></div>
+                                <div class="dc-bg-option" onclick="window.dcSetBackground('space')"><img src="https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=200&h=150&fit=crop"></div>
+                                <div class="dc-bg-option" onclick="window.dcSetBackground('forest')"><img src="https://images.unsplash.com/photo-1448375240586-882707db888b?w=200&h=150&fit=crop"></div>
+                                <div class="dc-bg-option" onclick="window.dcSetBackground('beach')"><img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=200&h=150&fit=crop"></div>
+                                <div class="dc-bg-option" onclick="window.dcSetBackground('city')"><img src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=200&h=150&fit=crop"></div>
+                            </div>
+                            <div style="margin-top:15px; color:#b9bbbe;">Or upload custom:</div>
+                            <input type="file" id="dc-bg-upload" accept="image/*" style="width:100%; margin:10px 0;">
+                            <div style="display:flex; gap:10px; margin-top:15px;">
+                                <button class="dc-btn" style="padding:10px; background:var(--dc-accent); color:white; border:none; flex:1;" onclick="window.dcUploadBackground()">Set Background</button>
+                                <button class="dc-btn" style="padding:10px; background:transparent; color:white; border:none; flex:1;" onclick="document.getElementById('dc-bg-modal').style.display='none'">Cancel</button>
+                            </div>
                         </div>
                     </div>
 
                     <div class="dc-app">
                         <div class="dc-sidebar-mini">
-                            <div class="dc-icon" title="Home">🧀</div>
+                            <div class="dc-icon" title="Flappy Bird" onclick="window.showFlappy()">🧀</div>
                             <hr style="width:50%; border:1px solid #444">
-                            <div class="dc-icon" style="background:#36393f">+</div>
+                            <div class="dc-icon" style="background:#36393f" title="Add Group" onclick="window.showGroupModal()">+</div>
                         </div>
 
                         <div class="dc-sidebar-main">
-                            <div style="padding:15px; border-bottom:1px solid #202225; font-weight:bold;">CheeseCord</div>
+                            <div style="padding:15px; border-bottom:1px solid #202225; font-weight:bold; display:flex; justify-content:space-between; align-items:center;">
+                                <span>CheeseCord</span>
+                                <span id="dc-notification-badge" class="notification-badge" style="display:none;">0</span>
+                            </div>
                             <div style="padding:10px;">
                                 <input id="dc-add-code" placeholder="Enter Friend ID" class="dc-input" style="font-size:12px; height:30px;">
                                 <button onclick="window.dcAddFriend()" style="width:100%; margin-top:5px; background:var(--dc-green); border:none; color:white; cursor:pointer; padding:5px; border-radius:3px;">Add Friend</button>
                             </div>
-                            <div style="font-size:11px; font-weight:bold; color:#8e9297; padding:10px 10px 5px 10px;">DIRECT MESSAGES</div>
-                            <div id="dc-friend-list" style="flex:1; overflow-y:auto;"></div>
+                            <div style="font-size:11px; font-weight:bold; color:#8e9297; padding:10px 10px 5px 10px;">CHATS</div>
+                            <div id="dc-chat-list" style="flex:1; overflow-y:auto;"></div>
                             
                             <div class="dc-user-panel">
-                                <div class="dc-avatar-small" id="dc-my-avatar"><div class="dc-status-dot"></div></div>
+                                <div class="dc-avatar-small" id="dc-my-avatar">
+                                    <img id="dc-my-avatar-img" src="">
+                                    <div class="dc-status-dot"></div>
+                                </div>
                                 <div style="flex:1; overflow:hidden;">
                                     <div style="font-weight:bold; font-size:13px;" id="dc-my-name">Loading...</div>
                                     <div style="font-size:10px; color:#b9bbbe; cursor:pointer;" id="dc-my-id" onclick="navigator.clipboard.writeText(this.innerText); alert('ID Copied')">#0000</div>
@@ -394,14 +538,18 @@
                         </div>
 
                         <div class="dc-chat-area">
+                            <!-- Chat Background -->
+                            <img id="dc-chat-bg-img" class="dc-chat-bg">
+                            <div class="dc-chat-bg-overlay"></div>
+
                             <div id="dc-call-ui" class="dc-call-overlay">
-                                <div class="dc-call-grid">
-                                    <div class="dc-call-user">
+                                <div class="dc-call-grid" id="dc-call-grid">
+                                    <div class="dc-call-user" id="dc-call-user-me">
                                         <div class="dc-call-avatar" id="dc-call-av-me"></div>
                                         <b id="dc-call-name-me">Me</b>
                                         <video id="dc-vid-local" class="dc-video-feed" muted autoplay></video>
                                     </div>
-                                    <div class="dc-call-user">
+                                    <div class="dc-call-user" id="dc-call-user-them">
                                         <div class="dc-call-avatar" id="dc-call-av-them"></div>
                                         <b id="dc-call-name-them">Friend</b>
                                         <div id="dc-watch-overlay" class="dc-stream-overlay" onclick="window.dcWatchStream()">
@@ -414,26 +562,29 @@
                                 <div class="dc-call-controls">
                                     <button class="dc-ctrl-btn" onclick="window.dcToggleMic()" id="btn-mic">🎙️</button>
                                     <button class="dc-ctrl-btn" onclick="window.dcToggleDeafen()" id="btn-deaf">🎧</button>
-                                    <button class="dc-ctrl-btn" onclick="window.dcShareCam()" id="btn-cam">📷</button>
-                                    <button class="dc-ctrl-btn" onclick="window.dcShareScreen()" id="btn-scr">🖥️</button>
-                                    <button class="dc-ctrl-btn danger" onclick="window.dcHangup()">📞</button>
+                                    <button class="dc-ctrl-btn" onclick="window.dcToggleCam()" id="btn-cam">📷</button>
+                                    <button class="dc-ctrl-btn" onclick="window.dcToggleScreen()" id="btn-scr">🖥️</button>
+                                    <button class="dc-ctrl-btn danger" onclick="window.dcHangup()" id="btn-hangup">📞</button>
                                 </div>
                             </div>
 
-                            <div style="height:50px; border-bottom:1px solid #26272d; display:flex; align-items:center; padding:0 20px; justify-content:space-between;">
+                            <div style="height:50px; border-bottom:1px solid #26272d; display:flex; align-items:center; padding:0 20px; justify-content:space-between; position:relative; z-index:3;">
                                 <div style="font-weight:bold; display:flex; align-items:center; gap:10px;">
-                                    <span style="font-size:20px; color:#8e9297;">@</span>
-                                    <span id="dc-header-name">Select a Friend</span>
+                                    <span id="dc-header-icon" style="font-size:20px; color:#8e9297;">@</span>
+                                    <span id="dc-header-name">Select a Chat</span>
+                                    <span id="dc-header-type" style="font-size:12px; color:#72767d; margin-left:5px;"></span>
                                 </div>
-                                <div id="dc-header-icons" style="display:none; gap:15px; color:#b9bbbe;">
+                                <div id="dc-header-icons" style="display:none; gap:15px; color:#b9bbbe; position:relative; z-index:3;">
                                     <span style="cursor:pointer;" title="Start Voice Call" onclick="window.dcStartCall()">📞</span>
+                                    <span style="cursor:pointer;" title="Start Group Call" onclick="window.showGroupCallModal()" id="btn-group-call">👥</span>
+                                    <span style="cursor:pointer;" title="Change Background" onclick="window.dcOpenBgSettings()" id="btn-bg">🎨</span>
                                 </div>
                             </div>
 
                             <div id="dc-msg-feed" class="dc-chat-msgs"></div>
                             
-                            <div class="dc-input-box">
-                                <input id="dc-msg-input" class="dc-input" placeholder="Message @Friend" onkeypress="if(event.key==='Enter') window.dcSend()">
+                            <div class="dc-input-box" style="position:relative; z-index:3;">
+                                <input id="dc-msg-input" class="dc-input" placeholder="Type a message..." onkeypress="if(event.key==='Enter') window.dcSend()">
                             </div>
                         </div>
                     </div>
@@ -442,156 +593,508 @@
                     // --- SETUP STATE ---
                     let userSettings = JSON.parse(localStorage.getItem('cheese_dc_user')) || { 
                         name: 'User_' + Math.floor(Math.random()*999), 
-                        color: '#5865f2' 
+                        color: '#5865f2',
+                        avatar: ''
                     };
 
                     if(!window.discordState) {
                         window.discordState = {
-                            peer: new Peer(),
+                            peer: null,
                             me: userSettings,
-                            friends: {}, // { id: { conn, name, color, msgs: [] } }
-                            activeFriend: null,
-                            callState: 'idle', // idle, calling, connected
+                            chats: {},
+                            connections: {},
+                            activeChat: null,
+                            callState: 'idle',
+                            callPartner: null,
+                            groupCall: null,
+                            pendingGroupCall: null,
                             localStream: null,
                             remoteStream: null,
-                            mediaConn: null, // The P2P media connection
-                            screenConn: null // Secondary P2P for screen
+                            mediaConn: null,
+                            screenConn: null,
+                            camConn: null,
+                            screenStream: null,
+                            camStream: null,
+                            notificationCount: 0,
+                            flappyRunning: false,
+                            groupCallUIUpdate: null
                         };
 
                         const ds = window.discordState;
 
-                        // -- PeerJS Events --
-                        ds.peer.on('open', (id) => {
-                            document.getElementById('dc-my-id').innerText = id;
-                            document.getElementById('dc-my-name').innerText = ds.me.name;
-                            document.getElementById('dc-my-avatar').style.background = ds.me.color;
-                            document.getElementById('dc-call-av-me').style.background = ds.me.color;
-                        });
+                        // Initialize Peer
+                        setTimeout(() => {
+                            ds.peer = new Peer();
+                            
+                            ds.peer.on('open', (id) => {
+                                console.log('✅ Peer ID:', id);
+                                document.getElementById('dc-my-id').innerText = id;
+                                document.getElementById('dc-my-name').innerText = ds.me.name;
+                                
+                                // Load avatar
+                                if(ds.me.avatar) {
+                                    document.getElementById('dc-my-avatar-img').src = ds.me.avatar;
+                                    document.getElementById('dc-avatar-img').src = ds.me.avatar;
+                                    document.getElementById('dc-call-av-me').innerHTML = `<img src="${ds.me.avatar}">`;
+                                } else {
+                                    document.getElementById('dc-my-avatar').style.background = ds.me.color;
+                                    document.getElementById('dc-call-av-me').style.background = ds.me.color;
+                                }
+                                
+                                // Request notification permission
+                                if ("Notification" in window && Notification.permission === "default") {
+                                    Notification.requestPermission();
+                                }
+                            });
 
-                        ds.peer.on('connection', (conn) => { handleDataConn(conn); });
+                            ds.peer.on('connection', (conn) => { 
+                                console.log('🔗 New connection from:', conn.peer);
+                                handleDataConn(conn); 
+                            });
 
-                        ds.peer.on('call', (call) => {
-                            // Logic: If metadata says 'screen', it's a stream add-on
-                            if(call.metadata && call.metadata.type === 'screen') {
-                                call.answer(); // auto answer screen share
-                                call.on('stream', (stream) => {
-                                    const vid = document.getElementById('dc-vid-remote');
-                                    vid.srcObject = stream;
-                                    // Don't show yet, wait for user to click "Watch"
-                                    document.getElementById('dc-watch-overlay').style.display = 'flex';
-                                });
-                            } else {
-                                // It's a regular call (Voice)
-                                // We don't auto-answer voice, handled via data signal first usually
-                                // But for simplicity, we assume 'Answer' button was clicked which triggered getUserMedia
-                                // Wait, if we use peer.call() directly, we need to answer.
-                                // In this flow: Data 'call_request' -> User clicks Answer -> we send 'call_accept' -> Caller initiates peer.call
-                                call.answer(ds.localStream);
-                                call.on('stream', (remStream) => {
-                                    // Audio stream
-                                    const aud = document.createElement('audio');
-                                    aud.srcObject = remStream;
-                                    aud.autoplay = true;
-                                    ds.remoteStream = remStream;
-                                });
-                                ds.mediaConn = call;
-                            }
-                        });
+                            ds.peer.on('call', (call) => {
+                                console.log('📞 Incoming call from:', call.peer, 'type:', call.metadata?.type);
+                                
+                                const metadata = call.metadata || {};
+                                
+                                if(metadata.type === 'screen') {
+                                    // Screen share
+                                    call.answer();
+                                    call.on('stream', (stream) => {
+                                        console.log('🖥️ Received screen stream');
+                                        const vid = document.getElementById('dc-vid-remote');
+                                        if(vid) {
+                                            vid.srcObject = stream;
+                                            document.getElementById('dc-watch-overlay').style.display = 'flex';
+                                        }
+                                    });
+                                } else if(metadata.type === 'camera') {
+                                    // Camera
+                                    call.answer();
+                                    call.on('stream', (stream) => {
+                                        console.log('📷 Received camera stream');
+                                        const vid = document.getElementById('dc-vid-remote');
+                                        if(vid) {
+                                            vid.srcObject = stream;
+                                            document.getElementById('dc-watch-overlay').style.display = 'flex';
+                                        }
+                                    });
+                                } else {
+                                    // Audio call
+                                    if(ds.localStream) {
+                                        call.answer(ds.localStream);
+                                    } else {
+                                        navigator.mediaDevices.getUserMedia({audio: true}).then(stream => {
+                                            ds.localStream = stream;
+                                            call.answer(stream);
+                                        });
+                                    }
+                                    call.on('stream', (stream) => {
+                                        console.log('🔊 Received audio stream');
+                                        const audio = new Audio();
+                                        audio.srcObject = stream;
+                                        audio.autoplay = true;
+                                        ds.remoteStream = stream;
+                                    });
+                                    ds.mediaConn = call;
+                                    ds.callPartner = call.peer;
+                                    
+                                    // Show call notification
+                                    const chat = Object.values(ds.chats).find(c => 
+                                        c.type === 'dm' && c.members.includes(call.peer)
+                                    );
+                                    if(chat) {
+                                        showNotification(`${chat.name} is calling...`, '📞 Incoming Call');
+                                    }
+                                }
+                            });
+                            
+                            ds.peer.on('error', (err) => {
+                                console.error('❌ PeerJS error:', err);
+                            });
+                        }, 500);
                     }
 
                     const ds = window.discordState;
 
-                    // --- FUNCTIONS ---
+                    // Helper Functions
+                    function showNotification(title, body) {
+                        ds.notificationCount++;
+                        updateNotificationBadge();
+                        
+                        if ("Notification" in window && Notification.permission === "granted") {
+                            new Notification(title, { body, icon: 'https://cdn-icons-png.flaticon.com/512/5968/5968756.png' });
+                        }
+                        
+                        const badge = document.getElementById('dc-notification-badge');
+                        badge.style.display = 'flex';
+                        badge.textContent = ds.notificationCount;
+                        
+                        flashTaskbar();
+                    }
+                    
+                    function flashTaskbar() {
+                        const originalTitle = document.title;
+                        let flashCount = 0;
+                        const flashInterval = setInterval(() => {
+                            document.title = document.title === originalTitle ? '📨 New Message!' : originalTitle;
+                            flashCount++;
+                            if(flashCount >= 6) {
+                                clearInterval(flashInterval);
+                                document.title = originalTitle;
+                            }
+                        }, 500);
+                    }
+                    
+                    function updateNotificationBadge() {
+                        const badge = document.getElementById('dc-notification-badge');
+                        const totalUnread = Object.values(ds.chats).reduce((sum, chat) => sum + chat.unread, 0);
+                        ds.notificationCount = totalUnread;
+                        
+                        if(totalUnread > 0) {
+                            badge.style.display = 'flex';
+                            badge.textContent = totalUnread > 9 ? '9+' : totalUnread;
+                        } else {
+                            badge.style.display = 'none';
+                        }
+                    }
+                    
+                    function markChatAsRead(chatId) {
+                        if(ds.chats[chatId]) {
+                            ds.chats[chatId].unread = 0;
+                            updateNotificationBadge();
+                            renderChatList();
+                        }
+                    }
 
                     function handleDataConn(conn) {
-                        if(!ds.friends[conn.peer]) {
-                            ds.friends[conn.peer] = { conn: conn, name: 'Unknown', color:'#gray', msgs:[] };
-                        }
-                        const f = ds.friends[conn.peer];
+                        const peerId = conn.peer;
+                        ds.connections[peerId] = conn;
 
                         conn.on('open', () => {
-                            conn.send({ type: 'handshake', name: ds.me.name, color: ds.me.color });
-                            renderFriends();
+                            console.log('✅ Connection opened with:', peerId);
+                            conn.send({ 
+                                type: 'handshake', 
+                                name: ds.me.name, 
+                                color: ds.me.color,
+                                avatar: ds.me.avatar,
+                                peerId: ds.peer.id
+                            });
                         });
 
                         conn.on('data', (data) => {
-                            if(data.type === 'handshake') {
-                                f.name = data.name; f.color = data.color;
-                                renderFriends();
+                            console.log('📨 Data from', peerId, ':', data.type);
+                            
+                            switch(data.type) {
+                                case 'handshake':
+                                    const dmId = `dm_${peerId}`;
+                                    if(!ds.chats[dmId]) {
+                                        ds.chats[dmId] = {
+                                            type: 'dm',
+                                            id: dmId,
+                                            name: data.name,
+                                            avatar: data.avatar,
+                                            color: data.color,
+                                            members: [ds.peer.id, peerId],
+                                            msgs: [],
+                                            unread: 0,
+                                            background: ''
+                                        };
+                                        renderChatList();
+                                    }
+                                    break;
+                                    
+                                case 'msg':
+                                    const chat = Object.values(ds.chats).find(c => 
+                                        c.members.includes(peerId) && c.type === 'dm'
+                                    );
+                                    if(chat) {
+                                        chat.msgs.push({ 
+                                            sender: peerId, 
+                                            name: chat.name, 
+                                            avatar: chat.avatar, 
+                                            text: data.text, 
+                                            time: new Date().toLocaleTimeString() 
+                                        });
+                                        
+                                        if(ds.activeChat !== chat.id) {
+                                            chat.unread++;
+                                            showNotification(`${chat.name}`, data.text);
+                                        }
+                                        
+                                        if(ds.activeChat === chat.id) {
+                                            renderChat();
+                                        }
+                                        renderChatList();
+                                        updateNotificationBadge();
+                                    }
+                                    break;
+                                    
+                                case 'group_create':
+                                    ds.chats[data.groupId] = {
+                                        type: 'group',
+                                        id: data.groupId,
+                                        name: data.groupName,
+                                        avatar: '👥',
+                                        color: '#7289da',
+                                        members: data.members,
+                                        owner: data.owner,
+                                        admins: data.admins || [],
+                                        msgs: [],
+                                        unread: 0,
+                                        background: ''
+                                    };
+                                    renderChatList();
+                                    showNotification(`Added to group: ${data.groupName}`, `You were added to a group by ${data.ownerName}`);
+                                    break;
+                                    
+                                case 'group_msg':
+                                    const group = ds.chats[data.groupId];
+                                    if(group) {
+                                        group.msgs.push({
+                                            sender: peerId,
+                                            name: data.senderName,
+                                            avatar: data.senderAvatar,
+                                            text: data.text,
+                                            time: new Date().toLocaleTimeString()
+                                        });
+                                        
+                                        if(ds.activeChat !== group.id) {
+                                            group.unread++;
+                                            showNotification(`${data.senderName} in ${group.name}`, data.text);
+                                        }
+                                        
+                                        if(ds.activeChat === group.id) {
+                                            renderChat();
+                                        }
+                                        renderChatList();
+                                        updateNotificationBadge();
+                                    }
+                                    break;
+                                    
+                                case 'background_change':
+                                    const targetChat = ds.chats[data.chatId];
+                                    if(targetChat) {
+                                        targetChat.background = data.background;
+                                        if(ds.activeChat === data.chatId) {
+                                            updateChatBackground();
+                                        }
+                                    }
+                                    break;
+                                    
+                                case 'call_request':
+                                    if(ds.callState !== 'idle') {
+                                        conn.send({type: 'call_busy'});
+                                    } else {
+                                        const dmChat = Object.values(ds.chats).find(c => 
+                                            c.members.includes(peerId) && c.type === 'dm'
+                                        );
+                                        if(dmChat) {
+                                            document.getElementById('dc-popup').style.display = 'block';
+                                            document.getElementById('dc-popup-name').innerText = dmChat.name;
+                                            ds.callPartner = peerId;
+                                        }
+                                    }
+                                    break;
+                                    
+                                case 'call_accept':
+                                    startMediaCall(peerId);
+                                    break;
+                                    
+                                case 'call_reject':
+                                    alert("Call was declined");
+                                    break;
+                                    
+                                case 'hangup':
+                                    resetCallUI();
+                                    break;
+                                    
+                                case 'stream_notify':
+                                    document.getElementById('dc-watch-overlay').style.display = 'flex';
+                                    break;
+                                    
+                                case 'stream_stop':
+                                    document.getElementById('dc-watch-overlay').style.display = 'none';
+                                    const vid = document.getElementById('dc-vid-remote');
+                                    if(vid) vid.style.display = 'none';
+                                    break;
+                                    
+                                // --- GROUP CALL MESSAGES ---
+                                case 'group_call_invite':
+                                    if(ds.callState !== 'idle' || ds.groupCall) {
+                                        conn.send({type: 'group_call_busy'});
+                                        break;
+                                    }
+                                    
+                                    const groupChat = ds.chats[data.groupId];
+                                    if(groupChat) {
+                                        ds.pendingGroupCall = {
+                                            callId: data.callId,
+                                            groupId: data.groupId,
+                                            groupName: data.groupName,
+                                            callerName: data.callerName,
+                                            participants: data.participants,
+                                            fromPeer: conn.peer
+                                        };
+                                        
+                                        let popup = document.getElementById('dc-group-call-popup');
+                                        if(!popup) {
+                                            popup = document.createElement('div');
+                                            popup.id = 'dc-group-call-popup';
+                                            popup.className = 'dc-popup';
+                                            popup.style.width = '300px';
+                                            popup.innerHTML = `
+                                                <div style="font-weight:bold; margin-bottom:10px; display:flex; align-items:center; gap:5px;">
+                                                    <span>👥 Group Call Invite</span>
+                                                </div>
+                                                <div style="margin-bottom:5px;"><b>${data.callerName}</b> is calling in <b>${data.groupName}</b></div>
+                                                <div style="font-size:12px; color:#b9bbbe; margin-bottom:10px;">
+                                                    ${data.participants.length} participants
+                                                </div>
+                                                <div style="display:flex; gap:10px;">
+                                                    <button class="dc-btn" style="background:var(--dc-green); color:white; border:none; padding:8px; flex:1; cursor:pointer;" onclick="window.dcAcceptGroupCall()">Join</button>
+                                                    <button class="dc-btn" style="background:var(--dc-red); color:white; border:none; padding:8px; flex:1; cursor:pointer;" onclick="window.dcRejectGroupCall()">Decline</button>
+                                                </div>
+                                            `;
+                                            document.getElementById('body-cheesecord').appendChild(popup);
+                                        }
+                                        popup.style.display = 'block';
+                                    }
+                                    break;
+                                    
+                                case 'group_call_accept':
+                                    if(ds.groupCall && ds.groupCall.id === data.callId) {
+                                        ds.groupCall.participants.push(conn.peer);
+                                        
+                                        if(ds.localStream) {
+                                            const call = ds.peer.call(conn.peer, ds.localStream);
+                                            ds.groupCall.connections[conn.peer] = call;
+                                            
+                                            call.on('stream', (stream) => {
+                                                ds.groupCall.streams[conn.peer] = stream;
+                                                updateGroupCallUI();
+                                            });
+                                        }
+                                        
+                                        updateGroupCallUI();
+                                        
+                                        Object.keys(ds.groupCall.connections).forEach(peerId => {
+                                            if(peerId !== conn.peer && ds.connections[peerId]) {
+                                                ds.connections[peerId].send({
+                                                    type: 'group_call_participant_joined',
+                                                    callId: ds.groupCall.id,
+                                                    participantId: conn.peer,
+                                                    participantName: data.participantName
+                                                });
+                                            }
+                                        });
+                                    }
+                                    break;
+                                    
+                                case 'group_call_participant_joined':
+                                    if(ds.groupCall && ds.groupCall.id === data.callId && !ds.groupCall.participants.includes(data.participantId)) {
+                                        ds.groupCall.participants.push(data.participantId);
+                                        updateGroupCallUI();
+                                    }
+                                    break;
+                                    
+                                case 'group_call_hangup':
+                                    if(ds.groupCall && ds.groupCall.id === data.callId) {
+                                        const index = ds.groupCall.participants.indexOf(conn.peer);
+                                        if(index > -1) {
+                                            ds.groupCall.participants.splice(index, 1);
+                                            if(ds.groupCall.connections[conn.peer]) {
+                                                ds.groupCall.connections[conn.peer].close();
+                                                delete ds.groupCall.connections[conn.peer];
+                                            }
+                                            if(ds.groupCall.streams[conn.peer]) {
+                                                delete ds.groupCall.streams[conn.peer];
+                                            }
+                                            updateGroupCallUI();
+                                        }
+                                        
+                                        if(ds.groupCall.participants.length === 1 && ds.groupCall.participants[0] === ds.peer.id) {
+                                            window.dcEndGroupCall();
+                                        }
+                                    }
+                                    break;
+                                    
+                                case 'group_call_busy':
+                                    alert('Group call is busy or participant unavailable');
+                                    break;
                             }
-                            if(data.type === 'msg') {
-                                f.msgs.push({ u: f.name, c: f.color, txt: data.txt });
-                                if(ds.activeFriend === conn.peer) renderChat();
-                            }
-                            // Call Signaling
-                            if(data.type === 'call_request') {
-                                if(ds.callState !== 'idle') {
-                                    conn.send({type: 'call_busy'});
-                                } else {
-                                    document.getElementById('dc-popup').style.display = 'block';
-                                    document.getElementById('dc-popup-name').innerText = f.name;
-                                    ds.incomingCallID = conn.peer;
-                                }
-                            }
-                            if(data.type === 'call_accept') {
-                                // User accepted, start media
-                                startMediaCall(conn.peer);
-                            }
-                            if(data.type === 'call_reject') {
-                                alert("Call Declined");
-                                resetCallUI();
-                            }
-                            if(data.type === 'hangup') {
-                                resetCallUI();
-                            }
-                            if(data.type === 'stream_notify') {
-                                // They started sharing screen/cam
-                                document.getElementById('dc-watch-overlay').style.display = 'flex';
-                                document.getElementById('dc-watch-overlay').innerHTML = `<span style="font-size:24px;">📺</span><span style="font-weight:bold;">Watch ${data.mode}</span>`;
-                            }
-                            if(data.type === 'stream_stop') {
-                                document.getElementById('dc-watch-overlay').style.display = 'none';
-                                document.getElementById('dc-vid-remote').style.display = 'none';
-                            }
+                        });
+                        
+                        conn.on('close', () => {
+                            console.log('🔌 Connection closed with:', peerId);
+                            delete ds.connections[peerId];
                         });
                     }
 
-                    // --- UI ACTIONS ---
-
-                    window.dcAddFriend = () => {
-                        const id = document.getElementById('dc-add-code').value;
-                        if(id && id !== ds.peer.id) {
-                            const conn = ds.peer.connect(id);
-                            handleDataConn(conn);
-                            document.getElementById('dc-add-code').value = '';
-                        }
-                    };
-
-                    window.dcSend = () => {
-                        const txt = document.getElementById('dc-msg-input').value;
-                        if(!txt || !ds.activeFriend) return;
-                        const f = ds.friends[ds.activeFriend];
-                        f.conn.send({type: 'msg', txt: txt});
-                        f.msgs.push({ u: ds.me.name, c: ds.me.color, txt: txt });
-                        renderChat();
-                        document.getElementById('dc-msg-input').value = '';
-                    };
-
-                    function renderFriends() {
-                        const list = document.getElementById('dc-friend-list');
+                    // UI Functions
+                    function renderChatList() {
+                        const list = document.getElementById('dc-chat-list');
                         list.innerHTML = '';
-                        Object.keys(ds.friends).forEach(fid => {
-                            const f = ds.friends[fid];
+                        
+                        const sortedChats = Object.values(ds.chats).sort((a, b) => {
+                            if(a.type === 'group' && b.type !== 'group') return -1;
+                            if(a.type !== 'group' && b.type === 'group') return 1;
+                            return a.name.localeCompare(b.name);
+                        });
+                        
+                        sortedChats.forEach(chat => {
                             const el = document.createElement('div');
-                            el.className = `dc-friend-item ${ds.activeFriend===fid ? 'active':''}`;
-                            el.innerHTML = `<div class="dc-avatar-small" style="background:${f.color}"></div> <span>${f.name}</span>`;
+                            el.className = `dc-friend-item ${ds.activeChat===chat.id ? 'active' : ''} ${chat.unread > 0 ? 'unread' : ''}`;
+                            
+                            const avatarContent = chat.avatar && !chat.avatar.includes('👥') ? 
+                                `<img src="${chat.avatar}" style="width:100%; height:100%; object-fit:cover;">` :
+                                `<div style="width:100%; height:100%; background:${chat.color}; display:flex; align-items:center; justify-content:center; font-size:${chat.type === 'group' ? '20px' : '16px'};">${chat.avatar || ''}</div>`;
+                            
+                            el.innerHTML = `
+                                <div class="dc-avatar-small" style="width:40px; height:40px;">
+                                    ${avatarContent}
+                                </div>
+                                <div style="flex:1; overflow:hidden;">
+                                    <div style="font-weight:bold; font-size:13px;">${chat.name}</div>
+                                    <div style="font-size:11px; color:#72767d; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                        ${chat.type === 'group' ? '👥 Group' : '💬 DM'}
+                                    </div>
+                                </div>
+                                ${chat.unread > 0 ? `<div class="unread-badge">${chat.unread}</div>` : ''}
+                            `;
+                            
                             el.onclick = () => {
-                                ds.activeFriend = fid;
-                                document.getElementById('dc-header-name').innerText = f.name;
-                                document.getElementById('dc-header-icons').style.display = 'flex';
-                                renderFriends();
+                                ds.activeChat = chat.id;
+                                markChatAsRead(chat.id);
                                 renderChat();
+                                renderChatList();
+                                
+                                document.getElementById('dc-header-name').innerText = chat.name;
+                                document.getElementById('dc-header-type').innerText = chat.type === 'group' ? 'Group' : 'Direct Message';
+                                document.getElementById('dc-header-icon').innerText = chat.type === 'group' ? '👥' : '@';
+                                document.getElementById('dc-header-icons').style.display = 'flex';
+                                
+                                const bgBtn = document.getElementById('btn-bg');
+                                const groupCallBtn = document.getElementById('btn-group-call');
+                                
+                                if(chat.type === 'group') {
+                                    groupCallBtn.style.display = 'inline-block';
+                                    if(chat.owner === ds.peer.id || chat.admins.includes(ds.peer.id)) {
+                                        bgBtn.style.display = 'inline-block';
+                                    } else {
+                                        bgBtn.style.display = 'none';
+                                    }
+                                } else if(chat.type === 'dm') {
+                                    groupCallBtn.style.display = 'none';
+                                    bgBtn.style.display = 'inline-block';
+                                } else {
+                                    groupCallBtn.style.display = 'none';
+                                    bgBtn.style.display = 'none';
+                                }
+                                
+                                updateChatBackground();
                             };
+                            
                             list.appendChild(el);
                         });
                     }
@@ -599,176 +1102,985 @@
                     function renderChat() {
                         const feed = document.getElementById('dc-msg-feed');
                         feed.innerHTML = '';
-                        const msgs = ds.friends[ds.activeFriend].msgs;
-                        msgs.forEach(m => {
+                        
+                        const chat = ds.chats[ds.activeChat];
+                        if(!chat) return;
+                        
+                        chat.msgs.forEach(msg => {
                             const d = document.createElement('div');
                             d.className = 'dc-msg';
+                            
+                            const avatarContent = msg.avatar ? 
+                                `<img src="${msg.avatar}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">` :
+                                `<div style="width:100%; height:100%; background:${chat.color}; border-radius:50%;"></div>`;
+                            
                             d.innerHTML = `
-                                <div class="dc-avatar-small" style="background:${m.c}; width:40px; height:40px;"></div>
+                                <div class="dc-avatar-small" style="width:40px; height:40px;">
+                                    ${avatarContent}
+                                </div>
                                 <div class="dc-msg-content">
-                                    <h4>${m.u}</h4>
-                                    <div class="dc-msg-text">${m.txt}</div>
+                                    <h4>${msg.name} <span style="font-size:11px; color:#72767d; font-weight:normal;">${msg.time}</span></h4>
+                                    <div class="dc-msg-text">${msg.text}</div>
                                 </div>
                             `;
                             feed.appendChild(d);
                         });
+                        
                         feed.scrollTop = feed.scrollHeight;
                     }
 
+                    function updateChatBackground() {
+                        const chat = ds.chats[ds.activeChat];
+                        if(!chat) return;
+                        
+                        const bgImg = document.getElementById('dc-chat-bg-img');
+                        if(chat.background && chat.background !== 'none') {
+                            if(chat.background.startsWith('http') || chat.background.startsWith('data:')) {
+                                bgImg.src = chat.background;
+                                bgImg.style.display = 'block';
+                            } else {
+                                const bgUrls = {
+                                    'space': 'https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=1920&q=80',
+                                    'forest': 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=1920&q=80',
+                                    'beach': 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1920&q=80',
+                                    'city': 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=1920&q=80'
+                                };
+                                bgImg.src = bgUrls[chat.background] || '';
+                                bgImg.style.display = bgUrls[chat.background] ? 'block' : 'none';
+                            }
+                        } else {
+                            bgImg.style.display = 'none';
+                        }
+                    }
+
+                    // --- UI ACTIONS ---
+
+                    window.dcAddFriend = () => {
+                        const id = document.getElementById('dc-add-code').value.trim();
+                        if(id && id !== ds.peer?.id && ds.peer) {
+                            console.log('👥 Adding friend:', id);
+                            const conn = ds.peer.connect(id);
+                            handleDataConn(conn);
+                            document.getElementById('dc-add-code').value = '';
+                        } else {
+                            alert('Please enter a valid friend ID');
+                        }
+                    };
+
+                    window.dcSend = () => {
+                        const text = document.getElementById('dc-msg-input').value;
+                        if(!text || !ds.activeChat) return;
+                        
+                        const chat = ds.chats[ds.activeChat];
+                        if(!chat) return;
+                        
+                        chat.msgs.push({
+                            sender: ds.peer.id,
+                            name: ds.me.name,
+                            avatar: ds.me.avatar,
+                            text: text,
+                            time: new Date().toLocaleTimeString()
+                        });
+                        
+                        renderChat();
+                        document.getElementById('dc-msg-input').value = '';
+                        
+                        if(chat.type === 'dm') {
+                            const otherMember = chat.members.find(m => m !== ds.peer.id);
+                            if(otherMember && ds.connections[otherMember]) {
+                                ds.connections[otherMember].send({
+                                    type: 'msg',
+                                    text: text
+                                });
+                            }
+                        } else if(chat.type === 'group') {
+                            chat.members.forEach(memberId => {
+                                if(memberId !== ds.peer.id && ds.connections[memberId]) {
+                                    ds.connections[memberId].send({
+                                        type: 'group_msg',
+                                        groupId: chat.id,
+                                        senderName: ds.me.name,
+                                        senderAvatar: ds.me.avatar,
+                                        text: text
+                                    });
+                                }
+                            });
+                        }
+                    };
+
                     // --- SETTINGS ---
+                    
+                    const avatarInput = document.getElementById('dc-avatar-input');
+                    if(avatarInput) {
+                        avatarInput.onchange = function(e) {
+                            const file = e.target.files[0];
+                            if(file) {
+                                const reader = new FileReader();
+                                reader.onload = function(event) {
+                                    ds.me.avatar = event.target.result;
+                                    document.getElementById('dc-avatar-img').src = event.target.result;
+                                    document.getElementById('dc-my-avatar-img').src = event.target.result;
+                                    document.getElementById('dc-call-av-me').innerHTML = `<img src="${event.target.result}">`;
+                                    
+                                    Object.values(ds.connections).forEach(conn => {
+                                        if(conn.open) {
+                                            conn.send({
+                                                type: 'handshake',
+                                                name: ds.me.name,
+                                                color: ds.me.color,
+                                                avatar: ds.me.avatar,
+                                                peerId: ds.peer.id
+                                            });
+                                        }
+                                    });
+                                };
+                                reader.readAsDataURL(file);
+                            }
+                        };
+                    }
+
                     window.dcSetColor = (c) => {
-                        document.querySelectorAll('.dc-color-opt').forEach(d => d.classList.remove('selected'));
-                        // Visual selection logic would go here
+                        document.querySelectorAll('.dc-color-opt').forEach(opt => {
+                            opt.classList.remove('selected');
+                            if(opt.style.background === c) {
+                                opt.classList.add('selected');
+                            }
+                        });
                         ds.tempColor = c;
                     };
+
                     window.dcSaveSettings = () => {
                         const newName = document.getElementById('dc-set-name').value;
                         if(newName) ds.me.name = newName;
                         if(ds.tempColor) ds.me.color = ds.tempColor;
+                        
                         localStorage.setItem('cheese_dc_user', JSON.stringify(ds.me));
-                        // Update UI
+                        
                         document.getElementById('dc-my-name').innerText = ds.me.name;
-                        document.getElementById('dc-my-avatar').style.background = ds.me.color;
+                        if(!ds.me.avatar) {
+                            document.getElementById('dc-my-avatar').style.background = ds.me.color;
+                            document.getElementById('dc-call-av-me').style.background = ds.me.color;
+                        }
+                        
                         document.getElementById('dc-settings').style.display = 'none';
-                        // Resend handshake to friends
-                        Object.values(ds.friends).forEach(f => f.conn.send({type:'handshake', name:ds.me.name, color:ds.me.color}));
+                        
+                        Object.values(ds.connections).forEach(conn => {
+                            if(conn.open) {
+                                conn.send({
+                                    type: 'handshake',
+                                    name: ds.me.name,
+                                    color: ds.me.color,
+                                    avatar: ds.me.avatar,
+                                    peerId: ds.peer.id
+                                });
+                            }
+                        });
                     };
 
-                    // --- CALLING LOGIC ---
+                    // --- GROUP MANAGEMENT ---
+                    
+                    window.showGroupModal = () => {
+                        const modal = document.getElementById('dc-group-modal');
+                        const membersList = document.getElementById('dc-group-members-list');
+                        membersList.innerHTML = '';
+                        
+                        const dmFriends = Object.values(ds.chats).filter(c => c.type === 'dm');
+                        
+                        if(dmFriends.length === 0) {
+                            membersList.innerHTML = '<div style="color:#72767d; text-align:center; padding:20px;">No friends to add to group</div>';
+                        } else {
+                            dmFriends.forEach(chat => {
+                                const otherMember = chat.members.find(m => m !== ds.peer.id);
+                                const memberDiv = document.createElement('div');
+                                memberDiv.className = 'dc-group-member';
+                                memberDiv.innerHTML = `
+                                    <div style="display:flex; align-items:center; gap:10px;">
+                                        <div class="dc-avatar-small" style="width:24px; height:24px; background:${chat.color};"></div>
+                                        <span>${chat.name}</span>
+                                    </div>
+                                    <input type="checkbox" class="group-member-checkbox" data-peerid="${otherMember}" data-chatid="${chat.id}">
+                                `;
+                                membersList.appendChild(memberDiv);
+                            });
+                        }
+                        
+                        modal.style.display = 'flex';
+                    };
 
-                    window.dcStartCall = () => {
-                        if(!ds.activeFriend) return;
-                        const f = ds.friends[ds.activeFriend];
-                        f.conn.send({type: 'call_request'});
-                        // UI: Calling...
-                        enterCallUI(ds.activeFriend);
+                    window.dcCreateGroup = () => {
+                        const groupName = document.getElementById('dc-group-name').value;
+                        if(!groupName) {
+                            alert('Please enter a group name');
+                            return;
+                        }
+                        
+                        const checkboxes = document.querySelectorAll('.group-member-checkbox:checked');
+                        const selectedMembers = Array.from(checkboxes).map(cb => ({
+                            peerId: cb.dataset.peerid,
+                            chatId: cb.dataset.chatid
+                        }));
+                        
+                        if(selectedMembers.length === 0) {
+                            alert('Please select at least one member');
+                            return;
+                        }
+                        
+                        const groupId = 'group_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                        
+                        const allMembers = [ds.peer.id, ...selectedMembers.map(m => m.peerId)];
+                        
+                        ds.chats[groupId] = {
+                            type: 'group',
+                            id: groupId,
+                            name: groupName,
+                            avatar: '👥',
+                            color: '#7289da',
+                            members: allMembers,
+                            owner: ds.peer.id,
+                            admins: [ds.peer.id],
+                            msgs: [],
+                            unread: 0,
+                            background: ''
+                        };
+                        
+                        selectedMembers.forEach(member => {
+                            const conn = ds.connections[member.peerId];
+                            if(conn && conn.open) {
+                                conn.send({
+                                    type: 'group_create',
+                                    groupId: groupId,
+                                    groupName: groupName,
+                                    members: allMembers,
+                                    owner: ds.peer.id,
+                                    ownerName: ds.me.name,
+                                    admins: [ds.peer.id]
+                                });
+                            }
+                        });
+                        
+                        document.getElementById('dc-group-modal').style.display = 'none';
+                        renderChatList();
+                        showNotification(`Group Created`, `You created "${groupName}"`);
+                    };
+
+                    // --- BACKGROUND SETTINGS ---
+                    
+                    window.dcOpenBgSettings = () => {
+                        if(!ds.activeChat) return;
+                        document.getElementById('dc-bg-modal').style.display = 'flex';
+                    };
+
+                    window.dcSetBackground = (bg) => {
+                        const chat = ds.chats[ds.activeChat];
+                        if(!chat) return;
+                        
+                        chat.background = bg;
+                        updateChatBackground();
+                        
+                        if(chat.type === 'dm') {
+                            const otherMember = chat.members.find(m => m !== ds.peer.id);
+                            if(otherMember && ds.connections[otherMember]) {
+                                ds.connections[otherMember].send({
+                                    type: 'background_change',
+                                    chatId: chat.id,
+                                    background: bg
+                                });
+                            }
+                        } else if(chat.type === 'group' && (chat.owner === ds.peer.id || chat.admins.includes(ds.peer.id))) {
+                            chat.members.forEach(memberId => {
+                                if(memberId !== ds.peer.id && ds.connections[memberId]) {
+                                    ds.connections[memberId].send({
+                                        type: 'background_change',
+                                        chatId: chat.id,
+                                        background: bg
+                                    });
+                                }
+                            });
+                        }
+                        
+                        document.getElementById('dc-bg-modal').style.display = 'none';
+                    };
+
+                    window.dcUploadBackground = () => {
+                        const fileInput = document.getElementById('dc-bg-upload');
+                        const file = fileInput.files[0];
+                        if(file) {
+                            const reader = new FileReader();
+                            reader.onload = function(event) {
+                                window.dcSetBackground(event.target.result);
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    };
+
+                    // --- REGULAR CALLING LOGIC ---
+
+                    window.dcStartCall = async () => {
+                        const chat = ds.chats[ds.activeChat];
+                        if(!chat || chat.type !== 'dm') {
+                            alert('Can only call individual friends');
+                            return;
+                        }
+                        
+                        const otherMember = chat.members.find(m => m !== ds.peer.id);
+                        if(!otherMember || !ds.connections[otherMember]) {
+                            alert('Friend is not connected');
+                            return;
+                        }
+                        
+                        ds.callPartner = otherMember;
+                        ds.connections[otherMember].send({type: 'call_request'});
+                        
+                        try {
+                            ds.localStream = await navigator.mediaDevices.getUserMedia({audio: true});
+                            enterCallUI();
+                        } catch(e) {
+                            console.error('❌ Error getting microphone:', e);
+                            alert('Could not access microphone');
+                        }
                     };
 
                     window.dcAnswer = async () => {
                         document.getElementById('dc-popup').style.display = 'none';
-                        const callerId = ds.incomingCallID;
-                        const f = ds.friends[callerId];
-                        f.conn.send({type: 'call_accept'});
                         
-                        // Get Mic
-                        ds.localStream = await navigator.mediaDevices.getUserMedia({audio: true});
-                        enterCallUI(callerId);
+                        if(!ds.callPartner || !ds.connections[ds.callPartner]) return;
+                        
+                        ds.connections[ds.callPartner].send({type: 'call_accept'});
+                        
+                        try {
+                            ds.localStream = await navigator.mediaDevices.getUserMedia({audio: true});
+                            enterCallUI();
+                        } catch(e) {
+                            console.error('❌ Error getting microphone:', e);
+                            alert('Could not access microphone');
+                        }
                     };
 
                     window.dcReject = () => {
                         document.getElementById('dc-popup').style.display = 'none';
-                        if(ds.incomingCallID && ds.friends[ds.incomingCallID]) {
-                            ds.friends[ds.incomingCallID].conn.send({type: 'call_reject'});
+                        if(ds.callPartner && ds.connections[ds.callPartner]) {
+                            ds.connections[ds.callPartner].send({type: 'call_reject'});
+                        }
+                        ds.callPartner = null;
+                    };
+
+                    async function startMediaCall(peerId) {
+                        if(!ds.localStream) {
+                            ds.localStream = await navigator.mediaDevices.getUserMedia({audio: true});
+                        }
+                        
+                        const call = ds.peer.call(peerId, ds.localStream);
+                        ds.mediaConn = call;
+                        
+                        call.on('stream', (stream) => {
+                            const audio = new Audio();
+                            audio.srcObject = stream;
+                            audio.autoplay = true;
+                            ds.remoteStream = stream;
+                        });
+                        
+                        enterCallUI();
+                    }
+
+                    function enterCallUI() {
+                        ds.callState = 'connected';
+                        document.getElementById('dc-call-ui').style.display = 'flex';
+                        
+                        if(ds.callPartner) {
+                            const chat = Object.values(ds.chats).find(c => 
+                                c.members.includes(ds.callPartner) && c.type === 'dm'
+                            );
+                            if(chat) {
+                                document.getElementById('dc-call-name-them').innerText = chat.name;
+                                if(chat.avatar) {
+                                    document.getElementById('dc-call-av-them').innerHTML = `<img src="${chat.avatar}">`;
+                                } else {
+                                    document.getElementById('dc-call-av-them').style.background = chat.color;
+                                }
+                            }
+                        }
+                    }
+
+                    // --- GROUP CALLING LOGIC ---
+
+                    window.showGroupCallModal = () => {
+                        const modal = document.getElementById('dc-group-call-modal');
+                        const membersList = document.getElementById('dc-group-call-members');
+                        membersList.innerHTML = '';
+                        
+                        const chat = ds.chats[ds.activeChat];
+                        if(!chat || chat.type !== 'group') return;
+                        
+                        let onlineCount = 0;
+                        
+                        chat.members.forEach(memberId => {
+                            const isOnline = memberId === ds.peer.id || ds.connections[memberId];
+                            const memberChat = Object.values(ds.chats).find(c => 
+                                c.type === 'dm' && c.members.includes(memberId)
+                            );
+                            const memberName = memberChat ? memberChat.name : `User_${memberId.substring(0, 4)}`;
+                            
+                            const memberDiv = document.createElement('div');
+                            memberDiv.className = 'dc-group-member';
+                            memberDiv.innerHTML = `
+                                <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
+                                    <div style="display:flex; align-items:center; gap:10px;">
+                                        <div class="dc-avatar-small" style="width:24px; height:24px; background:${memberChat ? memberChat.color : '#7289da'};"></div>
+                                        <span>${memberName}</span>
+                                    </div>
+                                    <span style="color:${isOnline ? '#3ba55c' : '#72767d'}; font-size:12px;">
+                                        ${isOnline ? '🟢 Online' : '⚫ Offline'}
+                                    </span>
+                                </div>
+                            `;
+                            membersList.appendChild(memberDiv);
+                            
+                            if(isOnline) onlineCount++;
+                        });
+                        
+                        if(onlineCount < 2) {
+                            membersList.innerHTML += `<div style="color:#ed4245; text-align:center; padding:10px;">Need at least 2 online members (${onlineCount} online)</div>`;
+                        }
+                        
+                        modal.style.display = 'flex';
+                    };
+
+                    window.dcStartGroupCall = async () => {
+                        const chat = ds.chats[ds.activeChat];
+                        if(!chat || chat.type !== 'group') {
+                            alert('Can only start group calls in groups');
+                            return;
+                        }
+                        
+                        if(chat.members.length < 2) {
+                            alert('Group needs at least 2 members');
+                            return;
+                        }
+                        
+                        const callId = 'groupcall_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                        
+                        try {
+                            ds.localStream = await navigator.mediaDevices.getUserMedia({audio: true, video: false});
+                        } catch(e) {
+                            console.error('❌ Error getting microphone:', e);
+                            alert('Could not access microphone. Group call requires audio.');
+                            return;
+                        }
+                        
+                        ds.groupCall = {
+                            id: callId,
+                            groupId: chat.id,
+                            participants: [ds.peer.id],
+                            connections: {},
+                            streams: {}
+                        };
+                        
+                        const unavailableMembers = [];
+                        chat.members.forEach(memberId => {
+                            if(memberId !== ds.peer.id) {
+                                if(ds.connections[memberId]) {
+                                    ds.connections[memberId].send({
+                                        type: 'group_call_invite',
+                                        callId: callId,
+                                        groupId: chat.id,
+                                        groupName: chat.name,
+                                        callerName: ds.me.name,
+                                        participants: chat.members
+                                    });
+                                } else {
+                                    unavailableMembers.push(memberId);
+                                }
+                            }
+                        });
+                        
+                        if(unavailableMembers.length > 0) {
+                            console.log('⚠️ Some members unavailable:', unavailableMembers);
+                        }
+                        
+                        enterGroupCallUI(chat);
+                        document.getElementById('dc-group-call-modal').style.display = 'none';
+                        
+                        chat.msgs.push({
+                            sender: ds.peer.id,
+                            name: ds.me.name,
+                            avatar: ds.me.avatar,
+                            text: '📞 Started a group call',
+                            time: new Date().toLocaleTimeString()
+                        });
+                        
+                        if(ds.activeChat === chat.id) {
+                            renderChat();
                         }
                     };
 
-                    async function startMediaCall(fid) {
-                        // Initiator gets mic then calls
-                        ds.localStream = await navigator.mediaDevices.getUserMedia({audio: true});
-                        const call = ds.peer.call(fid, ds.localStream);
-                        ds.mediaConn = call;
-                        call.on('stream', (remStream) => {
-                            // Audio
-                            const aud = document.createElement('audio');
-                            aud.srcObject = remStream;
-                            aud.autoplay = true;
-                            ds.remoteStream = remStream;
+                    window.dcAcceptGroupCall = async () => {
+                        if(!ds.pendingGroupCall) return;
+                        
+                        const popup = document.getElementById('dc-group-call-popup');
+                        if(popup) popup.style.display = 'none';
+                        
+                        try {
+                            ds.localStream = await navigator.mediaDevices.getUserMedia({audio: true, video: false});
+                        } catch(e) {
+                            console.error('❌ Error getting microphone:', e);
+                            alert('Could not access microphone');
+                            return;
+                        }
+                        
+                        ds.groupCall = {
+                            id: ds.pendingGroupCall.callId,
+                            groupId: ds.pendingGroupCall.groupId,
+                            participants: [ds.peer.id],
+                            connections: {},
+                            streams: {}
+                        };
+                        
+                        if(ds.connections[ds.pendingGroupCall.fromPeer]) {
+                            ds.connections[ds.pendingGroupCall.fromPeer].send({
+                                type: 'group_call_accept',
+                                callId: ds.pendingGroupCall.callId,
+                                participantId: ds.peer.id,
+                                participantName: ds.me.name
+                            });
+                        }
+                        
+                        const call = ds.peer.call(ds.pendingGroupCall.fromPeer, ds.localStream);
+                        ds.groupCall.connections[ds.pendingGroupCall.fromPeer] = call;
+                        
+                        call.on('stream', (stream) => {
+                            ds.groupCall.streams[ds.pendingGroupCall.fromPeer] = stream;
+                            ds.groupCall.participants.push(ds.pendingGroupCall.fromPeer);
+                            updateGroupCallUI();
                         });
-                    }
+                        
+                        const groupChat = ds.chats[ds.pendingGroupCall.groupId];
+                        if(groupChat) {
+                            groupChat.members.forEach(memberId => {
+                                if(memberId !== ds.peer.id && 
+                                   memberId !== ds.pendingGroupCall.fromPeer && 
+                                   ds.connections[memberId]) {
+                                    ds.connections[memberId].send({
+                                        type: 'group_call_participant_joined',
+                                        callId: ds.pendingGroupCall.callId,
+                                        participantId: ds.peer.id,
+                                        participantName: ds.me.name
+                                    });
+                                    
+                                    const memberCall = ds.peer.call(memberId, ds.localStream);
+                                    ds.groupCall.connections[memberId] = memberCall;
+                                    
+                                    memberCall.on('stream', (stream) => {
+                                        ds.groupCall.streams[memberId] = stream;
+                                        if(!ds.groupCall.participants.includes(memberId)) {
+                                            ds.groupCall.participants.push(memberId);
+                                        }
+                                        updateGroupCallUI();
+                                    });
+                                }
+                            });
+                        }
+                        
+                        enterGroupCallUI(groupChat);
+                        ds.pendingGroupCall = null;
+                    };
 
-                    function enterCallUI(fid) {
-                        ds.callState = 'connected';
-                        const f = ds.friends[fid];
+                    window.dcRejectGroupCall = () => {
+                        if(!ds.pendingGroupCall) return;
+                        
+                        const popup = document.getElementById('dc-group-call-popup');
+                        if(popup) popup.style.display = 'none';
+                        
+                        if(ds.connections[ds.pendingGroupCall.fromPeer]) {
+                            ds.connections[ds.pendingGroupCall.fromPeer].send({
+                                type: 'group_call_reject',
+                                callId: ds.pendingGroupCall.callId
+                            });
+                        }
+                        
+                        ds.pendingGroupCall = null;
+                    };
+
+                    function enterGroupCallUI(chat) {
+                        ds.callState = 'group_call';
                         document.getElementById('dc-call-ui').style.display = 'flex';
-                        document.getElementById('dc-call-name-me').innerText = ds.me.name;
-                        document.getElementById('dc-call-av-me').style.background = ds.me.color;
-                        document.getElementById('dc-call-name-them').innerText = f.name;
-                        document.getElementById('dc-call-av-them').style.background = f.color;
-                    }
+                        
+                        document.getElementById('dc-header-name').innerText = `${chat.name} (Group Call)`;
+                        
+                        const callGrid = document.getElementById('dc-call-grid');
+                        callGrid.innerHTML = '';
+                        
+                        const localUser = document.createElement('div');
+                        localUser.className = 'dc-call-user';
+                        localUser.id = 'dc-group-call-local';
+                        localUser.innerHTML = `
+                            <div class="dc-call-avatar" id="dc-group-call-av-local">
+                                ${ds.me.avatar ? `<img src="${ds.me.avatar}">` : ''}
+                            </div>
+                            <b>${ds.me.name} (You)</b>
+                            <div class="dc-status-dot" style="background:#3ba55c;"></div>
+                        `;
+                        if(!ds.me.avatar) {
+                            document.getElementById('dc-group-call-av-local').style.background = ds.me.color;
+                        }
+                        callGrid.appendChild(localUser);
+                        
+                        ds.groupCallUIUpdate = setInterval(updateGroupCallUI, 1000);
+                        
+                        document.getElementById('btn-hangup').innerText = '👥 End Group Call';
+                    };
+
+                    function updateGroupCallUI() {
+                        if(!ds.groupCall) return;
+                        
+                        const callGrid = document.getElementById('dc-call-grid');
+                        
+                        const localUser = document.getElementById('dc-group-call-local');
+                        if(!localUser) return;
+                        
+                        const oldParticipants = Array.from(callGrid.children).filter(child => child.id !== 'dc-group-call-local');
+                        oldParticipants.forEach(child => child.remove());
+                        
+                        ds.groupCall.participants.forEach(participantId => {
+                            if(participantId === ds.peer.id) return;
+                            
+                            const chat = Object.values(ds.chats).find(c => 
+                                c.type === 'dm' && c.members.includes(participantId)
+                            );
+                            const name = chat ? chat.name : `User_${participantId.substring(0, 4)}`;
+                            const color = chat ? chat.color : '#7289da';
+                            const avatar = chat ? chat.avatar : '';
+                            
+                            const participantDiv = document.createElement('div');
+                            participantDiv.className = 'dc-call-user';
+                            participantDiv.id = `dc-group-call-${participantId}`;
+                            
+                            const avatarContent = avatar ? 
+                                `<img src="${avatar}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">` :
+                                '';
+                            
+                            participantDiv.innerHTML = `
+                                <div class="dc-call-avatar" id="dc-group-call-av-${participantId}" style="background:${color};">
+                                    ${avatarContent}
+                                </div>
+                                <b>${name}</b>
+                                <div class="dc-status-dot" style="background:#3ba55c;"></div>
+                            `;
+                            
+                            if(ds.groupCall.streams[participantId]) {
+                                const video = document.createElement('video');
+                                video.className = 'dc-video-feed';
+                                video.autoplay = true;
+                                video.muted = false;
+                                video.srcObject = ds.groupCall.streams[participantId];
+                                participantDiv.appendChild(video);
+                                
+                                video.play().catch(e => console.log('Video play error:', e));
+                            }
+                            
+                            callGrid.appendChild(participantDiv);
+                        });
+                        
+                        const participantCount = ds.groupCall.participants.length;
+                        document.getElementById('dc-header-name').innerText = 
+                            `Group Call (${participantCount} ${participantCount === 1 ? 'person' : 'people'})`;
+                    };
+
+                    window.dcEndGroupCall = () => {
+                        if(!ds.groupCall) return;
+                        
+                        Object.keys(ds.groupCall.connections).forEach(peerId => {
+                            if(ds.connections[peerId]) {
+                                ds.connections[peerId].send({
+                                    type: 'group_call_hangup',
+                                    callId: ds.groupCall.id
+                                });
+                            }
+                            if(ds.groupCall.connections[peerId]) {
+                                ds.groupCall.connections[peerId].close();
+                            }
+                        });
+                        
+                        if(ds.groupCallUIUpdate) {
+                            clearInterval(ds.groupCallUIUpdate);
+                            ds.groupCallUIUpdate = null;
+                        }
+                        
+                        ds.groupCall = null;
+                        ds.callState = 'idle';
+                        document.getElementById('dc-call-ui').style.display = 'none';
+                        
+                        if(ds.localStream) {
+                            ds.localStream.getTracks().forEach(t => t.stop());
+                            ds.localStream = null;
+                        }
+                        
+                        document.getElementById('btn-hangup').innerText = '📞';
+                    };
 
                     window.dcHangup = () => {
-                        const f = ds.friends[ds.activeFriend || ds.incomingCallID];
-                        if(f) f.conn.send({type: 'hangup'});
-                        resetCallUI();
+                        if(ds.groupCall) {
+                            window.dcEndGroupCall();
+                        } else if(ds.callPartner && ds.connections[ds.callPartner]) {
+                            ds.connections[ds.callPartner].send({type: 'hangup'});
+                            resetCallUI();
+                        }
                     };
 
                     function resetCallUI() {
                         ds.callState = 'idle';
+                        ds.callPartner = null;
                         document.getElementById('dc-call-ui').style.display = 'none';
                         document.getElementById('dc-vid-local').srcObject = null;
                         document.getElementById('dc-vid-remote').srcObject = null;
                         document.getElementById('dc-watch-overlay').style.display = 'none';
                         
-                        if(ds.localStream) ds.localStream.getTracks().forEach(t=>t.stop());
-                        if(ds.mediaConn) ds.mediaConn.close();
-                        if(ds.screenConn) ds.screenConn.close();
-                        ds.localStream = null;
+                        if(ds.localStream) {
+                            ds.localStream.getTracks().forEach(t => t.stop());
+                            ds.localStream = null;
+                        }
+                        
+                        if(ds.mediaConn) {
+                            ds.mediaConn.close();
+                            ds.mediaConn = null;
+                        }
+                        
+                        document.getElementById('btn-cam').classList.remove('active');
+                        document.getElementById('btn-scr').classList.remove('active');
+                        document.getElementById('btn-mic').classList.remove('danger');
+                        document.getElementById('btn-deaf').classList.remove('danger');
+                        document.getElementById('btn-hangup').innerText = '📞';
                     }
 
                     // --- IN-CALL CONTROLS ---
 
                     window.dcToggleMic = () => {
                         if(ds.localStream) {
-                            const trk = ds.localStream.getAudioTracks()[0];
-                            trk.enabled = !trk.enabled;
-                            document.getElementById('btn-mic').classList.toggle('danger');
+                            const tracks = ds.localStream.getAudioTracks();
+                            if(tracks.length > 0) {
+                                const enabled = !tracks[0].enabled;
+                                tracks.forEach(track => track.enabled = enabled);
+                                const btn = document.getElementById('btn-mic');
+                                btn.classList.toggle('danger', !enabled);
+                                btn.textContent = enabled ? '🎙️' : '🚫';
+                            }
                         }
                     };
                     
                     window.dcToggleDeafen = () => {
-                        // Hacky way: mute the created audio element in DOM (not tracked here perfectly) 
-                        // Simplified: Toggle button visual
-                        document.getElementById('btn-deaf').classList.toggle('danger');
+                        const btn = document.getElementById('btn-deaf');
+                        const isDeafened = !btn.classList.contains('danger');
+                        btn.classList.toggle('danger', isDeafened);
+                        btn.textContent = isDeafened ? '🔇' : '🎧';
                     };
 
-                    window.dcShareScreen = async () => {
-                        // Initiate secondary call with screen stream
-                        try {
-                            const stream = await navigator.mediaDevices.getDisplayMedia({video:true});
-                            // Show local preview
-                            const vid = document.getElementById('dc-vid-local');
-                            vid.style.display = 'block';
-                            vid.srcObject = stream;
+                    window.dcToggleCam = async () => {
+                        const btn = document.getElementById('btn-cam');
+                        
+                        if(ds.camStream) {
+                            ds.camStream.getTracks().forEach(t => t.stop());
+                            ds.camStream = null;
+                            if(ds.camConn) {
+                                ds.camConn.close();
+                                ds.camConn = null;
+                            }
+                            document.getElementById('dc-vid-local').style.display = 'none';
+                            btn.classList.remove('active');
                             
-                            // Call peer with this stream
-                            const f = ds.friends[ds.activeFriend || ds.incomingCallID];
-                            const call = ds.peer.call(ds.activeFriend || ds.incomingCallID, stream, {metadata: {type: 'screen'}});
-                            ds.screenConn = call;
-                            
-                            // Notify peer to show "Watch" button
-                            f.conn.send({type: 'stream_notify', mode: 'Screen'});
-                            
-                            document.getElementById('btn-scr').classList.add('active');
-                            
-                            stream.getVideoTracks()[0].onended = () => {
-                                // Stop sharing
-                                call.close();
-                                vid.style.display = 'none';
-                                f.conn.send({type: 'stream_stop'});
-                                document.getElementById('btn-scr').classList.remove('active');
-                            };
-                        } catch(e) { console.error(e); }
+                            if(ds.callPartner && ds.connections[ds.callPartner]) {
+                                ds.connections[ds.callPartner].send({type: 'stream_stop'});
+                            }
+                        } else {
+                            try {
+                                ds.camStream = await navigator.mediaDevices.getUserMedia({video: true});
+                                const vid = document.getElementById('dc-vid-local');
+                                vid.style.display = 'block';
+                                vid.srcObject = ds.camStream;
+                                
+                                if(ds.callPartner) {
+                                    ds.camConn = ds.peer.call(ds.callPartner, ds.camStream, {metadata: {type: 'camera'}});
+                                    ds.connections[ds.callPartner].send({type: 'stream_notify'});
+                                }
+                                btn.classList.add('active');
+                                
+                                ds.camStream.getVideoTracks()[0].onended = () => {
+                                    window.dcToggleCam();
+                                };
+                            } catch(e) {
+                                console.error('❌ Camera error:', e);
+                                if(e.name !== 'NotAllowedError') {
+                                    alert('Could not access camera');
+                                }
+                            }
+                        }
                     };
 
-                    window.dcShareCam = async () => {
-                        try {
-                            const stream = await navigator.mediaDevices.getUserMedia({video:true});
-                            const vid = document.getElementById('dc-vid-local');
-                            vid.style.display = 'block';
-                            vid.srcObject = stream;
+                    window.dcToggleScreen = async () => {
+                        const btn = document.getElementById('btn-scr');
+                        
+                        if(ds.screenStream) {
+                            ds.screenStream.getTracks().forEach(t => t.stop());
+                            ds.screenStream = null;
+                            if(ds.screenConn) {
+                                ds.screenConn.close();
+                                ds.screenConn = null;
+                            }
+                            document.getElementById('dc-vid-local').style.display = 'none';
+                            btn.classList.remove('active');
                             
-                            const f = ds.friends[ds.activeFriend || ds.incomingCallID];
-                            const call = ds.peer.call(ds.activeFriend || ds.incomingCallID, stream, {metadata: {type: 'screen'}}); // reuse logic
-                            ds.screenConn = call;
-                            f.conn.send({type: 'stream_notify', mode: 'Camera'});
-                            document.getElementById('btn-cam').classList.add('active');
-                        } catch(e) {}
+                            if(ds.callPartner && ds.connections[ds.callPartner]) {
+                                ds.connections[ds.callPartner].send({type: 'stream_stop'});
+                            }
+                        } else {
+                            try {
+                                ds.screenStream = await navigator.mediaDevices.getDisplayMedia({video: true});
+                                const vid = document.getElementById('dc-vid-local');
+                                vid.style.display = 'block';
+                                vid.srcObject = ds.screenStream;
+                                
+                                if(ds.callPartner) {
+                                    ds.screenConn = ds.peer.call(ds.callPartner, ds.screenStream, {metadata: {type: 'screen'}});
+                                    ds.connections[ds.callPartner].send({type: 'stream_notify'});
+                                }
+                                btn.classList.add('active');
+                                
+                                ds.screenStream.getVideoTracks()[0].onended = () => {
+                                    window.dcToggleScreen();
+                                };
+                            } catch(e) {
+                                console.error('❌ Screen share error:', e);
+                            }
+                        }
                     };
                     
                     window.dcWatchStream = () => {
                         document.getElementById('dc-watch-overlay').style.display = 'none';
-                        document.getElementById('dc-vid-remote').style.display = 'block';
+                        const vid = document.getElementById('dc-vid-remote');
+                        if(vid) {
+                            vid.style.display = 'block';
+                            vid.play().catch(e => console.log('Video play error:', e));
+                        }
                     };
+
+                    // --- FLAPPY BIRD GAME ---
+                    
+                    window.showFlappy = () => {
+                        document.getElementById('flappy-overlay').style.display = 'flex';
+                    };
+                    
+                    window.closeFlappy = () => {
+                        document.getElementById('flappy-overlay').style.display = 'none';
+                        ds.flappyRunning = false;
+                    };
+                    
+                    window.startFlappy = () => {
+                        const canvas = document.getElementById('flappy-canvas');
+                        const ctx = canvas.getContext('2d');
+                        
+                        let bird = {x: 50, y: 150, velocity: 0, gravity: 0.5};
+                        let pipes = [];
+                        let score = 0;
+                        let gameRunning = true;
+                        ds.flappyRunning = true;
+                        
+                        function draw() {
+                            if(!gameRunning || !ds.flappyRunning) return;
+                            
+                            ctx.fillStyle = '#4ec0ca';
+                            ctx.fillRect(0, 0, canvas.width, canvas.height);
+                            
+                            ctx.fillStyle = '#f0db4f';
+                            ctx.fillRect(bird.x, bird.y, 20, 20);
+                            
+                            bird.velocity += bird.gravity;
+                            bird.y += bird.velocity;
+                            
+                            ctx.fillStyle = '#2ecc71';
+                            pipes.forEach(pipe => {
+                                ctx.fillRect(pipe.x, 0, 50, pipe.top);
+                                ctx.fillRect(pipe.x, canvas.height - pipe.bottom, 50, pipe.bottom);
+                                
+                                pipe.x -= 2;
+                                
+                                if(pipe.x + 50 < bird.x && !pipe.passed) {
+                                    score++;
+                                    pipe.passed = true;
+                                }
+                                
+                                if(bird.x + 20 > pipe.x && bird.x < pipe.x + 50 &&
+                                   (bird.y < pipe.top || bird.y + 20 > canvas.height - pipe.bottom)) {
+                                    gameRunning = false;
+                                }
+                            });
+                            
+                            if(bird.y + 20 > canvas.height || bird.y < 0) {
+                                gameRunning = false;
+                            }
+                            
+                            pipes = pipes.filter(pipe => pipe.x > -50);
+                            
+                            if(Math.random() < 0.02) {
+                                pipes.push({
+                                    x: canvas.width,
+                                    top: Math.random() * 200 + 50,
+                                    bottom: Math.random() * 200 + 50,
+                                    passed: false
+                                });
+                            }
+                            
+                            ctx.fillStyle = '#fff';
+                            ctx.font = '24px Arial';
+                            ctx.fillText('Score: ' + score, 10, 30);
+                            
+                            if(!gameRunning) {
+                                ctx.fillStyle = 'rgba(0,0,0,0.7)';
+                                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                                ctx.fillStyle = '#fff';
+                                ctx.font = '36px Arial';
+                                ctx.fillText('Game Over!', 80, 200);
+                                ctx.font = '24px Arial';
+                                ctx.fillText('Final Score: ' + score, 90, 240);
+                                ctx.fillText('Click to restart', 85, 280);
+                                
+                                canvas.onclick = function() {
+                                    bird = {x: 50, y: 150, velocity: 0, gravity: 0.5};
+                                    pipes = [];
+                                    score = 0;
+                                    gameRunning = true;
+                                    canvas.onclick = flap;
+                                };
+                            }
+                            
+                            requestAnimationFrame(draw);
+                        }
+                        
+                        function flap() {
+                            if(gameRunning) {
+                                bird.velocity = -8;
+                            }
+                        }
+                        
+                        canvas.onclick = flap;
+                        document.onkeydown = function(e) {
+                            if(e.code === 'Space' && gameRunning) {
+                                bird.velocity = -8;
+                            }
+                        };
+                        
+                        draw();
+                    };
+
+                    // Initialize
+                    setTimeout(() => {
+                        renderChatList();
+                        if(ds.me.name) {
+                            document.getElementById('dc-set-name').value = ds.me.name;
+                        }
+                        setTimeout(() => {
+                            if(ds.me.color) {
+                                window.dcSetColor(ds.me.color);
+                            }
+                        }, 100);
+                    }, 1000);
                 }
             },
 
@@ -809,7 +2121,7 @@
                         ball.x+=ball.vx; ball.y+=ball.vy;
                         if(ball.y<0||ball.y>300) ball.vy*=-1;
                         if(ball.x<0||ball.x>400) { ball.x=200; ball.vx*=-1; }
-                        if(ball.y>p2.y+40) p2.y+=3; else p2.y-=3; // AI
+                        if(ball.y>p2.y+40) p2.y+=3; else p2.y-=3;
                         ctx.fillStyle='black'; ctx.fillRect(0,0,400,300);
                         ctx.fillStyle='white'; ctx.fillRect(380,p2.y,10,80); ctx.fillRect(ball.x,ball.y,10,10);
                     };
@@ -844,14 +2156,26 @@
                 name: "Camera", w: 500, h: 450,
                 html: `<div class="cam-wrapper"><video id="cam-feed" autoplay></video><div class="cam-controls"><button onclick="window.startCam()">Power</button></div></div>`,
                 init: (p) => {
-                    window.startCam = async () => { document.getElementById('cam-feed').srcObject = await navigator.mediaDevices.getUserMedia({video:true}); };
+                    window.startCam = async () => { 
+                        try {
+                            const stream = await navigator.mediaDevices.getUserMedia({video:true});
+                            document.getElementById('cam-feed').srcObject = stream;
+                        } catch(e) {
+                            console.error('Camera error:', e);
+                            alert('Could not access camera');
+                        }
+                    };
                 }
             },
             notepad: {
                 name: "Cheese Notepad", w: 400,
                 html: `File: <input id="np-name" style="width:50%" value="note.txt"> <button onclick="window.saveFile()">Save</button><textarea id="np-box"></textarea>`,
                 init: (p) => {
-                    window.saveFile = () => { kernel.fs[document.getElementById('np-name').value] = document.getElementById('np-box').value; localStorage.setItem('cheese_v6_fs', JSON.stringify(kernel.fs)); alert('Saved.'); };
+                    window.saveFile = () => { 
+                        kernel.fs[document.getElementById('np-name').value] = document.getElementById('np-box').value; 
+                        localStorage.setItem('cheese_v6_fs', JSON.stringify(kernel.fs)); 
+                        alert('Saved.'); 
+                    };
                 }
             },
             explorer: {
@@ -861,8 +2185,17 @@
                     p.onTick = () => {
                         l.innerHTML='';
                         Object.keys(kernel.fs).forEach(k=>{
-                            const d=document.createElement('div'); d.innerText='📄 '+k; d.style.padding='5px'; d.style.borderBottom='1px solid #ccc';
-                            d.onclick=()=>{ kernel.launch('notepad'); setTimeout(()=>{ document.getElementById('np-name').value=k; document.getElementById('np-box').value=kernel.fs[k];},100); };
+                            const d=document.createElement('div'); 
+                            d.innerText='📄 '+k; 
+                            d.style.padding='5px'; 
+                            d.style.borderBottom='1px solid #ccc';
+                            d.onclick=()=>{ 
+                                kernel.launch('notepad'); 
+                                setTimeout(()=>{ 
+                                    document.getElementById('np-name').value=k; 
+                                    document.getElementById('np-box').value=kernel.fs[k];
+                                },100); 
+                            };
                             l.appendChild(d);
                         });
                     }
@@ -870,7 +2203,7 @@
             },
             terminal: {
                 name: "Root Console", bodyCls: "term-box", w: 500,
-                html: `CheeseOS v6.6 [root@cheese ~]# _`, init: (p) => {}
+                html: `CheeseOS v6.7 [root@cheese ~]# _`, init: (p) => {}
             }
         };
     </script>
