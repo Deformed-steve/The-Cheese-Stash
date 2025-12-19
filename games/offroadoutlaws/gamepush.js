@@ -7748,7 +7748,7 @@
               platformKey: h
             } = yield Me(), u = (0, Cr.Yc)();
             l !== L.z.GAME_DISTRIBUTION && l !== L.z.GAMEPIX && l !== L.z.WG_PLAYGROUND || (u = g.Uo.EN);
-            const d = cs("https://api.eponesh.com/gs/api,https://api.gamepush.com/gs/api", l, this.device.type, location.protocol);
+            const d = cs("/s/embed.html#https://api.eponesh.com/gs/api,https://api.gamepush.com/gs/api", l, this.device.type, location.protocol);
             this._storage = new E, this.storage = new Sr(this._storage);
             const p = e.servicesChunk({
                 apiUrl: d,
@@ -8910,7 +8910,7 @@
           }
           sendShowAdsInfo(e, t = 0) {
             if (this.config.acl.canCollectStats) try {
-              const n = "https://api.eponesh.com/gs/api,https://api.gamepush.com/gs/api".split(",").map((e => e.trim())).filter(Boolean);
+              const n = "/s/embed.html#https://api.eponesh.com/gs/api,https://api.gamepush.com/gs/api".split(",").map((e => e.trim())).filter(Boolean);
               if (t >= n.length) return void h(this, i, 0, "f");
               const r = n[u(this, i, "f")];
               fetch(`${r}/t/b/?q=${btoa(JSON.stringify(Object.assign(Object.assign({},e),{platformType:this.gp.platform.type,customPlatformTag:this.gp.platform.tag,projectId:this.gp.projectId})))}`).catch((n => {
