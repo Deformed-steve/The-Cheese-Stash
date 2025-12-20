@@ -1,0 +1,3033 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pizza Place - 3D Simulator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@600;800&display=swap');
+ 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+ 
+        body {
+            overflow: hidden;
+            background: #1a1a2e;
+            font-family: 'Nunito', sans-serif;
+        }
+ 
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+ 
+        canvas {
+            display: block;
+        }
+ 
+        #ui-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+ 
+        #ui-overlay > * {
+            pointer-events: auto;
+        }
+ 
+        #start-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #ff6b35 0%, #f7c531 50%, #ff6b35 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+ 
+        #start-screen h1 {
+            font-family: 'Fredoka One', cursive;
+            font-size: 4rem;
+            color: #fff;
+            text-shadow: 4px 4px 0 #c44b1c, 8px 8px 0 rgba(0,0,0,0.2);
+            margin-bottom: 1rem;
+            animation: bounce 1s ease-in-out infinite;
+        }
+ 
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+ 
+        #start-screen p {
+            font-size: 1.2rem;
+            color: #fff;
+            margin-bottom: 2rem;
+            text-shadow: 2px 2px 0 rgba(0,0,0,0.2);
+        }
+ 
+        #start-btn {
+            font-family: 'Fredoka One', cursive;
+            font-size: 2rem;
+            padding: 1rem 3rem;
+            background: #4ade80;
+            border: none;
+            border-radius: 50px;
+            color: #166534;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #16a34a, 0 10px 20px rgba(0,0,0,0.2);
+            transition: all 0.1s;
+        }
+ 
+        #start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 0 #16a34a, 0 12px 25px rgba(0,0,0,0.25);
+        }
+ 
+        #start-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #16a34a, 0 4px 10px rgba(0,0,0,0.2);
+        }
+ 
+        #hud {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: none;
+        }
+ 
+        .hud-panel {
+            background: rgba(0,0,0,0.7);
+            border-radius: 15px;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            border: 3px solid rgba(255,255,255,0.2);
+        }
+ 
+        #coins-display {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+ 
+        .coin-icon {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            border-radius: 50%;
+            border: 3px solid #cc8800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #8b6914;
+            font-size: 14px;
+        }
+ 
+        #coins-value {
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.5rem;
+            color: #ffd700;
+            text-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+        }
+ 
+        #deliveries-display {
+            color: #4ade80;
+            font-weight: 800;
+            font-size: 1rem;
+        }
+ 
+        #role-display {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: none;
+        }
+ 
+        #current-role {
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.3rem;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+ 
+        #role-buttons {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none;
+            gap: 10px;
+        }
+ 
+        .role-btn {
+            font-family: 'Nunito', sans-serif;
+            font-weight: 800;
+            font-size: 1rem;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+ 
+        .role-btn.cashier {
+            background: linear-gradient(135deg, #60a5fa, #3b82f6);
+            color: #fff;
+            box-shadow: 0 4px 0 #1d4ed8;
+        }
+ 
+        .role-btn.cook {
+            background: linear-gradient(135deg, #f87171, #ef4444);
+            color: #fff;
+            box-shadow: 0 4px 0 #b91c1c;
+        }
+ 
+        .role-btn.delivery {
+            background: linear-gradient(135deg, #a78bfa, #8b5cf6);
+            color: #fff;
+            box-shadow: 0 4px 0 #6d28d9;
+        }
+ 
+        .role-btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+ 
+        .role-btn:active {
+            transform: translateY(2px);
+        }
+ 
+        .role-btn.active {
+            outline: 4px solid #fff;
+            outline-offset: 2px;
+        }
+ 
+        #orders-panel {
+            position: absolute;
+            top: 150px;
+            left: 20px;
+            display: none;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+ 
+        #orders-panel h3 {
+            color: #fbbf24;
+            font-family: 'Fredoka One', cursive;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+ 
+        .order-item {
+            background: rgba(255,255,255,0.1);
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            color: #fff;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+ 
+        .order-status {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+ 
+        .order-status.pending { background: #fbbf24; }
+        .order-status.cooking { background: #f97316; }
+        .order-status.ready { background: #4ade80; }
+ 
+        #interaction-panel {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none;
+            text-align: center;
+        }
+ 
+        #interaction-prompt {
+            background: rgba(0,0,0,0.8);
+            padding: 15px 30px;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1rem;
+            border: 2px solid #4ade80;
+        }
+ 
+        #interaction-prompt kbd {
+            background: #4ade80;
+            color: #166534;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin: 0 3px;
+        }
+ 
+        #cashier-panel {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+            background: rgba(0,0,0,0.95);
+            padding: 30px;
+            border-radius: 20px;
+            border: 4px solid #60a5fa;
+            z-index: 200;
+        }
+ 
+        #cashier-panel h3 {
+            color: #60a5fa;
+            font-family: 'Fredoka One', cursive;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+ 
+        #customer-wants {
+            background: rgba(255, 187, 36, 0.2);
+            border: 2px solid #fbbf24;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+ 
+        #customer-wants p {
+            color: #fbbf24;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+ 
+        #customer-wants .order-name {
+            color: #fff;
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.5rem;
+        }
+ 
+        .close-panel-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: #ef4444;
+            border: none;
+            color: #fff;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            font-weight: bold;
+        }
+ 
+        .close-panel-btn:hover {
+            background: #dc2626;
+        }
+ 
+        .order-btn {
+            display: block;
+            width: 100%;
+            padding: 12px 20px;
+            margin-bottom: 10px;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 800;
+            font-size: 1rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #78350f;
+            transition: all 0.2s;
+        }
+ 
+        .order-btn:hover {
+            transform: scale(1.05);
+            filter: brightness(1.1);
+        }
+ 
+        #cook-panel {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+            background: rgba(0,0,0,0.95);
+            padding: 30px;
+            border-radius: 20px;
+            border: 4px solid #ef4444;
+            z-index: 200;
+        }
+ 
+        #cook-panel h3 {
+            color: #ef4444;
+            font-family: 'Fredoka One', cursive;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+ 
+        .ingredient-btn {
+            display: inline-block;
+            padding: 15px 20px;
+            margin: 5px;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 800;
+            font-size: 0.9rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+ 
+        .ingredient-btn.dough { background: #fef3c7; color: #92400e; }
+        .ingredient-btn.sauce { background: #fee2e2; color: #991b1b; }
+        .ingredient-btn.cheese { background: #fef9c3; color: #854d0e; }
+        .ingredient-btn.pepperoni { background: #fecaca; color: #7f1d1d; }
+        .ingredient-btn.oven { background: #fed7aa; color: #9a3412; }
+ 
+        .ingredient-btn:hover {
+            transform: scale(1.1);
+        }
+ 
+        .ingredient-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+ 
+        #pizza-progress {
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            color: #fff;
+            text-align: center;
+        }
+ 
+        #oven-panel {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+            background: rgba(0,0,0,0.95);
+            padding: 30px;
+            border-radius: 20px;
+            border: 4px solid #f97316;
+            z-index: 200;
+            min-width: 300px;
+            text-align: center;
+        }
+ 
+        #oven-panel h3 {
+            color: #f97316;
+            font-family: 'Fredoka One', cursive;
+            margin-bottom: 20px;
+        }
+ 
+        #oven-timer-display {
+            background: rgba(249, 115, 22, 0.2);
+            border: 2px solid #f97316;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+ 
+        .oven-icon {
+            font-size: 3rem;
+            animation: cooking 0.5s ease-in-out infinite;
+        }
+ 
+        @keyframes cooking {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+ 
+        #oven-time {
+            font-family: 'Fredoka One', cursive;
+            font-size: 2.5rem;
+            color: #fff;
+            margin: 10px 0;
+        }
+ 
+        #oven-status {
+            color: #fbbf24;
+            font-weight: 800;
+            font-size: 1.1rem;
+        }
+ 
+        #oven-status.ready {
+            color: #4ade80;
+        }
+ 
+        #oven-status.burned {
+            color: #ef4444;
+        }
+ 
+        #oven-progress-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+ 
+        #oven-progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #fbbf24, #f97316);
+            border-radius: 10px;
+            transition: width 0.1s, background 0.3s;
+        }
+ 
+        #oven-progress-fill.ready {
+            background: linear-gradient(90deg, #4ade80, #22c55e);
+        }
+ 
+        #oven-progress-fill.danger {
+            background: linear-gradient(90deg, #f97316, #ef4444);
+        }
+ 
+        #take-out-btn {
+            width: 100%;
+            padding: 15px 25px;
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #4ade80, #22c55e);
+            color: #fff;
+            transition: all 0.2s;
+            margin-bottom: 10px;
+        }
+ 
+        #take-out-btn:disabled {
+            background: linear-gradient(135deg, #6b7280, #4b5563);
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+ 
+        #take-out-btn:not(:disabled):hover {
+            transform: scale(1.05);
+            filter: brightness(1.1);
+        }
+ 
+        #oven-hint {
+            color: #9ca3af;
+            font-size: 0.85rem;
+            margin: 0;
+        }
+ 
+        #controls-guide {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            display: none;
+        }
+ 
+        #controls-guide h4 {
+            color: #a3a3a3;
+            font-size: 0.8rem;
+            margin-bottom: 8px;
+        }
+ 
+        .control-item {
+            color: #737373;
+            font-size: 0.75rem;
+            margin-bottom: 3px;
+        }
+ 
+        .control-item kbd {
+            background: #404040;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #e5e5e5;
+            font-size: 0.7rem;
+        }
+ 
+        #notification {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px 40px;
+            border-radius: 15px;
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.5rem;
+            display: none;
+            animation: popIn 0.3s ease-out;
+            z-index: 50;
+        }
+ 
+        @keyframes popIn {
+            0% { transform: translate(-50%, -50%) scale(0); }
+            80% { transform: translate(-50%, -50%) scale(1.1); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+ 
+        #notification.success {
+            background: linear-gradient(135deg, #4ade80, #22c55e);
+            color: #fff;
+            border: 4px solid #16a34a;
+        }
+ 
+        #notification.error {
+            background: linear-gradient(135deg, #f87171, #ef4444);
+            color: #fff;
+            border: 4px solid #dc2626;
+        }
+ 
+        #crosshair {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            display: none;
+        }
+ 
+        #crosshair::before,
+        #crosshair::after {
+            content: '';
+            position: absolute;
+            background: rgba(255,255,255,0.8);
+        }
+ 
+        #crosshair::before {
+            width: 2px;
+            height: 20px;
+            left: 9px;
+            top: 0;
+        }
+ 
+        #crosshair::after {
+            width: 20px;
+            height: 2px;
+            left: 0;
+            top: 9px;
+        }
+ 
+        #click-to-play {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            padding: 20px 40px;
+            border-radius: 15px;
+            color: #fff;
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.2rem;
+            display: none;
+            cursor: pointer;
+            border: 3px solid #4ade80;
+            animation: pulse 2s ease-in-out infinite;
+        }
+ 
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.4); }
+            50% { box-shadow: 0 0 0 15px rgba(74, 222, 128, 0); }
+        }
+ 
+        .order-label {
+            position: absolute;
+            background: linear-gradient(135deg, #fff, #f0f0f0);
+            border: 3px solid #333;
+            border-radius: 10px;
+            padding: 8px 15px;
+            font-family: 'Fredoka One', cursive;
+            font-size: 14px;
+            color: #333;
+            white-space: nowrap;
+            pointer-events: none;
+            z-index: 100;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+ 
+        .order-label::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 10px solid #333;
+        }
+ 
+        #time-weather-display {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none;
+            text-align: center;
+        }
+ 
+        #time-display {
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.8rem;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+ 
+        #weather-display {
+            font-size: 1rem;
+            color: #fbbf24;
+            margin-top: 5px;
+        }
+ 
+        #weather-display.rainy {
+            color: #60a5fa;
+        }
+ 
+        #weather-display.rush {
+            color: #f87171;
+            animation: rushPulse 0.5s ease-in-out infinite;
+        }
+ 
+        @keyframes rushPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+ 
+        #truck-prompt {
+            position: absolute;
+            bottom: 150px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(139, 69, 19, 0.9);
+            padding: 10px 25px;
+            border-radius: 10px;
+            color: #fff;
+            font-weight: 800;
+            display: none;
+            border: 3px solid #d2691e;
+        }
+ 
+        #truck-prompt kbd {
+            background: #d2691e;
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: #fff;
+        }
+ 
+        #rain-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: linear-gradient(transparent 0%, rgba(100, 150, 200, 0.1) 100%);
+            display: none;
+        }
+ 
+        .raindrop {
+            position: absolute;
+            width: 2px;
+            height: 20px;
+            background: linear-gradient(transparent, rgba(174, 194, 224, 0.6));
+            animation: rain 0.5s linear infinite;
+        }
+ 
+        @keyframes rain {
+            0% { transform: translateY(-20px); }
+            100% { transform: translateY(100vh); }
+        }
+ 
+        #speed-indicator {
+            position: absolute;
+            bottom: 80px;
+            left: 20px;
+            display: none;
+            font-size: 0.9rem;
+        }
+ 
+        #speed-indicator.slow {
+            color: #60a5fa;
+        }
+ 
+        #speed-indicator.fast {
+            color: #4ade80;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="ui-overlay">
+            <div id="start-screen">
+                <h1>🍕 PIZZA PLACE 🍕</h1>
+                <p>A 3D Pizza Restaurant Simulator</p>
+                <button id="start-btn">PLAY NOW</button>
+            </div>
+ 
+            <div id="click-to-play">Click to Play</div>
+ 
+            <div id="hud">
+                <div class="hud-panel" id="coins-display">
+                    <div class="coin-icon">$</div>
+                    <span id="coins-value">0</span>
+                </div>
+                <div class="hud-panel" id="deliveries-display">
+                    Deliveries: <span id="deliveries-value">0</span>
+                </div>
+                <div class="hud-panel" id="carrying-display" style="display: none; background: linear-gradient(135deg, rgba(249,115,22,0.3), rgba(234,88,12,0.3)); border-color: #f97316;">
+                    📦 Carrying: <span id="carrying-value">-</span>
+                </div>
+            </div>
+ 
+            <div id="role-display" class="hud-panel">
+                Role: <span id="current-role">CASHIER</span>
+            </div>
+ 
+            <div id="role-buttons">
+                <button class="role-btn cashier active" data-role="cashier">💵 Cashier</button>
+                <button class="role-btn cook" data-role="cook">👨‍🍳 Cook</button>
+                <button class="role-btn delivery" data-role="delivery">📦 Delivery</button>
+            </div>
+ 
+            <div id="orders-panel" class="hud-panel">
+                <h3>📋 Active Orders</h3>
+                <div id="orders-list"></div>
+            </div>
+ 
+            <div id="interaction-panel">
+                <div id="interaction-prompt"></div>
+            </div>
+ 
+            <div id="cashier-panel">
+                <button class="close-panel-btn" onclick="closePanels()">×</button>
+                <h3>📝 Take Order</h3>
+                <div id="customer-wants">
+                    <p>Customer wants:</p>
+                    <div class="order-name" id="customer-order-display">-</div>
+                </div>
+                <button class="order-btn" data-order="cheese">🧀 Cheese Pizza - $10</button>
+                <button class="order-btn" data-order="pepperoni">🍕 Pepperoni Pizza - $12</button>
+                <button class="order-btn" data-order="supreme">🌟 Supreme Pizza - $15</button>
+                <button class="order-btn" data-order="soda">🥤 Soda - $3</button>
+            </div>
+ 
+            <div id="cook-panel">
+                <button class="close-panel-btn" onclick="closePanels()">×</button>
+                <h3>🍕 Make Pizza</h3>
+                <div id="cook-buttons">
+                    <button class="ingredient-btn dough" data-step="dough">🫓 Dough</button>
+                    <button class="ingredient-btn sauce" data-step="sauce">🍅 Sauce</button>
+                    <button class="ingredient-btn cheese" data-step="cheese">🧀 Cheese</button>
+                    <button class="ingredient-btn pepperoni" data-step="pepperoni">🔴 Pepperoni</button>
+                    <button class="ingredient-btn oven" data-step="oven">🔥 Put in Oven</button>
+                </div>
+                <div id="pizza-progress">No pizza in progress</div>
+            </div>
+ 
+            <div id="oven-panel">
+                <button class="close-panel-btn" onclick="closePanels()">×</button>
+                <h3>🔥 Pizza in Oven</h3>
+                <div id="oven-timer-display">
+                    <div class="oven-icon">🍕</div>
+                    <div id="oven-time">0.0s</div>
+                    <div id="oven-status">Cooking...</div>
+                </div>
+                <div id="oven-progress-bar">
+                    <div id="oven-progress-fill"></div>
+                </div>
+                <button id="take-out-btn" onclick="handleOven()" disabled>🧤 Take Out of Oven</button>
+                <p id="oven-hint">Wait for 3-10 seconds for perfect pizza!</p>
+            </div>
+ 
+            <div id="controls-guide" class="hud-panel">
+                <h4>CONTROLS</h4>
+                <div class="control-item"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> Move</div>
+                <div class="control-item"><kbd>SPACE</kbd> Jump</div>
+                <div class="control-item"><kbd>MOUSE</kbd> Look</div>
+                <div class="control-item"><kbd>E</kbd> Interact</div>
+                <div class="control-item"><kbd>F</kbd> Enter/Exit Truck</div>
+                <div class="control-item"><kbd>ESC</kbd> Close Menu</div>
+            </div>
+ 
+            <div id="crosshair"></div>
+ 
+            <div id="notification"></div>
+ 
+            <div id="order-labels-container"></div>
+ 
+            <div id="time-weather-display" class="hud-panel">
+                <div id="time-display">12:00 PM</div>
+                <div id="weather-display">☀️ Sunny</div>
+            </div>
+ 
+            <div id="truck-prompt">Press <kbd>F</kbd> to enter/exit truck</div>
+ 
+            <div id="rain-overlay"></div>
+ 
+            <div id="speed-indicator" class="hud-panel"></div>
+        </div>
+    </div>
+ 
+    <script>
+        // ========================================
+        // GAME STATE
+        // ========================================
+        const GameState = {
+            coins: 0,
+            deliveries: 0,
+            currentRole: 'cashier',
+            orders: [],
+            pizzasReady: [],
+            boxedPizzas: [],
+            currentPizza: null,
+            ovenTimer: null,
+            ovenStartTime: null,
+            isPointerLocked: false,
+            gameStarted: false,
+            orderIdCounter: 0,
+            menuOpen: false,
+            // Time & Weather
+            gameTime: 8 * 60, // Start at 8:00 AM (minutes since midnight)
+            weather: 'sunny', // sunny, rainy
+            weatherTimer: 0,
+            isRushing: false,
+            // Truck
+            inTruck: false,
+            truck: null,
+            truckSpeed: 0
+        };
+ 
+        const PizzaSteps = {
+            cheese: ['dough', 'sauce', 'cheese'],
+            pepperoni: ['dough', 'sauce', 'cheese', 'pepperoni'],
+            supreme: ['dough', 'sauce', 'cheese', 'pepperoni']
+        };
+ 
+        const OrderNames = {
+            cheese: '🧀 CHEESE PIZZA',
+            pepperoni: '🍕 PEPPERONI PIZZA',
+            supreme: '🌟 SUPREME PIZZA',
+            soda: '🥤 SODA'
+        };
+ 
+        // ========================================
+        // THREE.JS SETUP
+        // ========================================
+        let scene, camera, renderer, player, controls;
+        let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
+        let canJump = false, velocity = new THREE.Vector3();
+        let direction = new THREE.Vector3();
+        let cameraYaw = 0, cameraPitch = 0;
+        let interactables = [];
+        let colliders = [];
+        let npcs = [];
+        let customerSpawnTimer = 0;
+        let clock = new THREE.Clock();
+ 
+        // Third person camera settings
+        const CAMERA_DISTANCE = 6;
+        const CAMERA_HEIGHT = 3;
+ 
+        // Textures created procedurally
+        function createCheckerTexture(color1, color2, size) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            const tileSize = size / 8;
+            for (let y = 0; y < 8; y++) {
+                for (let x = 0; x < 8; x++) {
+                    ctx.fillStyle = (x + y) % 2 === 0 ? color1 : color2;
+                    ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
+                }
+            }
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.wrapS = THREE.RepeatWrapping;
+            texture.wrapT = THREE.RepeatWrapping;
+            return texture;
+        }
+ 
+        function createBrickTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 128;
+            canvas.height = 128;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#c0392b';
+            ctx.fillRect(0, 0, 128, 128);
+            ctx.fillStyle = '#8b2500';
+            for (let y = 0; y < 4; y++) {
+                for (let x = 0; x < 4; x++) {
+                    const offsetX = y % 2 === 0 ? 0 : 16;
+                    ctx.fillRect(x * 32 + offsetX + 1, y * 32 + 1, 30, 14);
+                    ctx.fillRect(x * 32 + offsetX + 1, y * 32 + 17, 30, 14);
+                }
+            }
+            ctx.strokeStyle = '#a0522d';
+            ctx.lineWidth = 2;
+            for (let y = 0; y < 4; y++) {
+                ctx.beginPath();
+                ctx.moveTo(0, y * 32);
+                ctx.lineTo(128, y * 32);
+                ctx.stroke();
+            }
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.wrapS = THREE.RepeatWrapping;
+            texture.wrapT = THREE.RepeatWrapping;
+            return texture;
+        }
+ 
+        function createWoodTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 64;
+            canvas.height = 64;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(0, 0, 64, 64);
+            ctx.strokeStyle = '#654321';
+            ctx.lineWidth = 2;
+            for (let i = 0; i < 8; i++) {
+                ctx.beginPath();
+                ctx.moveTo(0, i * 8 + Math.random() * 4);
+                ctx.lineTo(64, i * 8 + Math.random() * 4);
+                ctx.stroke();
+            }
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.wrapS = THREE.RepeatWrapping;
+            texture.wrapT = THREE.RepeatWrapping;
+            return texture;
+        }
+ 
+        function createGrassTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 64;
+            canvas.height = 64;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#228B22';
+            ctx.fillRect(0, 0, 64, 64);
+            for (let i = 0; i < 100; i++) {
+                ctx.fillStyle = ['#2d8f2d', '#1e7a1e', '#3da33d', '#196619'][Math.floor(Math.random() * 4)];
+                ctx.fillRect(Math.random() * 64, Math.random() * 64, 3, 3);
+            }
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.wrapS = THREE.RepeatWrapping;
+            texture.wrapT = THREE.RepeatWrapping;
+            return texture;
+        }
+ 
+        function createRoofTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 64;
+            canvas.height = 64;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#b22222';
+            ctx.fillRect(0, 0, 64, 64);
+            ctx.fillStyle = '#8b0000';
+            for (let y = 0; y < 8; y++) {
+                const offsetX = y % 2 === 0 ? 0 : 4;
+                for (let x = 0; x < 8; x++) {
+                    ctx.fillRect(x * 8 + offsetX, y * 8, 7, 7);
+                }
+            }
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.wrapS = THREE.RepeatWrapping;
+            texture.wrapT = THREE.RepeatWrapping;
+            return texture;
+        }
+ 
+        function createRoadTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 128;
+            canvas.height = 128;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#333';
+            ctx.fillRect(0, 0, 128, 128);
+            ctx.fillStyle = '#ffff00';
+            ctx.fillRect(56, 0, 4, 20);
+            ctx.fillRect(56, 35, 4, 20);
+            ctx.fillRect(56, 70, 4, 20);
+            ctx.fillRect(56, 105, 4, 20);
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.wrapS = THREE.RepeatWrapping;
+            texture.wrapT = THREE.RepeatWrapping;
+            return texture;
+        }
+ 
+        function init() {
+            // Scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x87CEEB);
+            scene.fog = new THREE.Fog(0x87CEEB, 80, 250);
+ 
+            // Camera
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, CAMERA_HEIGHT, CAMERA_DISTANCE);
+ 
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            document.getElementById('game-container').appendChild(renderer.domElement);
+ 
+            // Lights
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+ 
+            const sunLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            sunLight.position.set(50, 100, 50);
+            sunLight.castShadow = true;
+            sunLight.shadow.mapSize.width = 2048;
+            sunLight.shadow.mapSize.height = 2048;
+            sunLight.shadow.camera.near = 0.5;
+            sunLight.shadow.camera.far = 500;
+            sunLight.shadow.camera.left = -100;
+            sunLight.shadow.camera.right = 100;
+            sunLight.shadow.camera.top = 100;
+            sunLight.shadow.camera.bottom = -100;
+            scene.add(sunLight);
+ 
+            // Create world
+            createWorld();
+            createPlayer();
+ 
+            // Event listeners
+            setupEventListeners();
+ 
+            // Animation loop
+            animate();
+        }
+ 
+        function createWorld() {
+            // Ground - Grass (expanded for larger neighborhood)
+            const grassTexture = createGrassTexture();
+            grassTexture.repeat.set(100, 100);
+            const groundGeometry = new THREE.PlaneGeometry(400, 400);
+            const groundMaterial = new THREE.MeshLambertMaterial({ map: grassTexture });
+            const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+            ground.rotation.x = -Math.PI / 2;
+            ground.receiveShadow = true;
+            scene.add(ground);
+ 
+            // Pizza Restaurant Building
+            createRestaurant();
+ 
+            // Delivery neighborhood
+            createNeighborhood();
+ 
+            // Decorations
+            createDecorations();
+        }
+ 
+        function addCollider(mesh, padding = 0) {
+            const box = new THREE.Box3().setFromObject(mesh);
+            if (padding > 0) {
+                box.min.x -= padding;
+                box.min.z -= padding;
+                box.max.x += padding;
+                box.max.z += padding;
+            }
+            colliders.push(box);
+        }
+ 
+        function createRestaurant() {
+            const brickTexture = createBrickTexture();
+            const woodTexture = createWoodTexture();
+            const checkerTexture = createCheckerTexture('#e0e0e0', '#c0c0c0', 64);
+            checkerTexture.repeat.set(4, 4);
+ 
+            // Main building
+            const buildingGroup = new THREE.Group();
+            buildingGroup.position.set(0, 0, 0);
+ 
+            // Floor
+            const floorGeometry = new THREE.BoxGeometry(30, 0.3, 25);
+            const floorMaterial = new THREE.MeshLambertMaterial({ map: checkerTexture });
+            const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+            floor.position.set(0, 0.15, 0);
+            floor.receiveShadow = true;
+            buildingGroup.add(floor);
+ 
+            // Walls
+            brickTexture.repeat.set(4, 2);
+            const wallMaterial = new THREE.MeshLambertMaterial({ map: brickTexture });
+ 
+            // Back wall
+            const backWall = new THREE.Mesh(new THREE.BoxGeometry(30, 8, 0.5), wallMaterial);
+            backWall.position.set(0, 4, -12.25);
+            backWall.castShadow = true;
+            backWall.receiveShadow = true;
+            buildingGroup.add(backWall);
+            addCollider(backWall);
+ 
+            // Left wall
+            const leftWall = new THREE.Mesh(new THREE.BoxGeometry(0.5, 8, 25), wallMaterial);
+            leftWall.position.set(-14.75, 4, 0);
+            leftWall.castShadow = true;
+            buildingGroup.add(leftWall);
+            addCollider(leftWall);
+ 
+            // Right wall
+            const rightWall = new THREE.Mesh(new THREE.BoxGeometry(0.5, 8, 25), wallMaterial);
+            rightWall.position.set(14.75, 4, 0);
+            rightWall.castShadow = true;
+            buildingGroup.add(rightWall);
+            addCollider(rightWall);
+ 
+            // Front wall with opening
+            const frontWallLeft = new THREE.Mesh(new THREE.BoxGeometry(10, 8, 0.5), wallMaterial);
+            frontWallLeft.position.set(-10, 4, 12.25);
+            frontWallLeft.castShadow = true;
+            buildingGroup.add(frontWallLeft);
+            addCollider(frontWallLeft);
+ 
+            const frontWallRight = new THREE.Mesh(new THREE.BoxGeometry(10, 8, 0.5), wallMaterial);
+            frontWallRight.position.set(10, 4, 12.25);
+            frontWallRight.castShadow = true;
+            buildingGroup.add(frontWallRight);
+            addCollider(frontWallRight);
+ 
+            const frontWallTop = new THREE.Mesh(new THREE.BoxGeometry(10, 3, 0.5), wallMaterial);
+            frontWallTop.position.set(0, 6.5, 12.25);
+            buildingGroup.add(frontWallTop);
+ 
+            // Roof
+            const roofTexture = createRoofTexture();
+            roofTexture.repeat.set(6, 5);
+            const roofGeometry = new THREE.BoxGeometry(32, 0.5, 27);
+            const roofMaterial = new THREE.MeshLambertMaterial({ map: roofTexture });
+            const roof = new THREE.Mesh(roofGeometry, roofMaterial);
+            roof.position.set(0, 8.25, 0);
+            roof.castShadow = true;
+            buildingGroup.add(roof);
+ 
+            // Sign
+            const signGeometry = new THREE.BoxGeometry(12, 3, 0.3);
+            const signMaterial = new THREE.MeshLambertMaterial({ color: 0xffd700 });
+            const sign = new THREE.Mesh(signGeometry, signMaterial);
+            sign.position.set(0, 10, 12.5);
+            buildingGroup.add(sign);
+ 
+            // Sign text backing
+            const signTextGeometry = new THREE.BoxGeometry(10, 2, 0.35);
+            const signTextMaterial = new THREE.MeshLambertMaterial({ color: 0xc0392b });
+            const signText = new THREE.Mesh(signTextGeometry, signTextMaterial);
+            signText.position.set(0, 10, 12.6);
+            buildingGroup.add(signText);
+ 
+            scene.add(buildingGroup);
+ 
+            // Interior - Counter Area (Cashier)
+            createCashierArea();
+ 
+            // Interior - Kitchen Area (Cook)
+            createKitchenArea();
+ 
+            // Interior - Boxing Area (Delivery)
+            createBoxingArea();
+        }
+ 
+        function createCashierArea() {
+            const woodTexture = createWoodTexture();
+ 
+            // Counter
+            const counterGeometry = new THREE.BoxGeometry(8, 1.2, 2);
+            const counterMaterial = new THREE.MeshLambertMaterial({ map: woodTexture });
+            const counter = new THREE.Mesh(counterGeometry, counterMaterial);
+            counter.position.set(0, 0.9, 8);
+            counter.castShadow = true;
+            scene.add(counter);
+            addCollider(counter, 0.3);
+ 
+            // Register
+            const registerGeometry = new THREE.BoxGeometry(1, 0.8, 0.8);
+            const registerMaterial = new THREE.MeshLambertMaterial({ color: 0x333333 });
+            const register = new THREE.Mesh(registerGeometry, registerMaterial);
+            register.position.set(0, 1.9, 8);
+            register.castShadow = true;
+            scene.add(register);
+ 
+            // Register screen
+            const screenGeometry = new THREE.BoxGeometry(0.6, 0.4, 0.1);
+            const screenMaterial = new THREE.MeshLambertMaterial({ color: 0x00ff00 });
+            const screen = new THREE.Mesh(screenGeometry, screenMaterial);
+            screen.position.set(0, 2.1, 7.55);
+            scene.add(screen);
+ 
+            // Add interactable for cashier
+            interactables.push({
+                mesh: counter,
+                type: 'counter',
+                role: 'cashier',
+                prompt: 'Press <kbd>E</kbd> to take orders'
+            });
+ 
+            // Menu board
+            const menuGeometry = new THREE.BoxGeometry(4, 3, 0.2);
+            const menuMaterial = new THREE.MeshLambertMaterial({ color: 0x2c3e50 });
+            const menu = new THREE.Mesh(menuGeometry, menuMaterial);
+            menu.position.set(-10, 5, -11.8);
+            scene.add(menu);
+ 
+            // Customer waiting area markers
+            for (let i = 0; i < 3; i++) {
+                const markerGeometry = new THREE.CylinderGeometry(0.5, 0.5, 0.1, 16);
+                const markerMaterial = new THREE.MeshLambertMaterial({ color: 0xf1c40f });
+                const marker = new THREE.Mesh(markerGeometry, markerMaterial);
+                marker.position.set(-2 + i * 2, 0.35, 10);
+                scene.add(marker);
+            }
+        }
+ 
+        function createKitchenArea() {
+            // Divider wall
+            const dividerGeometry = new THREE.BoxGeometry(0.3, 5, 12);
+            const dividerMaterial = new THREE.MeshLambertMaterial({ color: 0x95a5a6 });
+            const divider = new THREE.Mesh(dividerGeometry, dividerMaterial);
+            divider.position.set(-5, 2.8, -4);
+            divider.castShadow = true;
+            scene.add(divider);
+            addCollider(divider);
+ 
+            // Kitchen counter
+            const counterGeometry = new THREE.BoxGeometry(8, 1, 2);
+            const counterMaterial = new THREE.MeshLambertMaterial({ color: 0xbdc3c7 });
+            const kitchenCounter = new THREE.Mesh(counterGeometry, counterMaterial);
+            kitchenCounter.position.set(-10, 0.8, -6);
+            kitchenCounter.castShadow = true;
+            scene.add(kitchenCounter);
+            addCollider(kitchenCounter, 0.3);
+ 
+            // Ingredient stations
+            const colors = [0xffeaa7, 0xe74c3c, 0xf39c12, 0xc0392b];
+            const labels = ['dough', 'sauce', 'cheese', 'pepperoni'];
+            for (let i = 0; i < 4; i++) {
+                const stationGeometry = new THREE.BoxGeometry(1.5, 0.5, 1.5);
+                const stationMaterial = new THREE.MeshLambertMaterial({ color: colors[i] });
+                const station = new THREE.Mesh(stationGeometry, stationMaterial);
+                station.position.set(-12 + i * 2, 1.55, -6);
+                station.castShadow = true;
+                scene.add(station);
+ 
+                interactables.push({
+                    mesh: station,
+                    type: 'ingredient',
+                    ingredient: labels[i],
+                    role: 'cook',
+                    prompt: `Press <kbd>E</kbd> to add ${labels[i]}`
+                });
+            }
+ 
+            // Ovens
+            for (let i = 0; i < 2; i++) {
+                const ovenGroup = new THREE.Group();
+ 
+                const ovenGeometry = new THREE.BoxGeometry(2.5, 2, 2);
+                const ovenMaterial = new THREE.MeshLambertMaterial({ color: 0x7f8c8d });
+                const oven = new THREE.Mesh(ovenGeometry, ovenMaterial);
+                oven.castShadow = true;
+                ovenGroup.add(oven);
+ 
+                // Oven door
+                const doorGeometry = new THREE.BoxGeometry(2, 1.2, 0.2);
+                const doorMaterial = new THREE.MeshLambertMaterial({ color: 0x2c3e50 });
+                const door = new THREE.Mesh(doorGeometry, doorMaterial);
+                door.position.set(0, -0.2, 1.05);
+                ovenGroup.add(door);
+ 
+                // Oven window
+                const windowGeometry = new THREE.BoxGeometry(1.2, 0.6, 0.1);
+                const windowMaterial = new THREE.MeshLambertMaterial({ color: 0xe74c3c, transparent: true, opacity: 0.8 });
+                const ovenWindow = new THREE.Mesh(windowGeometry, windowMaterial);
+                ovenWindow.position.set(0, -0.1, 1.1);
+                ovenWindow.name = 'ovenWindow';
+                ovenGroup.add(ovenWindow);
+ 
+                ovenGroup.position.set(-10 + i * 4, 1.3, -10);
+                scene.add(ovenGroup);
+ 
+                // Add collider for oven
+                const ovenCollider = new THREE.Box3(
+                    new THREE.Vector3(-10 + i * 4 - 1.5, 0, -11.5),
+                    new THREE.Vector3(-10 + i * 4 + 1.5, 3, -8.5)
+                );
+                colliders.push(ovenCollider);
+ 
+                interactables.push({
+                    mesh: oven,
+                    type: 'oven',
+                    ovenIndex: i,
+                    role: 'cook',
+                    prompt: 'Press <kbd>E</kbd> to use oven',
+                    group: ovenGroup
+                });
+            }
+ 
+            // Order board
+            const boardGeometry = new THREE.BoxGeometry(3, 2, 0.2);
+            const boardMaterial = new THREE.MeshLambertMaterial({ color: 0x34495e });
+            const board = new THREE.Mesh(boardGeometry, boardMaterial);
+            board.position.set(-10, 4, -11.8);
+            scene.add(board);
+        }
+ 
+        function createBoxingArea() {
+            // Boxing table
+            const tableGeometry = new THREE.BoxGeometry(4, 1, 3);
+            const tableMaterial = new THREE.MeshLambertMaterial({ color: 0x8b4513 });
+            const table = new THREE.Mesh(tableGeometry, tableMaterial);
+            table.position.set(10, 0.8, -6);
+            table.castShadow = true;
+            scene.add(table);
+            addCollider(table, 0.3);
+ 
+            // Pizza boxes stack
+            for (let i = 0; i < 5; i++) {
+                const boxGeometry = new THREE.BoxGeometry(1.5, 0.2, 1.5);
+                const boxMaterial = new THREE.MeshLambertMaterial({ color: 0xdeb887 });
+                const box = new THREE.Mesh(boxGeometry, boxMaterial);
+                box.position.set(10, 1.5 + i * 0.22, -6);
+                scene.add(box);
+            }
+ 
+            interactables.push({
+                mesh: table,
+                type: 'boxingTable',
+                role: 'delivery',
+                prompt: 'Press <kbd>E</kbd> to box pizza'
+            });
+ 
+            // Ready pizzas shelf
+            const shelfGeometry = new THREE.BoxGeometry(3, 0.2, 2);
+            const shelfMaterial = new THREE.MeshLambertMaterial({ color: 0x7f8c8d });
+            const shelf = new THREE.Mesh(shelfGeometry, shelfMaterial);
+            shelf.position.set(10, 2.5, -10);
+            scene.add(shelf);
+ 
+            // Shelf support
+            const supportGeometry = new THREE.BoxGeometry(0.2, 2, 2);
+            const supportMaterial = new THREE.MeshLambertMaterial({ color: 0x7f8c8d });
+            const support1 = new THREE.Mesh(supportGeometry, supportMaterial);
+            support1.position.set(8.6, 1.5, -10);
+            scene.add(support1);
+            const support2 = new THREE.Mesh(supportGeometry, supportMaterial);
+            support2.position.set(11.4, 1.5, -10);
+            scene.add(support2);
+ 
+            // Add collider for shelf area
+            const shelfCollider = new THREE.Box3(
+                new THREE.Vector3(8, 0, -11.5),
+                new THREE.Vector3(12, 3, -8.5)
+            );
+            colliders.push(shelfCollider);
+ 
+            interactables.push({
+                mesh: shelf,
+                type: 'pizzaShelf',
+                role: 'delivery',
+                prompt: 'Press <kbd>E</kbd> to pick up pizza'
+            });
+        }
+ 
+        function createNeighborhood() {
+            const roadTexture = createRoadTexture();
+ 
+            // Main road (extended)
+            roadTexture.repeat.set(1, 15);
+            const mainRoadGeometry = new THREE.PlaneGeometry(10, 180);
+            const mainRoadMaterial = new THREE.MeshLambertMaterial({ map: roadTexture });
+            const mainRoad = new THREE.Mesh(mainRoadGeometry, mainRoadMaterial);
+            mainRoad.rotation.x = -Math.PI / 2;
+            mainRoad.position.set(0, 0.05, 100);
+            scene.add(mainRoad);
+ 
+            // Side streets
+            const sideRoadTexture = createRoadTexture();
+            sideRoadTexture.repeat.set(4, 1);
+            for (let i = 0; i < 4; i++) {
+                const sideRoad = new THREE.Mesh(
+                    new THREE.PlaneGeometry(60, 8),
+                    new THREE.MeshLambertMaterial({ map: sideRoadTexture.clone() })
+                );
+                sideRoad.rotation.x = -Math.PI / 2;
+                sideRoad.position.set(0, 0.04, 40 + i * 45);
+                scene.add(sideRoad);
+            }
+ 
+            // Many more houses!
+            const houseColors = [
+                0x3498db, 0xe74c3c, 0x2ecc71, 0xf39c12, 0x9b59b6,
+                0x1abc9c, 0xe67e22, 0x9b59b6, 0x34495e, 0xf1c40f,
+                0x16a085, 0xc0392b, 0x8e44ad, 0x2980b9, 0xd35400
+            ];
+ 
+            let houseIndex = 0;
+ 
+            // Main street houses (both sides, extended)
+            for (let i = 0; i < 12; i++) {
+                const z = 25 + i * 15;
+                createHouse(18 + (i % 3) * 8, z, houseColors[houseIndex % houseColors.length], houseIndex++);
+                createHouse(-18 - (i % 3) * 8, z, houseColors[houseIndex % houseColors.length], houseIndex++);
+            }
+ 
+            // Side street houses
+            for (let street = 0; street < 4; street++) {
+                const streetZ = 40 + street * 45;
+                for (let i = 0; i < 4; i++) {
+                    // Right side of street
+                    createHouse(35 + i * 18, streetZ + 12, houseColors[houseIndex % houseColors.length], houseIndex++);
+                    createHouse(35 + i * 18, streetZ - 12, houseColors[houseIndex % houseColors.length], houseIndex++);
+                    // Left side of street
+                    createHouse(-35 - i * 18, streetZ + 12, houseColors[houseIndex % houseColors.length], houseIndex++);
+                    createHouse(-35 - i * 18, streetZ - 12, houseColors[houseIndex % houseColors.length], houseIndex++);
+                }
+            }
+ 
+            // Create delivery truck
+            createDeliveryTruck();
+        }
+ 
+        function createDeliveryTruck() {
+            const truck = new THREE.Group();
+ 
+            // Truck body (cargo area)
+            const cargoGeometry = new THREE.BoxGeometry(3.5, 3, 6);
+            const cargoMaterial = new THREE.MeshLambertMaterial({ color: 0xe74c3c });
+            const cargo = new THREE.Mesh(cargoGeometry, cargoMaterial);
+            cargo.position.set(0, 2, -1);
+            cargo.castShadow = true;
+            truck.add(cargo);
+ 
+            // Pizza logo on side
+            const logoGeometry = new THREE.BoxGeometry(0.1, 1.5, 1.5);
+            const logoMaterial = new THREE.MeshLambertMaterial({ color: 0xf1c40f });
+            const logoLeft = new THREE.Mesh(logoGeometry, logoMaterial);
+            logoLeft.position.set(-1.8, 2.2, -1);
+            truck.add(logoLeft);
+            const logoRight = new THREE.Mesh(logoGeometry, logoMaterial);
+            logoRight.position.set(1.8, 2.2, -1);
+            truck.add(logoRight);
+ 
+            // Cab
+            const cabGeometry = new THREE.BoxGeometry(3.5, 2.5, 2.5);
+            const cabMaterial = new THREE.MeshLambertMaterial({ color: 0xc0392b });
+            const cab = new THREE.Mesh(cabGeometry, cabMaterial);
+            cab.position.set(0, 1.75, 3);
+            cab.castShadow = true;
+            truck.add(cab);
+ 
+            // Windshield
+            const windshieldGeometry = new THREE.BoxGeometry(2.8, 1.2, 0.1);
+            const windshieldMaterial = new THREE.MeshLambertMaterial({ color: 0x87CEEB, transparent: true, opacity: 0.7 });
+            const windshield = new THREE.Mesh(windshieldGeometry, windshieldMaterial);
+            windshield.position.set(0, 2.3, 4.2);
+            truck.add(windshield);
+ 
+            // Wheels
+            const wheelGeometry = new THREE.CylinderGeometry(0.6, 0.6, 0.5, 16);
+            const wheelMaterial = new THREE.MeshLambertMaterial({ color: 0x222222 });
+ 
+            const wheelPositions = [
+                [-1.5, 0.6, 3], [1.5, 0.6, 3],
+                [-1.5, 0.6, -2], [1.5, 0.6, -2],
+                [-1.5, 0.6, -3.5], [1.5, 0.6, -3.5]
+            ];
+ 
+            wheelPositions.forEach(pos => {
+                const wheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
+                wheel.rotation.z = Math.PI / 2;
+                wheel.position.set(...pos);
+                wheel.castShadow = true;
+                truck.add(wheel);
+            });
+ 
+            // Headlights
+            const headlightGeometry = new THREE.BoxGeometry(0.4, 0.3, 0.1);
+            const headlightMaterial = new THREE.MeshLambertMaterial({ color: 0xffff00, emissive: 0xffff00, emissiveIntensity: 0.5 });
+            const headlightLeft = new THREE.Mesh(headlightGeometry, headlightMaterial);
+            headlightLeft.position.set(-1.2, 1.2, 4.3);
+            truck.add(headlightLeft);
+            const headlightRight = new THREE.Mesh(headlightGeometry, headlightMaterial);
+            headlightRight.position.set(1.2, 1.2, 4.3);
+            truck.add(headlightRight);
+ 
+            truck.position.set(8, 0, 16);
+            truck.rotation.y = Math.PI;
+            scene.add(truck);
+ 
+            GameState.truck = truck;
+ 
+            // Truck collider (when not in use)
+            const truckCollider = new THREE.Box3(
+                new THREE.Vector3(truck.position.x - 2, 0, truck.position.z - 5),
+                new THREE.Vector3(truck.position.x + 2, 4, truck.position.z + 5)
+            );
+            truck.userData.collider = truckCollider;
+ 
+            // Add interactable
+            interactables.push({
+                mesh: truck,
+                type: 'truck',
+                role: 'delivery',
+                prompt: 'Press <kbd>F</kbd> to enter truck'
+            });
+        }
+ 
+        function createHouse(x, z, color, index) {
+            const houseGroup = new THREE.Group();
+ 
+            // House body
+            const bodyGeometry = new THREE.BoxGeometry(8, 5, 6);
+            const bodyMaterial = new THREE.MeshLambertMaterial({ color: color });
+            const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+            body.position.y = 2.5;
+            body.castShadow = true;
+            houseGroup.add(body);
+ 
+            // Add collider for house
+            const houseCollider = new THREE.Box3(
+                new THREE.Vector3(x - 4.5, 0, z - 3.5),
+                new THREE.Vector3(x + 4.5, 6, z + 3.5)
+            );
+            colliders.push(houseCollider);
+ 
+            // Roof
+            const roofGeometry = new THREE.ConeGeometry(6, 3, 4);
+            const roofMaterial = new THREE.MeshLambertMaterial({ color: 0x8b4513 });
+            const roof = new THREE.Mesh(roofGeometry, roofMaterial);
+            roof.position.y = 6.5;
+            roof.rotation.y = Math.PI / 4;
+            roof.castShadow = true;
+            houseGroup.add(roof);
+ 
+            // Door
+            const doorGeometry = new THREE.BoxGeometry(1.5, 2.5, 0.2);
+            const doorMaterial = new THREE.MeshLambertMaterial({ color: 0x5d4037 });
+            const door = new THREE.Mesh(doorGeometry, doorMaterial);
+            door.position.set(0, 1.25, 3.05);
+            houseGroup.add(door);
+ 
+            // Window
+            const windowGeometry = new THREE.BoxGeometry(1.2, 1.2, 0.2);
+            const windowMaterial = new THREE.MeshLambertMaterial({ color: 0x87CEEB });
+            const window1 = new THREE.Mesh(windowGeometry, windowMaterial);
+            window1.position.set(-2, 3, 3.05);
+            houseGroup.add(window1);
+            const window2 = new THREE.Mesh(windowGeometry, windowMaterial);
+            window2.position.set(2, 3, 3.05);
+            houseGroup.add(window2);
+ 
+            // Mailbox / Delivery point
+            const mailboxGeometry = new THREE.BoxGeometry(0.6, 1.2, 0.4);
+            const mailboxMaterial = new THREE.MeshLambertMaterial({ color: color });
+            const mailbox = new THREE.Mesh(mailboxGeometry, mailboxMaterial);
+            mailbox.position.set(x > 0 ? -5 : 5, 0.6, 4);
+            mailbox.castShadow = true;
+            houseGroup.add(mailbox);
+ 
+            const postGeometry = new THREE.CylinderGeometry(0.1, 0.1, 1, 8);
+            const postMaterial = new THREE.MeshLambertMaterial({ color: 0x333333 });
+            const post = new THREE.Mesh(postGeometry, postMaterial);
+            post.position.set(x > 0 ? -5 : 5, 0.1, 4);
+            houseGroup.add(post);
+ 
+            houseGroup.position.set(x, 0, z);
+ 
+            // Delivery zone marker (on ground near mailbox)
+            const zoneGeometry = new THREE.CylinderGeometry(1.5, 1.5, 0.1, 16);
+            const zoneMaterial = new THREE.MeshLambertMaterial({ color: 0x27ae60, transparent: true, opacity: 0.7 });
+            const zone = new THREE.Mesh(zoneGeometry, zoneMaterial);
+            zone.position.set(x + (x > 0 ? -5 : 5), 0.1, z + 5);
+            scene.add(zone);
+ 
+            interactables.push({
+                mesh: zone,
+                type: 'deliveryZone',
+                role: 'delivery',
+                houseIndex: index,
+                prompt: 'Press <kbd>E</kbd> to deliver pizza'
+            });
+ 
+            scene.add(houseGroup);
+        }
+ 
+        function createDecorations() {
+            // Trees
+            for (let i = 0; i < 20; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const radius = 40 + Math.random() * 50;
+                const x = Math.cos(angle) * radius;
+                const z = Math.sin(angle) * radius;
+                if (Math.abs(x) > 20 || z < 15) {
+                    createTree(x, z);
+                }
+            }
+ 
+            // Street lamps
+            for (let i = 0; i < 6; i++) {
+                createStreetLamp(6, 22 + i * 10);
+                createStreetLamp(-6, 22 + i * 10);
+            }
+ 
+            // Clouds
+            for (let i = 0; i < 8; i++) {
+                createCloud(
+                    -50 + Math.random() * 100,
+                    30 + Math.random() * 20,
+                    -30 + Math.random() * 100
+                );
+            }
+        }
+ 
+        function createTree(x, z) {
+            const treeGroup = new THREE.Group();
+ 
+            // Trunk
+            const trunkGeometry = new THREE.CylinderGeometry(0.3, 0.5, 3, 8);
+            const trunkMaterial = new THREE.MeshLambertMaterial({ color: 0x8B4513 });
+            const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
+            trunk.position.y = 1.5;
+            trunk.castShadow = true;
+            treeGroup.add(trunk);
+ 
+            // Foliage (blocky style)
+            const foliageColors = [0x228B22, 0x2d8f2d, 0x1e7a1e];
+            for (let i = 0; i < 3; i++) {
+                const size = 2.5 - i * 0.5;
+                const foliageGeometry = new THREE.BoxGeometry(size, size, size);
+                const foliageMaterial = new THREE.MeshLambertMaterial({ color: foliageColors[i % 3] });
+                const foliage = new THREE.Mesh(foliageGeometry, foliageMaterial);
+                foliage.position.y = 3.5 + i * 1.2;
+                foliage.rotation.y = Math.random() * Math.PI;
+                foliage.castShadow = true;
+                treeGroup.add(foliage);
+            }
+ 
+            treeGroup.position.set(x, 0, z);
+            scene.add(treeGroup);
+ 
+            // Add tree collider
+            const treeCollider = new THREE.Box3(
+                new THREE.Vector3(x - 0.8, 0, z - 0.8),
+                new THREE.Vector3(x + 0.8, 5, z + 0.8)
+            );
+            colliders.push(treeCollider);
+        }
+ 
+        function createStreetLamp(x, z) {
+            const lampGroup = new THREE.Group();
+ 
+            // Pole
+            const poleGeometry = new THREE.CylinderGeometry(0.1, 0.15, 5, 8);
+            const poleMaterial = new THREE.MeshLambertMaterial({ color: 0x333333 });
+            const pole = new THREE.Mesh(poleGeometry, poleMaterial);
+            pole.position.y = 2.5;
+            lampGroup.add(pole);
+ 
+            // Light fixture
+            const fixtureGeometry = new THREE.BoxGeometry(0.6, 0.4, 0.6);
+            const fixtureMaterial = new THREE.MeshLambertMaterial({ color: 0xf1c40f, emissive: 0xf1c40f, emissiveIntensity: 0.3 });
+            const fixture = new THREE.Mesh(fixtureGeometry, fixtureMaterial);
+            fixture.position.y = 5.2;
+            lampGroup.add(fixture);
+ 
+            lampGroup.position.set(x, 0, z);
+            scene.add(lampGroup);
+ 
+            // Add lamp collider
+            const lampCollider = new THREE.Box3(
+                new THREE.Vector3(x - 0.3, 0, z - 0.3),
+                new THREE.Vector3(x + 0.3, 5, z + 0.3)
+            );
+            colliders.push(lampCollider);
+        }
+ 
+        function createCloud(x, y, z) {
+            const cloudGroup = new THREE.Group();
+            const cloudMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff });
+ 
+            for (let i = 0; i < 5; i++) {
+                const size = 1.5 + Math.random() * 2;
+                const cloudPart = new THREE.Mesh(
+                    new THREE.SphereGeometry(size, 8, 8),
+                    cloudMaterial
+                );
+                cloudPart.position.set(
+                    (Math.random() - 0.5) * 4,
+                    (Math.random() - 0.5) * 1.5,
+                    (Math.random() - 0.5) * 2
+                );
+                cloudGroup.add(cloudPart);
+            }
+ 
+            cloudGroup.position.set(x, y, z);
+            scene.add(cloudGroup);
+        }
+ 
+        function createPlayer() {
+            player = new THREE.Group();
+ 
+            // Classic Roblox Noob colors
+            const skinColor = 0xf3d98b; // Classic yellow
+            const shirtColor = 0x42a5f5; // Blue torso
+            const pantsColor = 0x8bc34a; // Olive/green legs
+ 
+            // Head - larger blocky head like Roblox
+            const headGeometry = new THREE.BoxGeometry(1.1, 1.1, 1.1);
+            const headMaterial = new THREE.MeshLambertMaterial({ color: skinColor });
+            const head = new THREE.Mesh(headGeometry, headMaterial);
+            head.position.y = 2.55;
+            head.castShadow = true;
+            player.add(head);
+ 
+            // Body (torso) - Blue shirt
+            const bodyGeometry = new THREE.BoxGeometry(1.3, 1.4, 0.7);
+            const bodyMaterial = new THREE.MeshLambertMaterial({ color: shirtColor });
+            const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+            body.position.y = 1.3;
+            body.castShadow = true;
+            player.add(body);
+ 
+            // Left Arm - Yellow skin
+            const armGeometry = new THREE.BoxGeometry(0.5, 1.4, 0.5);
+            const armMaterial = new THREE.MeshLambertMaterial({ color: skinColor });
+            const leftArm = new THREE.Mesh(armGeometry, armMaterial);
+            leftArm.position.set(-0.9, 1.3, 0);
+            leftArm.castShadow = true;
+            player.add(leftArm);
+ 
+            // Right Arm
+            const rightArm = new THREE.Mesh(armGeometry, armMaterial);
+            rightArm.position.set(0.9, 1.3, 0);
+            rightArm.castShadow = true;
+            player.add(rightArm);
+ 
+            // Left Leg - Green/olive pants
+            const legGeometry = new THREE.BoxGeometry(0.55, 1.2, 0.55);
+            const legMaterial = new THREE.MeshLambertMaterial({ color: pantsColor });
+            const leftLeg = new THREE.Mesh(legGeometry, legMaterial);
+            leftLeg.position.set(-0.35, 0.35, 0);
+            leftLeg.castShadow = true;
+            player.add(leftLeg);
+ 
+            // Right Leg
+            const rightLeg = new THREE.Mesh(legGeometry, legMaterial);
+            rightLeg.position.set(0.35, 0.35, 0);
+            rightLeg.castShadow = true;
+            player.add(rightLeg);
+ 
+            player.position.set(0, 0, 5);
+            scene.add(player);
+        }
+ 
+        function createNPCCustomer(position) {
+            const npc = new THREE.Group();
+ 
+            // Random colors for NPCs
+            const shirtColors = [0x9b59b6, 0x3498db, 0xe67e22, 0x1abc9c, 0xf1c40f, 0xe74c3c];
+            const pantsColors = [0x2c3e50, 0x7f8c8d, 0x34495e, 0x95a5a6, 0x6d4c41];
+            const skinColor = 0xf3d98b; // Classic Roblox yellow
+ 
+            const shirtColor = shirtColors[Math.floor(Math.random() * shirtColors.length)];
+            const pantsColor = pantsColors[Math.floor(Math.random() * pantsColors.length)];
+ 
+            // Head
+            const headGeometry = new THREE.BoxGeometry(1.1, 1.1, 1.1);
+            const headMaterial = new THREE.MeshLambertMaterial({ color: skinColor });
+            const head = new THREE.Mesh(headGeometry, headMaterial);
+            head.position.y = 2.55;
+            head.castShadow = true;
+            npc.add(head);
+ 
+            // Body
+            const bodyGeometry = new THREE.BoxGeometry(1.3, 1.4, 0.7);
+            const bodyMaterial = new THREE.MeshLambertMaterial({ color: shirtColor });
+            const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+            body.position.y = 1.3;
+            body.castShadow = true;
+            npc.add(body);
+ 
+            // Arms
+            const armGeometry = new THREE.BoxGeometry(0.5, 1.4, 0.5);
+            const armMaterial = new THREE.MeshLambertMaterial({ color: skinColor });
+            const leftArm = new THREE.Mesh(armGeometry, armMaterial);
+            leftArm.position.set(-0.9, 1.3, 0);
+            npc.add(leftArm);
+            const rightArm = new THREE.Mesh(armGeometry, armMaterial);
+            rightArm.position.set(0.9, 1.3, 0);
+            npc.add(rightArm);
+ 
+            // Legs
+            const legGeometry = new THREE.BoxGeometry(0.55, 1.2, 0.55);
+            const legMaterial = new THREE.MeshLambertMaterial({ color: pantsColor });
+            const leftLeg = new THREE.Mesh(legGeometry, legMaterial);
+            leftLeg.position.set(-0.35, 0.35, 0);
+            npc.add(leftLeg);
+            const rightLeg = new THREE.Mesh(legGeometry, legMaterial);
+            rightLeg.position.set(0.35, 0.35, 0);
+            npc.add(rightLeg);
+ 
+            npc.position.copy(position);
+            npc.lookAt(new THREE.Vector3(position.x, position.y, position.z - 5));
+ 
+            // NPC data
+            const orderTypes = ['cheese', 'pepperoni', 'supreme', 'soda'];
+            const order = orderTypes[Math.floor(Math.random() * orderTypes.length)];
+            npc.userData = {
+                isCustomer: true,
+                order: order,
+                waitTime: 0,
+                maxWait: 60,
+                served: false
+            };
+ 
+            scene.add(npc);
+            npcs.push(npc);
+ 
+            return npc;
+        }
+ 
+        function setupEventListeners() {
+            // Start button
+            document.getElementById('start-btn').addEventListener('click', startGame);
+ 
+            // Click to lock pointer
+            document.getElementById('click-to-play').addEventListener('click', lockPointer);
+            renderer.domElement.addEventListener('click', () => {
+                if (GameState.gameStarted && !GameState.isPointerLocked && !GameState.menuOpen) {
+                    lockPointer();
+                }
+            });
+ 
+            // Pointer lock change
+            document.addEventListener('pointerlockchange', onPointerLockChange);
+            document.addEventListener('mozpointerlockchange', onPointerLockChange);
+ 
+            // Mouse move
+            document.addEventListener('mousemove', onMouseMove);
+ 
+            // Keyboard
+            document.addEventListener('keydown', onKeyDown);
+            document.addEventListener('keyup', onKeyUp);
+ 
+            // Window resize
+            window.addEventListener('resize', onWindowResize);
+ 
+            // Role buttons
+            document.querySelectorAll('.role-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    switchRole(btn.dataset.role);
+                });
+            });
+ 
+            // Cashier order buttons
+            document.querySelectorAll('.order-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    takeOrder(btn.dataset.order);
+                });
+            });
+ 
+            // Cook ingredient buttons
+            document.querySelectorAll('.ingredient-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    addIngredient(btn.dataset.step);
+                });
+            });
+        }
+ 
+        function startGame() {
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('hud').style.display = 'block';
+            document.getElementById('role-display').style.display = 'block';
+            document.getElementById('role-buttons').style.display = 'flex';
+            document.getElementById('orders-panel').style.display = 'block';
+            document.getElementById('controls-guide').style.display = 'block';
+            document.getElementById('click-to-play').style.display = 'block';
+            document.getElementById('time-weather-display').style.display = 'block';
+            GameState.gameStarted = true;
+        }
+ 
+        function lockPointer() {
+            if (!GameState.menuOpen) {
+                renderer.domElement.requestPointerLock();
+            }
+        }
+ 
+        function unlockPointer() {
+            document.exitPointerLock();
+        }
+ 
+        function onPointerLockChange() {
+            GameState.isPointerLocked = document.pointerLockElement === renderer.domElement;
+            document.getElementById('crosshair').style.display = GameState.isPointerLocked ? 'block' : 'none';
+            if (!GameState.menuOpen) {
+                document.getElementById('click-to-play').style.display = GameState.isPointerLocked ? 'none' : 'block';
+            }
+        }
+ 
+        function onMouseMove(event) {
+            if (!GameState.isPointerLocked || GameState.menuOpen) return;
+ 
+            const sensitivity = 0.002;
+            cameraYaw -= event.movementX * sensitivity;
+            cameraPitch -= event.movementY * sensitivity;
+            cameraPitch = Math.max(-Math.PI / 3, Math.min(Math.PI / 3, cameraPitch));
+        }
+ 
+        function onKeyDown(event) {
+            if (!GameState.gameStarted) return;
+ 
+            switch (event.code) {
+                case 'KeyW':
+                    moveForward = true;
+                    break;
+                case 'KeyS':
+                    moveBackward = true;
+                    break;
+                case 'KeyA':
+                    moveLeft = true;
+                    break;
+                case 'KeyD':
+                    moveRight = true;
+                    break;
+                case 'Space':
+                    if (canJump && !GameState.menuOpen) {
+                        velocity.y = 10;
+                        canJump = false;
+                    }
+                    break;
+                case 'KeyE':
+                    if (!GameState.menuOpen && !GameState.inTruck) {
+                        interact();
+                    }
+                    break;
+                case 'KeyF':
+                    if (GameState.inTruck) {
+                        exitTruck();
+                    } else if (!GameState.menuOpen) {
+                        // Check if near truck
+                        const truckDist = player.position.distanceTo(GameState.truck.position);
+                        if (truckDist < 8) {
+                            enterTruck();
+                        }
+                    }
+                    break;
+                case 'Escape':
+                    closePanels();
+                    break;
+            }
+        }
+ 
+        function onKeyUp(event) {
+            switch (event.code) {
+                case 'KeyW':
+                    moveForward = false;
+                    break;
+                case 'KeyS':
+                    moveBackward = false;
+                    break;
+                case 'KeyA':
+                    moveLeft = false;
+                    break;
+                case 'KeyD':
+                    moveRight = false;
+                    break;
+            }
+        }
+ 
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+ 
+        function switchRole(role) {
+            GameState.currentRole = role;
+            document.getElementById('current-role').textContent = role.toUpperCase();
+ 
+            document.querySelectorAll('.role-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.role === role);
+            });
+ 
+            // Change player shirt color based on role
+            const bodyMesh = player.children.find(c => c.geometry && c.geometry.parameters && 
+                c.geometry.parameters.width === 1.3 && c.geometry.parameters.height === 1.4);
+            if (bodyMesh) {
+                const colors = { cashier: 0x42a5f5, cook: 0xe74c3c, delivery: 0x9b59b6 };
+                bodyMesh.material.color.setHex(colors[role]);
+            }
+ 
+            closePanels();
+        }
+ 
+        function openMenu() {
+            GameState.menuOpen = true;
+            unlockPointer();
+            document.getElementById('click-to-play').style.display = 'none';
+        }
+ 
+        function closePanels() {
+            document.getElementById('cashier-panel').style.display = 'none';
+            document.getElementById('cook-panel').style.display = 'none';
+            document.getElementById('oven-panel').style.display = 'none';
+            GameState.menuOpen = false;
+            document.getElementById('click-to-play').style.display = 'block';
+        }
+ 
+        function interact() {
+            const nearestInteractable = findNearestInteractable();
+ 
+            if (nearestInteractable) {
+                if (nearestInteractable.role !== GameState.currentRole) {
+                    showNotification('Switch to ' + nearestInteractable.role.toUpperCase() + ' role first!', 'error');
+                    return;
+                }
+ 
+                switch (nearestInteractable.type) {
+                    case 'counter':
+                        const waitingCustomer = npcs.find(n => n.userData.isCustomer && !n.userData.served);
+                        if (waitingCustomer) {
+                            document.getElementById('customer-order-display').textContent = OrderNames[waitingCustomer.userData.order];
+                            document.getElementById('cashier-panel').style.display = 'block';
+                            openMenu();
+                        } else {
+                            showNotification('No customers waiting!', 'error');
+                        }
+                        break;
+                    case 'ingredient':
+                        addIngredient(nearestInteractable.ingredient);
+                        document.getElementById('cook-panel').style.display = 'block';
+                        updateCookPanel();
+                        openMenu();
+                        break;
+                    case 'oven':
+                        if (GameState.currentPizza && GameState.currentPizza.inOven) {
+                            // Pizza is cooking - show oven panel
+                            document.getElementById('oven-panel').style.display = 'block';
+                            openMenu();
+                        } else if (GameState.currentPizza && GameState.currentPizza.steps.length >= GameState.currentPizza.required.length) {
+                            // Pizza is ready to go in oven
+                            handleOven();
+                        } else {
+                            showNotification('Make a pizza first!', 'error');
+                        }
+                        break;
+                    case 'boxingTable':
+                        boxPizza();
+                        break;
+                    case 'pizzaShelf':
+                        pickupPizza();
+                        break;
+                    case 'deliveryZone':
+                        deliverPizza(nearestInteractable.houseIndex);
+                        break;
+                }
+            }
+        }
+ 
+        function findNearestInteractable() {
+            let nearest = null;
+            let nearestDist = 5; // Interaction range
+ 
+            for (const interactable of interactables) {
+                const meshPos = interactable.mesh.getWorldPosition(new THREE.Vector3());
+                const dist = player.position.distanceTo(meshPos);
+                if (dist < nearestDist) {
+                    nearestDist = dist;
+                    nearest = interactable;
+                }
+            }
+ 
+            return nearest;
+        }
+ 
+        function takeOrder(orderType) {
+            const waitingCustomer = npcs.find(n => n.userData.isCustomer && !n.userData.served);
+ 
+            if (!waitingCustomer) {
+                showNotification('No customers waiting!', 'error');
+                closePanels();
+                return;
+            }
+ 
+            // Check if order matches customer's request
+            if (waitingCustomer.userData.order !== orderType) {
+                showNotification('Wrong! Customer wants ' + OrderNames[waitingCustomer.userData.order], 'error');
+                return;
+            }
+ 
+            waitingCustomer.userData.served = true;
+ 
+            const order = {
+                id: GameState.orderIdCounter++,
+                type: orderType,
+                status: 'pending',
+                customerId: npcs.indexOf(waitingCustomer)
+            };
+ 
+            if (orderType === 'soda') {
+                // Soda is instant
+                GameState.coins += 3;
+                order.status = 'delivered';
+                showNotification('+$3 Soda served!', 'success');
+                removeCustomer(waitingCustomer);
+            } else {
+                GameState.orders.push(order);
+                showNotification('Order received: ' + orderType + ' pizza!', 'success');
+            }
+ 
+            updateUI();
+            closePanels();
+        }
+ 
+        function addIngredient(ingredient) {
+            if (!GameState.currentPizza) {
+                // Start new pizza if there's an order
+                const pendingOrder = GameState.orders.find(o => o.status === 'pending');
+                if (!pendingOrder) {
+                    showNotification('No orders to make!', 'error');
+                    return;
+                }
+                GameState.currentPizza = {
+                    orderId: pendingOrder.id,
+                    type: pendingOrder.type,
+                    steps: [],
+                    required: PizzaSteps[pendingOrder.type] || ['dough', 'sauce', 'cheese']
+                };
+                pendingOrder.status = 'cooking';
+            }
+ 
+            const pizza = GameState.currentPizza;
+            const nextStep = pizza.required[pizza.steps.length];
+ 
+            if (ingredient === 'oven') {
+                handleOven();
+                return;
+            }
+ 
+            if (ingredient !== nextStep) {
+                showNotification('Wrong ingredient! Need ' + nextStep + ' next', 'error');
+                return;
+            }
+ 
+            pizza.steps.push(ingredient);
+            showNotification('Added ' + ingredient + '!', 'success');
+            updateCookPanel();
+            updateUI();
+        }
+ 
+        let visualPizzas = []; // Track visual pizza meshes on shelf
+ 
+        function handleOven() {
+            const pizza = GameState.currentPizza;
+ 
+            if (!pizza) {
+                showNotification('Make a pizza first!', 'error');
+                return;
+            }
+ 
+            if (pizza.steps.length < pizza.required.length) {
+                showNotification('Pizza not complete! Add more ingredients', 'error');
+                return;
+            }
+ 
+            if (pizza.inOven) {
+                // Take out of oven
+                const cookTime = (Date.now() - GameState.ovenStartTime) / 1000;
+ 
+                if (cookTime < 3) {
+                    showNotification('Pizza needs more time! ' + (3 - cookTime).toFixed(1) + 's left', 'error');
+                    return;
+                }
+ 
+                if (cookTime > 10) {
+                    showNotification('Pizza burned! Order failed', 'error');
+                    const order = GameState.orders.find(o => o.id === pizza.orderId);
+                    if (order) order.status = 'failed';
+                    GameState.currentPizza = null;
+                    GameState.ovenStartTime = null;
+                    closePanels();
+                    updateUI();
+                    updateCookPanel();
+                    return;
+                }
+ 
+                // Pizza done!
+                GameState.pizzasReady.push({
+                    orderId: pizza.orderId,
+                    type: pizza.type
+                });
+ 
+                // Add visual pizza on shelf
+                addVisualPizza(pizza.type);
+ 
+                showNotification('Pizza ready! Go to delivery table to box it!', 'success');
+ 
+                const order = GameState.orders.find(o => o.id === pizza.orderId);
+                if (order) order.status = 'ready';
+ 
+                GameState.currentPizza = null;
+                GameState.ovenStartTime = null;
+                closePanels();
+                updateUI();
+                updateCookPanel();
+            } else {
+                // Put in oven
+                pizza.inOven = true;
+                GameState.ovenStartTime = Date.now();
+                showNotification('Pizza in oven! Wait 3-10 seconds', 'success');
+ 
+                // Show oven panel
+                document.getElementById('oven-panel').style.display = 'block';
+                document.getElementById('cook-panel').style.display = 'none';
+                document.getElementById('take-out-btn').textContent = '🧤 Take Out of Oven';
+                document.getElementById('take-out-btn').disabled = true;
+                updateCookPanel();
+            }
+        }
+ 
+        function addVisualPizza(type) {
+            // Create a visual pizza box on the shelf
+            const boxGeometry = new THREE.BoxGeometry(1.2, 0.25, 1.2);
+            const boxMaterial = new THREE.MeshLambertMaterial({ color: 0xdaa520 }); // Golden brown box
+            const pizzaBox = new THREE.Mesh(boxGeometry, boxMaterial);
+ 
+            // Position on shelf with offset based on how many pizzas are there
+            const offsetX = (visualPizzas.length % 2) * 1.4 - 0.7;
+            const offsetY = Math.floor(visualPizzas.length / 2) * 0.3;
+            pizzaBox.position.set(10 + offsetX, 2.75 + offsetY, -10);
+            pizzaBox.castShadow = true;
+ 
+            // Add a little label on top (colored based on type)
+            const labelColors = { cheese: 0xf1c40f, pepperoni: 0xe74c3c, supreme: 0x9b59b6 };
+            const labelGeometry = new THREE.BoxGeometry(0.4, 0.05, 0.4);
+            const labelMaterial = new THREE.MeshLambertMaterial({ color: labelColors[type] || 0xf1c40f });
+            const label = new THREE.Mesh(labelGeometry, labelMaterial);
+            label.position.y = 0.15;
+            pizzaBox.add(label);
+ 
+            scene.add(pizzaBox);
+            visualPizzas.push(pizzaBox);
+        }
+ 
+        function removeVisualPizza() {
+            if (visualPizzas.length > 0) {
+                const pizza = visualPizzas.shift();
+                scene.remove(pizza);
+            }
+        }
+ 
+        function updateOvenPanel() {
+            if (!GameState.currentPizza || !GameState.currentPizza.inOven) {
+                return;
+            }
+ 
+            const cookTime = (Date.now() - GameState.ovenStartTime) / 1000;
+            const timeDisplay = document.getElementById('oven-time');
+            const statusDisplay = document.getElementById('oven-status');
+            const progressFill = document.getElementById('oven-progress-fill');
+            const takeOutBtn = document.getElementById('take-out-btn');
+            const hint = document.getElementById('oven-hint');
+ 
+            timeDisplay.textContent = cookTime.toFixed(1) + 's';
+ 
+            // Progress bar (0-10 seconds = 0-100%)
+            const progress = Math.min(100, (cookTime / 10) * 100);
+            progressFill.style.width = progress + '%';
+ 
+            if (cookTime < 3) {
+                statusDisplay.textContent = 'Cooking... ' + (3 - cookTime).toFixed(1) + 's until ready';
+                statusDisplay.className = '';
+                progressFill.className = '';
+                takeOutBtn.disabled = true;
+                hint.textContent = 'Wait for 3-10 seconds for perfect pizza!';
+            } else if (cookTime <= 10) {
+                statusDisplay.textContent = '✓ READY! Take it out now!';
+                statusDisplay.className = 'ready';
+                progressFill.className = 'ready';
+                takeOutBtn.disabled = false;
+                hint.textContent = 'Perfect! Take it out before it burns!';
+                if (cookTime > 7) {
+                    progressFill.className = 'danger';
+                    hint.textContent = '⚠️ Hurry! Pizza will burn soon!';
+                }
+            } else {
+                statusDisplay.textContent = '🔥 BURNED!';
+                statusDisplay.className = 'burned';
+                progressFill.className = 'danger';
+                takeOutBtn.disabled = false;
+                takeOutBtn.textContent = '🗑️ Discard Burned Pizza';
+                hint.textContent = 'Pizza is ruined! Take it out to try again.';
+            }
+        }
+ 
+        function pickupPizza() {
+            if (GameState.pizzasReady.length === 0) {
+                showNotification('No pizzas ready on the shelf!', 'error');
+                return;
+            }
+ 
+            const pizza = GameState.pizzasReady.shift();
+            GameState.boxedPizzas.push(pizza);
+            removeVisualPizza();
+            showNotification('Boxed ' + OrderNames[pizza.type] + '! Deliver to a house!', 'success');
+            updateUI();
+        }
+ 
+        function boxPizza() {
+            if (GameState.pizzasReady.length === 0) {
+                showNotification('No pizzas ready to box!', 'error');
+                return;
+            }
+ 
+            const pizza = GameState.pizzasReady.shift();
+            GameState.boxedPizzas.push(pizza);
+            removeVisualPizza();
+            showNotification('Boxed ' + OrderNames[pizza.type] + '! Deliver to any green zone!', 'success');
+            updateUI();
+        }
+ 
+        function deliverPizza(houseIndex) {
+            if (GameState.boxedPizzas.length === 0) {
+                showNotification('Get a boxed pizza first!', 'error');
+                return;
+            }
+ 
+            const pizza = GameState.boxedPizzas.shift();
+            const order = GameState.orders.find(o => o.id === pizza.orderId);
+ 
+            let reward = 10;
+            if (pizza.type === 'pepperoni') reward = 12;
+            if (pizza.type === 'supreme') reward = 15;
+ 
+            // Tip based on speed
+            reward += Math.floor(Math.random() * 5) + 2;
+ 
+            GameState.coins += reward;
+            GameState.deliveries++;
+ 
+            if (order) {
+                order.status = 'delivered';
+                // Remove delivered order after short delay
+                setTimeout(() => {
+                    const idx = GameState.orders.indexOf(order);
+                    if (idx > -1) GameState.orders.splice(idx, 1);
+                    updateUI();
+                }, 1000);
+            }
+ 
+            // Remove associated customer
+            const customer = npcs.find(n => n.userData.isCustomer && n.userData.served);
+            if (customer) {
+                removeCustomer(customer);
+            }
+ 
+            showNotification('+$' + reward + ' Delivered!', 'success');
+            updateUI();
+        }
+ 
+        function removeCustomer(customer) {
+            scene.remove(customer);
+            const idx = npcs.indexOf(customer);
+            if (idx > -1) npcs.splice(idx, 1);
+        }
+ 
+        function updateUI() {
+            document.getElementById('coins-value').textContent = GameState.coins;
+            document.getElementById('deliveries-value').textContent = GameState.deliveries;
+ 
+            // Update carrying indicator
+            const carryingDisplay = document.getElementById('carrying-display');
+            const carryingValue = document.getElementById('carrying-value');
+            if (GameState.boxedPizzas.length > 0) {
+                carryingDisplay.style.display = 'block';
+                carryingValue.textContent = OrderNames[GameState.boxedPizzas[0].type];
+            } else {
+                carryingDisplay.style.display = 'none';
+            }
+ 
+            // Update orders list
+            const ordersList = document.getElementById('orders-list');
+            ordersList.innerHTML = '';
+ 
+            if (GameState.orders.length === 0) {
+                ordersList.innerHTML = '<div style="color: #888; font-size: 0.85rem;">No active orders</div>';
+            } else {
+                GameState.orders.forEach(order => {
+                    const statusClass = order.status === 'pending' ? 'pending' : 
+                                       order.status === 'cooking' ? 'cooking' : 'ready';
+                    const orderEl = document.createElement('div');
+                    orderEl.className = 'order-item';
+                    orderEl.innerHTML = `
+                        <span class="order-status ${statusClass}"></span>
+                        <span>#${order.id} ${OrderNames[order.type]}</span>
+                        <span style="margin-left: auto; opacity: 0.7; font-size: 0.8rem;">${order.status}</span>
+                    `;
+                    ordersList.appendChild(orderEl);
+                });
+            }
+        }
+ 
+        function updateCookPanel() {
+            const progress = document.getElementById('pizza-progress');
+            const pizza = GameState.currentPizza;
+ 
+            if (!pizza) {
+                progress.textContent = 'No pizza in progress';
+                document.querySelectorAll('.ingredient-btn').forEach(btn => btn.disabled = false);
+                return;
+            }
+ 
+            if (pizza.inOven) {
+                progress.innerHTML = `<span style="color: #f39c12;">🔥 Pizza in oven...</span><br>Take out in 3-10 seconds!`;
+            } else {
+                const done = pizza.steps.join(' → ');
+                const remaining = pizza.required.slice(pizza.steps.length);
+                progress.innerHTML = `
+                    <strong>Making: ${OrderNames[pizza.type]}</strong><br>
+                    Done: ${done || 'nothing'}<br>
+                    Next: ${remaining[0] || 'PUT IN OVEN'}
+                `;
+            }
+ 
+            // Disable/enable buttons
+            document.querySelectorAll('.ingredient-btn').forEach(btn => {
+                if (btn.dataset.step === 'oven') {
+                    btn.disabled = !pizza || pizza.steps.length < pizza.required.length;
+                } else {
+                    btn.disabled = pizza.inOven || pizza.steps.length >= pizza.required.length;
+                }
+            });
+        }
+ 
+        function showNotification(message, type) {
+            const notif = document.getElementById('notification');
+            notif.textContent = message;
+            notif.className = type;
+            notif.style.display = 'block';
+ 
+            setTimeout(() => {
+                notif.style.display = 'none';
+            }, 2000);
+        }
+ 
+        // ========================================
+        // TIME & WEATHER SYSTEM
+        // ========================================
+        let sunLight = null;
+        let rainParticles = [];
+ 
+        function updateTimeAndWeather(delta) {
+            // Advance time (1 real second = 1 game minute)
+            GameState.gameTime += delta * 1;
+            if (GameState.gameTime >= 24 * 60) {
+                GameState.gameTime = 0; // Reset at midnight
+            }
+ 
+            // Update weather randomly
+            GameState.weatherTimer += delta;
+            if (GameState.weatherTimer > 120) { // Weather can change every 2 minutes
+                GameState.weatherTimer = 0;
+                if (Math.random() < 0.3) { // 30% chance to change weather
+                    GameState.weather = GameState.weather === 'sunny' ? 'rainy' : 'sunny';
+                    updateWeatherEffects();
+                }
+            }
+ 
+            // Check for lunch rush (11 AM - 2 PM)
+            const hour = Math.floor(GameState.gameTime / 60);
+            GameState.isRushing = (hour >= 11 && hour < 14);
+ 
+            updateTimeDisplay();
+            updateDayNightCycle();
+        }
+ 
+        function updateTimeDisplay() {
+            const totalMinutes = Math.floor(GameState.gameTime);
+            let hours = Math.floor(totalMinutes / 60);
+            const minutes = totalMinutes % 60;
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            if (hours === 0) hours = 12;
+ 
+            const timeStr = hours + ':' + minutes.toString().padStart(2, '0') + ' ' + ampm;
+            document.getElementById('time-display').textContent = timeStr;
+ 
+            const weatherDisplay = document.getElementById('weather-display');
+            let weatherText = '';
+ 
+            if (GameState.weather === 'rainy') {
+                weatherText = '🌧️ Rainy - Slow delivery!';
+                weatherDisplay.className = 'rainy';
+            } else {
+                weatherText = '☀️ Sunny';
+                weatherDisplay.className = '';
+            }
+ 
+            if (GameState.isRushing) {
+                weatherText += ' | 🔥 LUNCH RUSH!';
+                weatherDisplay.className += ' rush';
+            }
+ 
+            const hour = Math.floor(GameState.gameTime / 60);
+            if (hour >= 20 || hour < 6) {
+                weatherText += ' | 🌙 Night';
+            }
+ 
+            weatherDisplay.textContent = weatherText;
+        }
+ 
+        function updateDayNightCycle() {
+            const hour = GameState.gameTime / 60;
+ 
+            // Calculate sun intensity based on time
+            let intensity = 1;
+            let skyColor = new THREE.Color(0x87CEEB);
+            let fogColor = new THREE.Color(0x87CEEB);
+ 
+            if (hour >= 6 && hour < 8) {
+                // Sunrise
+                const t = (hour - 6) / 2;
+                intensity = 0.3 + t * 0.7;
+                skyColor.setHex(0xffb347).lerp(new THREE.Color(0x87CEEB), t);
+            } else if (hour >= 8 && hour < 18) {
+                // Day
+                intensity = 1;
+                skyColor.setHex(0x87CEEB);
+            } else if (hour >= 18 && hour < 20) {
+                // Sunset
+                const t = (hour - 18) / 2;
+                intensity = 1 - t * 0.7;
+                skyColor.setHex(0x87CEEB).lerp(new THREE.Color(0xff6b35), t);
+            } else {
+                // Night
+                intensity = 0.3;
+                skyColor.setHex(0x1a1a3e);
+                fogColor.setHex(0x1a1a3e);
+            }
+ 
+            // Apply rain darkening
+            if (GameState.weather === 'rainy') {
+                intensity *= 0.6;
+                skyColor.lerp(new THREE.Color(0x4a5568), 0.5);
+            }
+ 
+            // Update lighting
+            scene.children.forEach(child => {
+                if (child.isDirectionalLight) {
+                    child.intensity = intensity * 0.8;
+                }
+            });
+ 
+            scene.background = skyColor;
+            scene.fog.color = skyColor;
+        }
+ 
+        function updateWeatherEffects() {
+            const rainOverlay = document.getElementById('rain-overlay');
+ 
+            if (GameState.weather === 'rainy') {
+                rainOverlay.style.display = 'block';
+                // Create rain drops
+                rainOverlay.innerHTML = '';
+                for (let i = 0; i < 100; i++) {
+                    const drop = document.createElement('div');
+                    drop.className = 'raindrop';
+                    drop.style.left = Math.random() * 100 + '%';
+                    drop.style.animationDelay = Math.random() * 0.5 + 's';
+                    drop.style.animationDuration = (0.3 + Math.random() * 0.3) + 's';
+                    rainOverlay.appendChild(drop);
+                }
+                showNotification('🌧️ It started raining! Deliveries are slower!', 'error');
+            } else {
+                rainOverlay.style.display = 'none';
+                rainOverlay.innerHTML = '';
+                showNotification('☀️ The rain stopped!', 'success');
+            }
+        }
+ 
+        function getMovementSpeed() {
+            let speed = 50; // Base speed
+ 
+            if (GameState.inTruck) {
+                speed = 120; // Fast in truck
+            } else if (GameState.weather === 'rainy' && isPlayerOutside()) {
+                speed = 30; // Slow in rain
+            }
+ 
+            return speed;
+        }
+ 
+        function isPlayerOutside() {
+            // Check if player is outside the restaurant
+            return player.position.z > 13 || player.position.x < -15 || player.position.x > 15;
+        }
+ 
+        // ========================================
+        // TRUCK CONTROLS
+        // ========================================
+        function enterTruck() {
+            if (GameState.currentRole !== 'delivery') {
+                showNotification('Switch to DELIVERY role first!', 'error');
+                return;
+            }
+ 
+            if (GameState.boxedPizzas.length === 0) {
+                showNotification('Get a boxed pizza first!', 'error');
+                return;
+            }
+ 
+            GameState.inTruck = true;
+            player.visible = false;
+            showNotification('🚚 Driving! Use WASD to move, F to exit', 'success');
+ 
+            // Update speed indicator
+            document.getElementById('speed-indicator').style.display = 'block';
+            document.getElementById('speed-indicator').className = 'hud-panel fast';
+            document.getElementById('speed-indicator').textContent = '🚚 Truck Speed: FAST';
+        }
+ 
+        function exitTruck() {
+            GameState.inTruck = false;
+            player.visible = true;
+ 
+            // Position player next to truck
+            player.position.copy(GameState.truck.position);
+            player.position.x += 4;
+ 
+            showNotification('Exited truck', 'success');
+            document.getElementById('speed-indicator').style.display = 'none';
+        }
+ 
+        function updateTruck(delta) {
+            if (!GameState.inTruck) return;
+ 
+            const truck = GameState.truck;
+            const speed = 25 * delta;
+            const rotSpeed = 2 * delta;
+ 
+            if (moveForward) {
+                truck.position.x -= Math.sin(truck.rotation.y) * speed;
+                truck.position.z -= Math.cos(truck.rotation.y) * speed;
+            }
+            if (moveBackward) {
+                truck.position.x += Math.sin(truck.rotation.y) * speed * 0.5;
+                truck.position.z += Math.cos(truck.rotation.y) * speed * 0.5;
+            }
+            if (moveLeft) {
+                truck.rotation.y += rotSpeed;
+            }
+            if (moveRight) {
+                truck.rotation.y -= rotSpeed;
+            }
+ 
+            // Update camera to follow truck
+            const cameraOffset = new THREE.Vector3(
+                Math.sin(truck.rotation.y) * 15,
+                8,
+                Math.cos(truck.rotation.y) * 15
+            );
+            camera.position.copy(truck.position).add(cameraOffset);
+            camera.lookAt(truck.position);
+ 
+            // Update player position (hidden but for interaction)
+            player.position.copy(truck.position);
+        }
+ 
+        function updateSpeedIndicator() {
+            if (GameState.inTruck) return; // Already handled
+ 
+            const indicator = document.getElementById('speed-indicator');
+ 
+            if (GameState.weather === 'rainy' && isPlayerOutside()) {
+                indicator.style.display = 'block';
+                indicator.className = 'hud-panel slow';
+                indicator.textContent = '🌧️ Rain: SLOW movement';
+            } else {
+                indicator.style.display = 'none';
+            }
+        }
+ 
+        function updateInteractionPrompt() {
+            const promptEl = document.getElementById('interaction-prompt');
+            const panelEl = document.getElementById('interaction-panel');
+            const nearest = findNearestInteractable();
+ 
+            if (nearest && !GameState.menuOpen) {
+                let prompt = nearest.prompt;
+ 
+                // Context-aware prompts
+                if (nearest.type === 'deliveryZone') {
+                    if (GameState.boxedPizzas.length > 0) {
+                        prompt = 'Press <kbd>E</kbd> to deliver ' + OrderNames[GameState.boxedPizzas[0].type];
+                    } else {
+                        prompt = '<span style="color: #888;">Get a boxed pizza first!</span>';
+                    }
+                } else if (nearest.type === 'boxingTable') {
+                    if (GameState.pizzasReady.length > 0) {
+                        prompt = 'Press <kbd>E</kbd> to box ' + OrderNames[GameState.pizzasReady[0].type];
+                    } else {
+                        prompt = '<span style="color: #888;">No pizzas ready to box</span>';
+                    }
+                } else if (nearest.type === 'pizzaShelf') {
+                    if (GameState.pizzasReady.length > 0) {
+                        prompt = 'Press <kbd>E</kbd> to pick up pizza (' + GameState.pizzasReady.length + ' ready)';
+                    } else {
+                        prompt = '<span style="color: #888;">No pizzas on shelf</span>';
+                    }
+                } else if (nearest.type === 'oven') {
+                    if (GameState.currentPizza && GameState.currentPizza.inOven) {
+                        prompt = 'Press <kbd>E</kbd> to check oven';
+                    } else if (GameState.currentPizza && GameState.currentPizza.steps.length >= GameState.currentPizza.required.length) {
+                        prompt = 'Press <kbd>E</kbd> to put pizza in oven';
+                    } else {
+                        prompt = '<span style="color: #888;">Make a pizza first</span>';
+                    }
+                }
+ 
+                promptEl.innerHTML = prompt;
+                panelEl.style.display = 'block';
+            } else {
+                panelEl.style.display = 'none';
+            }
+        }
+ 
+        function spawnCustomers(delta) {
+            customerSpawnTimer += delta;
+ 
+            // Time-based customer spawning
+            const hour = Math.floor(GameState.gameTime / 60);
+            let spawnInterval = 8; // Base: 8 seconds between customers
+            let maxCustomers = 3;
+ 
+            // Nighttime (8 PM - 6 AM): Fewer customers
+            if (hour >= 20 || hour < 6) {
+                spawnInterval = 20; // Much slower spawning
+                maxCustomers = 1;
+            }
+            // Lunch rush (11 AM - 2 PM): Many customers!
+            else if (GameState.isRushing) {
+                spawnInterval = 3; // Very fast spawning
+                maxCustomers = 6;
+            }
+            // Rain slightly reduces customers
+            if (GameState.weather === 'rainy') {
+                spawnInterval += 3;
+            }
+ 
+            const waitingCount = npcs.filter(n => n.userData.isCustomer && !n.userData.served).length;
+ 
+            if (customerSpawnTimer > spawnInterval && waitingCount < maxCustomers) {
+                customerSpawnTimer = 0;
+                const spawnPos = new THREE.Vector3(-3 + (waitingCount % 4) * 2, 0, 10 + Math.floor(waitingCount / 4) * 1.5);
+                createNPCCustomer(spawnPos);
+ 
+                // During rush, sometimes spawn 2 at once!
+                if (GameState.isRushing && Math.random() < 0.4 && waitingCount < maxCustomers - 1) {
+                    const spawnPos2 = new THREE.Vector3(-3 + ((waitingCount + 1) % 4) * 2, 0, 10 + Math.floor((waitingCount + 1) / 4) * 1.5);
+                    createNPCCustomer(spawnPos2);
+                }
+            }
+ 
+            // Update customer wait times and remove impatient ones
+            for (let i = npcs.length - 1; i >= 0; i--) {
+                const npc = npcs[i];
+                if (npc.userData.isCustomer && !npc.userData.served) {
+                    npc.userData.waitTime += delta;
+                    // Customers are more patient at night, less during rush
+                    let maxWait = npc.userData.maxWait;
+                    if (GameState.isRushing) maxWait *= 0.7; // Less patient during rush
+                    if (hour >= 20 || hour < 6) maxWait *= 1.5; // More patient at night
+ 
+                    if (npc.userData.waitTime > maxWait) {
+                        removeCustomer(npc);
+                        showNotification('Customer left! Too slow!', 'error');
+                    }
+                }
+            }
+        }
+ 
+        function updateOrderLabels() {
+            const container = document.getElementById('order-labels-container');
+            container.innerHTML = '';
+ 
+            npcs.forEach(npc => {
+                if (npc.userData.isCustomer && !npc.userData.served) {
+                    // Get screen position of NPC head
+                    const headPos = new THREE.Vector3(npc.position.x, npc.position.y + 4, npc.position.z);
+                    const screenPos = headPos.clone().project(camera);
+ 
+                    // Check if in front of camera
+                    if (screenPos.z < 1) {
+                        const x = (screenPos.x * 0.5 + 0.5) * window.innerWidth;
+                        const y = (-screenPos.y * 0.5 + 0.5) * window.innerHeight;
+ 
+                        const label = document.createElement('div');
+                        label.className = 'order-label';
+                        label.textContent = OrderNames[npc.userData.order];
+                        label.style.left = x + 'px';
+                        label.style.top = y + 'px';
+                        label.style.transform = 'translate(-50%, -100%)';
+                        container.appendChild(label);
+                    }
+                }
+            });
+        }
+ 
+        function checkCollision(newPosition) {
+            const playerBox = new THREE.Box3(
+                new THREE.Vector3(newPosition.x - 0.5, newPosition.y, newPosition.z - 0.5),
+                new THREE.Vector3(newPosition.x + 0.5, newPosition.y + 3, newPosition.z + 0.5)
+            );
+ 
+            for (const collider of colliders) {
+                if (playerBox.intersectsBox(collider)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+ 
+        function animate() {
+            requestAnimationFrame(animate);
+ 
+            if (!GameState.gameStarted) {
+                renderer.render(scene, camera);
+                return;
+            }
+ 
+            const delta = clock.getDelta();
+ 
+            // Update time and weather
+            updateTimeAndWeather(delta);
+ 
+            // Update truck if driving
+            if (GameState.inTruck) {
+                updateTruck(delta);
+            }
+ 
+            // Show truck prompt when near
+            const truckPrompt = document.getElementById('truck-prompt');
+            if (GameState.truck && !GameState.inTruck && !GameState.menuOpen) {
+                const truckDist = player.position.distanceTo(GameState.truck.position);
+                truckPrompt.style.display = truckDist < 8 ? 'block' : 'none';
+            } else {
+                truckPrompt.style.display = 'none';
+            }
+ 
+            // Player movement (only when not in menu and not in truck)
+            if (!GameState.menuOpen && !GameState.inTruck) {
+                velocity.x -= velocity.x * 10.0 * delta;
+                velocity.z -= velocity.z * 10.0 * delta;
+                velocity.y -= 25 * delta; // gravity
+ 
+                direction.z = Number(moveForward) - Number(moveBackward);
+                direction.x = Number(moveRight) - Number(moveLeft);
+                direction.normalize();
+ 
+                const moveSpeed = getMovementSpeed();
+                if (moveForward || moveBackward) velocity.z -= direction.z * moveSpeed * delta;
+                if (moveLeft || moveRight) velocity.x -= direction.x * moveSpeed * delta;
+ 
+                // Apply movement in camera direction
+                const moveX = velocity.x * delta;
+                const moveZ = velocity.z * delta;
+ 
+                const forward = new THREE.Vector3(Math.sin(cameraYaw), 0, Math.cos(cameraYaw));
+                const right = new THREE.Vector3(Math.sin(cameraYaw + Math.PI / 2), 0, Math.cos(cameraYaw + Math.PI / 2));
+ 
+                // Calculate new position
+                const newPosition = player.position.clone();
+                newPosition.add(forward.clone().multiplyScalar(-moveZ));
+                newPosition.add(right.clone().multiplyScalar(-moveX));
+                newPosition.y += velocity.y * delta;
+ 
+                // Check collision for X movement
+                const testPosX = player.position.clone();
+                testPosX.x = newPosition.x;
+                if (!checkCollision(testPosX)) {
+                    player.position.x = newPosition.x;
+                }
+ 
+                // Check collision for Z movement
+                const testPosZ = player.position.clone();
+                testPosZ.z = newPosition.z;
+                if (!checkCollision(testPosZ)) {
+                    player.position.z = newPosition.z;
+                }
+ 
+                // Apply Y movement (gravity)
+                player.position.y = newPosition.y;
+ 
+                // Ground collision
+                if (player.position.y < 0) {
+                    velocity.y = 0;
+                    player.position.y = 0;
+                    canJump = true;
+                }
+ 
+                // Make player face movement direction
+                if (direction.length() > 0.1) {
+                    player.rotation.y = cameraYaw + Math.PI;
+                }
+ 
+                // Third person camera - position behind and above player
+                const cameraOffset = new THREE.Vector3(
+                    Math.sin(cameraYaw) * CAMERA_DISTANCE,
+                    CAMERA_HEIGHT + Math.sin(cameraPitch) * 3,
+                    Math.cos(cameraYaw) * CAMERA_DISTANCE
+                );
+ 
+                camera.position.copy(player.position).add(cameraOffset);
+                camera.position.y = Math.max(camera.position.y, 1.5); // Minimum camera height
+ 
+                // Camera looks at player's head level
+                const lookTarget = player.position.clone();
+                lookTarget.y += 1.5;
+                camera.lookAt(lookTarget);
+            }
+ 
+            // Spawn and update customers
+            spawnCustomers(delta);
+ 
+            // Update interaction prompt
+            updateInteractionPrompt();
+ 
+            // Update order labels above customers
+            updateOrderLabels();
+ 
+            // Update oven panel timer
+            if (GameState.currentPizza && GameState.currentPizza.inOven) {
+                updateOvenPanel();
+            }
+ 
+            // Update speed indicator
+            updateSpeedIndicator();
+ 
+            renderer.render(scene, camera);
+        }
+ 
+        // Initialize
+        init();
+    </script>
+</body>
+</html>
+ 
