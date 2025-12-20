@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <title>DOS Emulator</title>
+
+    <style>
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background: black;
+            color: #fedb1d;
+            overflow: hidden;
+        }
+
+        #canvas {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            height: 100%;
+            transform: translate(-50%, -50%);
+            background: black;
+        }
+
+        .emularity-splash-screen {
+            text-align: center;
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 50%;
+            color: #000;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas
+        id="canvas"
+        style="width:50%; height:50%; display:block; margin:0 auto;"
+        onclick="window.focus();">
+    </canvas>
+
+    <script src="https://cdn.jsdelivr.net/gh/Deformed-steve/DosGames@main/js/es6-promise.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/Deformed-steve/DosGames@main/js/browserfs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/Deformed-steve/DosGames@main/js/loader.js"></script>
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+
+    <script>
+        function $_GET(param) {
+            const vars = {};
+            window.location.href
+                .replace(location.hash, '')
+                .replace(/[?&]+([^=&]+)=?([^&]*)?/gi,
+                    (m, key, value) => vars[key] = value ?? '');
+            return param ? (vars[param] ?? null) : vars;
+        }
+
+        const softs = {
+            NFS: {
+                file: "softs/nfsdemo-cd.zip",
+                cmd: "NFS.BAT",
+                pointer: true
+            }
+        };
+
+        let file = "NFS";
+
+        const urlSoft = $_GET("soft");
+        if (urlSoft && softs[urlSoft]) {
+            file = urlSoft;
+        }
+
+        if (!softs[file]) {
+            throw new Error("Invalid software selected");
+        }
+
+        function locateAdditionalFiles(filename) {
+            if (filename === "dosbox.html.mem") {
+                return "https://cdn.jsdelivr.net/gh/Deformed-steve/DosGames@main/js/dosbox-sync.mem";
+            }
+            return "https://cdn.jsdelivr.net/gh/Deformed-steve/DosGames@main/js/" + filename;
+        }
+
+        if (!softs[file].machine) {
+            const dosbox = new Emulator(
+                document.querySelector("#canvas"),
+                null,
+                new DosBoxLoader(
+                    DosBoxLoader.emulatorJS("https://cdn.jsdelivr.net/gh/Deformed-steve/DosGames@main/js/dosbox-sync.js"),
+                    DosBoxLoader.locateAdditionalEmulatorJS(locateAdditionalFiles),
+                    DosBoxLoader.nativeResolution(640, 400),
+                    DosBoxLoader.mountZip(
+                        "c",
+                        DosBoxLoader.fetchFile("Software", softs[file].file)
+                    ),
+                    DosBoxLoader.startExe(softs[file].cmd)
+                )
+            );
+
+            dosbox.start({ waitAfterDownloading: false });
+        }
+
+        if (softs[file].pointer === false) {
+            document.getElementById("canvas").style.cursor = "none";
+        }
+    </script>
+</body>
+</html>
