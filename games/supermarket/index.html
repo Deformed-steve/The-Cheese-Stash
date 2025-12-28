@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>TOKFEED | WebGL</title>
+    <style>
+      /* --- GLOBAL RESET --- */
+      body, html {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #050505;
+        overflow: hidden;
+        font-family: 'Courier New', Courier, monospace;
+      }
+
+      /* --- GAME CANVAS --- */
+      #unity-canvas {
+        width: 100%;
+        height: 100%;
+        background: #000;
+        display: block;
+      }
+
+      /* --- LOADING SCREEN CONTAINER --- */
+      #loading-screen {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 999;
+        transition: opacity 1s ease-out;
+      }
+
+      /* --- GLITCH LOGO EFFECT --- */
+      .logo {
+        color: #fff;
+        font-size: 4rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 10px;
+        position: relative;
+        text-shadow: 0 0 10px rgba(0, 255, 255, 0.7), 0 0 20px rgba(0, 255, 255, 0.5);
+        margin-bottom: 40px;
+        animation: flicker 1.5s infinite alternate;
+      }
+
+      /* --- LOADER SPINNER --- */
+      .spinner {
+        width: 60px;
+        height: 60px;
+        border: 4px solid rgba(0, 255, 255, 0.1);
+        border-top: 4px solid #00ffff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-bottom: 20px;
+        box-shadow: 0 0 15px #00ffff;
+      }
+
+      /* --- PROGRESS BAR --- */
+      .progress-container {
+        width: 300px;
+        height: 6px;
+        background: #222;
+        border-radius: 3px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: inset 0 0 5px #000;
+      }
+
+      .progress-bar {
+        width: 0%;
+        height: 100%;
+        background: linear-gradient(90deg, #00ffff, #0088ff);
+        box-shadow: 0 0 10px #00ffff;
+        transition: width 0.2s ease-out;
+      }
+
+      .status-text {
+        margin-top: 15px;
+        color: #00ffff;
+        font-size: 0.8rem;
+        opacity: 0.8;
+      }
+
+      /* --- ANIMATIONS --- */
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+
+      @keyframes flicker {
+        0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+          text-shadow: 0 0 10px rgba(0, 255, 255, 0.7), 0 0 20px rgba(0, 255, 255, 0.5);
+          opacity: 1;
+        }
+        20%, 24%, 55% {
+          text-shadow: none;
+          opacity: 0.4;
+        }
+      }
+
+      /* HIDDEN CLASS FOR REMOVAL */
+      .hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+    </style>
+  </head>
+  <body>
+
+    <div id="loading-screen">
+      <div class="logo">Cheese Master Port :]]]</div>
+      <div class="spinner"></div>
+      <div class="progress-container">
+        <div id="progress-bar" class="progress-bar"></div>
+      </div>
+      <div id="status-text" class="status-text">INITIALIZING GAME ...</div>
+    </div>
+
+    <canvas id="unity-canvas"></canvas>
+
+    <script src="Build/Build.loader.js"></script>
+
+    <script>
+      // 1. Configuration matching your file structure
+      var buildUrl = "Build";
+      var loaderUrl = buildUrl + "/Build.loader.js";
+      
+      var config = {
+        dataUrl: buildUrl + "/Build.data.br",
+        frameworkUrl: buildUrl + "/Build.framework.js.br",
+        codeUrl: buildUrl + "/Build.wasm.br",
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "DefaultCompany",
+        productName: "TOKFEED",
+        productVersion: "1.0",
+      };
+
+      var container = document.querySelector("#unity-canvas");
+      var loadingScreen = document.querySelector("#loading-screen");
+      var progressBar = document.querySelector("#progress-bar");
+      var statusText = document.querySelector("#status-text");
+
+      // 2. Check for Mobile to adjust pixel ratio (Standard Unity Practice)
+      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        var meta = document.createElement('meta');
+        meta.name = 'viewport';
+        meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
+        document.getElementsByTagName('head')[0].appendChild(meta);
+      }
+
+      // 3. Initialize Engine
+      createUnityInstance(container, config, (progress) => {
+        // Update Progress Bar
+        var percent = 100 * progress;
+        progressBar.style.width = percent + "%";
+        
+        // Update Status Text based on percentage
+        if(progress < 0.2) statusText.innerText = "LOADING ASSETS...";
+        else if(progress < 0.5) statusText.innerText = "DECOMPRESSING BROTLI...";
+        else if(progress < 0.8) statusText.innerText = "COMPILING WASM...";
+        else statusText.innerText = "STARTING...";
+
+      }).then((unityInstance) => {
+        // 4. On Finish
+        console.log("Game Loaded Successfully");
+        
+        // Fade out loading screen
+        loadingScreen.classList.add("hidden");
+        
+        // Remove it from DOM after transition finishes
+        setTimeout(() => {
+            loadingScreen.style.display = "none";
+        }, 1000);
+
+      }).catch((message) => {
+        alert("Unity WebGL Error: " + message);
+      });
+    </script>
+  </body>
+</html>
