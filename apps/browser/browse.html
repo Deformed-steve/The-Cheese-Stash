@@ -184,7 +184,7 @@
 
       // Detect search vs URL
       if (!url.startsWith("http") && !url.includes(".")) {
-        url = "https://duckduckgo.com/?q=" + encodeURIComponent(url);
+        url = "https://search.brave.com/search?q=" + encodeURIComponent(url);
       } else if (!url.startsWith("http")) {
         url = "https://" + url;
       }
