@@ -1,58 +1,104 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Loading...</title>
-    <style>
-        body {
-            background: #0d0d0d;
-            color: #85c1ff; /* pastel blue */
-            font-family: 'Fira Mono', 'Consolas', monospace;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-        }
-        .loader {
-            width: 70px;
-            height: 70px;
-            border: 6px solid rgba(133, 193, 255, 0.2);
-            border-top: 6px solid #85c1ff;
-            border-radius: 50%;
-            animation: spin 1.5s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .loading-text {
-            font-size: 1.3rem;
-            font-weight: 500;
-            margin-top: 18px;
-            color: #a6cfff;
-            animation: fade 2s ease-in-out infinite;
-        }
-        @keyframes fade {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.4; }
-        }
-        .tips {
-            margin-top: 8px;
-            font-size: 1rem;
-            color: rgba(133, 193, 255, 0.5);
-            text-align: center;
-        }
-    </style>
-    <script src="uv/uv.bundle.js" defer></script>
-    <script src="uv/uv.config.js" defer></script>
-    <script src="register-sw.js" defer></script>
-    <script src="embed.js" defer></script>
+<meta charset="UTF-8">
+<title>The Cheese Stash Loading...</title>
+<style>
+    body {
+        background: #111; /* dark background */
+        color: #ffd700; /* yellow text */
+        font-family: 'Fira Mono', 'Consolas', monospace;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+    }
+
+    .loader-container {
+        position: relative;
+        width: 120px;
+        height: 120px;
+        display: flex;
+        justify-content: center;
+        align-items: flex-end;
+        margin-bottom: 20px;
+    }
+
+    .cheese {
+        font-size: 100px;
+        position: absolute;
+        color: transparent; /* invisible inside */
+        visibility: ;
+        -webkit-text-stroke: 2px #000; /* black outline */
+    }
+
+    .cheese-fill {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: 0%;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: flex-end;
+    }
+
+    .cheese-fill span {
+        font-size: 100px;
+        color: #ffd700; /* yellow fill */
+        line-height: 1;
+    }
+
+    .loading-text {
+        font-size: 1.3rem;
+        font-weight: 500;
+        margin-top: 8px;
+        color: #ffd633;
+        animation: fade 2s ease-in-out infinite;
+    }
+
+    @keyframes fade {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.4; }
+    }
+
+    .tips {
+        margin-top: 8px;
+        font-size: 1rem;
+        color: rgba(255, 215, 0, 0.5);
+        text-align: center;
+    }
+</style>
+<script src="uv/uv.bundle.js" defer></script>
+<script src="uv/uv.config.js" defer></script>
+<script src="register-sw.js" defer></script>
+<script src="embed.js" defer></script>
 </head>
 <body>
-    <div class="loader"></div>
-    <div class="loading-text">Loading...</div>
-    <div class="tips">Please wait a moment.</div>
+    <div class="loader-container">
+        <div class="cheese">🧀</div>
+        <div class="cheese-fill"><span>🧀</span></div>
+    </div>
+    <div class="loading-text">Loading The Cheese Stash...</div>
+    <div class="tips">Please wait until the cheese is full!</div>
+
+<script>
+    const fill = document.querySelector('.cheese-fill');
+    let progress = 0;
+
+    // Simulate loading progress
+    const interval = setInterval(() => {
+        progress += 1; // increment progress
+        fill.style.height = progress + '%';
+
+        if (progress >= 100) {
+            clearInterval(interval);
+            document.querySelector('.loading-text').textContent = "Cheese Loaded!";
+            // Optionally redirect or execute other code here
+        }
+    }, 50); // 50ms per increment, ~5 seconds total
+</script>
 </body>
 </html>
