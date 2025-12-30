@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MITHRAL</title>
+ <link rel="icon" href="/mithral.png" type="image/x-icon">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #0a0e27;
+    color: #fff;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  #startpage {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+  }
+
+  h1 {
+    font-size: 3rem;
+    font-weight: 300;
+    letter-spacing: 0.3rem;
+    color: #5b9dff;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  h1 img {
+    width: 50px;
+    height: 50px;
+  }
+
+  .search-box {
+    width: 90%;
+    max-width: 600px;
+    position: relative;
+  }
+
+  .search-box input {
+    width: 100%;
+    padding: 1rem 1.5rem;
+    font-size: 1rem;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 50px;
+    color: #fff;
+    outline: none;
+    transition: all 0.3s;
+  }
+
+  .search-box input:focus {
+    background: rgba(255,255,255,0.08);
+    border-color: #5b9dff;
+  }
+
+  .shortcuts {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .shortcut {
+    padding: 0.8rem 1.5rem;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .shortcut:hover {
+    background: rgba(91,157,255,0.15);
+    border-color: #5b9dff;
+    transform: translateY(-2px);
+  }
+
+  #browserview {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+  }
+
+  #viewer {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  #navbar {
+    position: fixed;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.2rem;
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    max-width: 900px;
+    width: 90%;
+    z-index: 10;
+  }
+
+  .nav-btn {
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 1.1rem;
+    padding: 0.5rem;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s;
+  }
+
+  .nav-btn:hover {
+    background: rgba(255,255,255,0.1);
+  }
+
+  #urlbar {
+    flex: 1;
+    padding: 0.6rem 1rem;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    color: #fff;
+    outline: none;
+    font-size: 0.9rem;
+  }
+
+  .settings-btn {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #fff;
+    padding: 0.7rem;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s;
+    z-index: 100;
+  }
+
+  .settings-btn:hover {
+    background: rgba(91,157,255,0.3);
+    border-color: #5b9dff;
+  }
+
+  #settings-panel {
+    position: fixed;
+    top: 4rem;
+    right: 1rem;
+    background: rgba(10,14,39,0.98);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 1.5rem;
+    display: none;
+    flex-direction: column;
+    gap: 1rem;
+    min-width: 220px;
+    z-index: 99;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  #settings-panel.show {
+    display: flex;
+    animation: slideIn 0.3s ease forwards;
+  }
+
+  @keyframes slideIn {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .setting-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .setting-item label {
+    font-size: 0.9rem;
+    cursor: pointer;
+  }
+
+  /* Custom Select */
+  .custom-select {
+    position: relative;
+    width: 140px;
+  }
+
+  .select-trigger {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #fff;
+    padding: 0.5rem 0.8rem;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s;
+  }
+
+  .select-trigger:hover {
+    background: rgba(255,255,255,0.08);
+  }
+
+  .select-trigger i {
+    font-size: 0.7rem;
+    transition: transform 0.3s;
+  }
+
+  .select-trigger.open i {
+    transform: rotate(180deg);
+  }
+
+  .select-options {
+    position: absolute;
+    top: calc(100% + 0.3rem);
+    left: 0;
+    right: 0;
+    background: rgba(10,14,39,0.98);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(-10px);
+    pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s;
+    z-index: 10;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+
+  .select-options.show {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: all;
+  }
+
+  .select-option {
+    padding: 0.6rem 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .select-option:hover {
+    background: rgba(255,255,255,0.1);
+  }
+
+  .select-option.selected {
+    background: rgba(91,157,255,0.2);
+    color: #5b9dff;
+  }
+
+  /* Custom Checkbox */
+  .custom-checkbox {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    cursor: pointer;
+  }
+
+  .custom-checkbox input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .checkbox-slider {
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.1);
+    border-radius: 24px;
+    transition: all 0.3s;
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+
+  .checkbox-slider:before {
+    content: '';
+    position: absolute;
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    top: 2px;
+    background: #fff;
+    border-radius: 50%;
+    transition: all 0.3s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+
+  .custom-checkbox input:checked + .checkbox-slider {
+    background: #5b9dff;
+    border-color: #5b9dff;
+  }
+
+  .custom-checkbox input:checked + .checkbox-slider:before {
+    transform: translateX(20px);
+  }
+
+  .hidden {
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<button class="settings-btn" onclick="toggleSettings()">
+  <i class="fa-solid fa-gear"></i>
+</button>
+
+<div id="settings-panel">
+  <div class="setting-item">
+    <label>Theme</label>
+    <div class="custom-select">
+      <div class="select-trigger" onclick="toggleSelect()">
+        <span id="selected-theme">Dark</span>
+        <i class="fa-solid fa-chevron-down"></i>
+      </div>
+      <div class="select-options" id="theme-options">
+        <div class="select-option selected" data-value="dark">Dark</div>
+        <div class="select-option" data-value="blue">Blue</div>
+        <div class="select-option" data-value="midnight">Midnight</div>
+        <div class="select-option" data-value="sakura">Sakura Pink</div>
+        <div class="select-option" data-value="forest">Forest Green</div>
+        <div class="select-option" data-value="sunset">Sunset Orange</div>
+        <div class="select-option" data-value="purple">Purple Haze</div>
+        <div class="select-option" data-value="ocean">Ocean Teal</div>
+      </div>
+    </div>
+  </div>
+  <div class="setting-item">
+    <label for="confirmCloseInput">Confirm Close</label>
+    <label class="custom-checkbox">
+      <input type="checkbox" id="confirmCloseInput" onchange="updateConfirmClose()">
+      <span class="checkbox-slider"></span>
+    </label>
+  </div>
+</div>
+
+<div id="startpage">
+  <h1>
+    <img src="/mithral.png" alt="Mithral Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline'">
+    <i class="fa-solid fa-gem" style="display:none;"></i>
+    MITHRAL
+  </h1>
+  
+  <div class="search-box">
+    <input id="startinput" type="text" placeholder="Search or enter URL..." onkeydown="if(event.key==='Enter') navigate()">
+  </div>
+
+  <div class="shortcuts">
+    <div class="shortcut" onclick="openSite('https://inv.nadeko.net')">
+      <i class="fab fa-youtube"></i> YouTube
+    </div>
+    <div class="shortcut" onclick="openSite('https://wikipedia.org')">
+      <i class="fab fa-wikipedia-w"></i> Wikipedia
+    </div>
+    <div class="shortcut" onclick="openGames()">
+      <i class="fa-solid fa-gamepad"></i> Games
+    </div>
+  </div>
+</div>
+
+<div id="browserview">
+  <iframe id="viewer" src=""></iframe>
+</div>
+
+<div id="navbar" style="display:none;">
+  <button class="nav-btn" onclick="goBack()"><i class="fa-solid fa-arrow-left"></i></button>
+  <button class="nav-btn" onclick="goForward()"><i class="fa-solid fa-arrow-right"></i></button>
+  <button class="nav-btn" onclick="reload()"><i class="fa-solid fa-rotate-right"></i></button>
+  <input id="urlbar" type="text" placeholder="Enter URL..." onkeydown="if(event.key==='Enter') navigate()">
+  <button class="nav-btn" onclick="goHome()"><i class="fa-solid fa-house"></i></button>
+</div>
+
+<script>
+const startpage = document.getElementById("startpage");
+const browserview = document.getElementById("browserview");
+const navbar = document.getElementById("navbar");
+const iframe = document.getElementById("viewer");
+const urlbar = document.getElementById("urlbar");
+const startinput = document.getElementById("startinput");
+const settingsPanel = document.getElementById("settings-panel");
+const themeOptions = document.getElementById("theme-options");
+const selectTrigger = document.querySelector(".select-trigger");
+const selectedThemeSpan = document.getElementById("selected-theme");
+
+// Theme storage
+let currentTheme = 'dark';
+let confirmClose = false;
+
+function toggleSettings() {
+  if (settingsPanel.classList.contains('show')) {
+    settingsPanel.style.opacity = '0';
+    settingsPanel.style.transform = 'translateY(-10px)';
+    setTimeout(() => {
+      settingsPanel.classList.remove('show');
+      settingsPanel.style.display = 'none';
+    }, 300);
+  } else {
+    settingsPanel.style.display = 'flex';
+    setTimeout(() => {
+      settingsPanel.classList.add('show');
+    }, 10);
+  }
+}
+
+function toggleSelect() {
+  event.stopPropagation();
+  themeOptions.classList.toggle('show');
+  selectTrigger.classList.toggle('open');
+}
+
+// Handle theme selection
+document.querySelectorAll('.select-option').forEach(option => {
+  option.addEventListener('click', function(e) {
+    e.stopPropagation();
+    const value = this.getAttribute('data-value');
+    const text = this.textContent;
+    
+    document.querySelectorAll('.select-option').forEach(opt => opt.classList.remove('selected'));
+    this.classList.add('selected');
+    
+    selectedThemeSpan.textContent = text;
+    currentTheme = value;
+    changeTheme();
+    
+    themeOptions.classList.remove('show');
+    selectTrigger.classList.remove('open');
+  });
+});
+
+function changeTheme() {
+  const themes = {
+    dark: { bg: '#0a0e27', accent: '#5b9dff' },
+    blue: { bg: '#001529', accent: '#40a9ff' },
+    midnight: { bg: '#0d1117', accent: '#58a6ff' },
+    sakura: { bg: '#2d1b2e', accent: '#ff9ec9' },
+    forest: { bg: '#0f2027', accent: '#5dbd74' },
+    sunset: { bg: '#1a1410', accent: '#ff8c42' },
+    purple: { bg: '#1a0d2e', accent: '#a78bfa' },
+    ocean: { bg: '#0a1e28', accent: '#2dd4bf' }
+  };
+  
+  const theme = themes[currentTheme];
+  document.body.style.background = theme.bg;
+  document.querySelector('h1').style.color = theme.accent;
+  
+  // Update checkbox accent color
+  const checkedInput = document.querySelector('#confirmCloseInput:checked');
+  if (checkedInput) {
+    checkedInput.nextElementSibling.style.background = theme.accent;
+    checkedInput.nextElementSibling.style.borderColor = theme.accent;
+  }
+  
+  // Update button and shortcut hover colors
+  document.querySelectorAll('.shortcut').forEach(el => {
+    el.addEventListener('mouseenter', function() {
+      this.style.borderColor = theme.accent;
+    });
+    el.addEventListener('mouseleave', function() {
+      this.style.borderColor = 'rgba(255,255,255,0.1)';
+    });
+  });
+}
+
+function updateConfirmClose() {
+  confirmClose = document.getElementById('confirmCloseInput').checked;
+  
+  if (confirmClose) {
+    // Add beforeunload listener when enabled
+    window.addEventListener('beforeunload', handleBeforeUnload);
+  } else {
+    // Remove beforeunload listener when disabled
+    window.removeEventListener('beforeunload', handleBeforeUnload);
+  }
+}
+
+function handleBeforeUnload(e) {
+  e.preventDefault();
+  e.returnValue = ''; // Required for Chrome
+  return ''; // Required for older browsers
+}
+
+function navigate() {
+  const input = (startpage.style.display !== 'none' ? startinput : urlbar).value.trim();
+  if (!input) return;
+  
+  // Check if we should confirm before leaving
+  if (confirmClose && iframe.src && browserview.style.display !== 'none') {
+    if (!confirm('Leave current page?')) return;
+  }
+  
+  let targetUrl;
+  const isURL = /^(https?:\/\/)?[a-zA-Z0-9.-]+\.[a-z]{2,}/.test(input);
+  
+  if (isURL) {
+    targetUrl = input.startsWith("http") ? input : "https://" + input;
+  } else {
+    targetUrl = "https://search.brave.com/search?q=" + encodeURIComponent(input);
+  }
+  
+  iframe.src = "/s/embed.html#" + targetUrl;
+  urlbar.value = input;
+  startpage.style.display = 'none';
+  browserview.style.display = 'block';
+  navbar.style.display = 'flex';
+}
+
+function openSite(url) {
+  // Check if we should confirm before leaving
+  if (confirmClose && iframe.src && browserview.style.display !== 'none') {
+    if (!confirm('Leave current page?')) return;
+  }
+  
+  iframe.src = "/s/embed.html#" + url;
+  urlbar.value = url;
+  startpage.style.display = 'none';
+  browserview.style.display = 'block';
+  navbar.style.display = 'flex';
+}
+
+function openGames() {
+  // Check if we should confirm before leaving
+  if (confirmClose && iframe.src && browserview.style.display !== 'none') {
+    if (!confirm('Leave current page?')) return;
+  }
+  
+  iframe.src = "games.html";
+  urlbar.value = "games.html";
+  startpage.style.display = 'none';
+  browserview.style.display = 'block';
+  navbar.style.display = 'flex';
+}
+
+function goBack() {
+  iframe.contentWindow.history.back();
+}
+
+function goForward() {
+  iframe.contentWindow.history.forward();
+}
+
+function reload() {
+  iframe.contentWindow.location.reload();
+}
+
+function goHome() {
+  startpage.style.display = 'flex';
+  browserview.style.display = 'none';
+  navbar.style.display = 'none';
+  iframe.src = '';
+  startinput.value = '';
+}
+
+// Close settings when clicking outside
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('#settings-panel') && !e.target.closest('.settings-btn')) {
+    if (settingsPanel.classList.contains('show')) {
+      settingsPanel.style.opacity = '0';
+      settingsPanel.style.transform = 'translateY(-10px)';
+      setTimeout(() => {
+        settingsPanel.classList.remove('show');
+        settingsPanel.style.display = 'none';
+      }, 300);
+    }
+  }
+  
+  // Close select dropdown when clicking outside
+  if (!e.target.closest('.custom-select')) {
+    themeOptions.classList.remove('show');
+    selectTrigger.classList.remove('open');
+  }
+});
+</script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"version":"2024.11.0","token":"94c79d4d951745d085049dd7f2bbd8f8","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>
+
+<script defer data-domain="html.cafe" src="https://milkymouse.com/js/script.js"></script>
+
+   
