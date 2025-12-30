@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>404 Not Found</title>
+<style>
+  body {
+    background: radial-gradient(circle at top, #0a1b3d, #00142e);
+    color: #e0e8ff;
+    font-family: "Inter", sans-serif;
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+  }
+  h1 {
+    font-size: 5rem;
+    margin: 0;
+    color: #4da3ff;
+    text-shadow: 0 0 10px #007bff, 0 0 20px #007bff;
+  }
+  p {
+    font-size: 1.2rem;
+    opacity: 0.85;
+    margin-bottom: 1.5rem;
+  }
+  button {
+    background: #003a80;
+    color: #e0e8ff;
+    border: 1px solid #4da3ff;
+    padding: 0.8rem 1.6rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+  }
+  button:hover {
+    background: #004ba8;
+    transform: scale(1.05);
+    box-shadow: 0 0 10px #007bff;
+  }
+</style>
+</head>
+<body>
+  <h1>404</h1>
+  <p>Page not found. Maybe try reloading?</p>
+  <button onclick="location.reload()">Reload Page</button>
+</body>
+</html>
