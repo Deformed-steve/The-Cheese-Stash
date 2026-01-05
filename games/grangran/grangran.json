@@ -1,0 +1,12 @@
+{
+"companyName": "DefaultCompany",
+"productName": "Caudillgrangran",
+"dataUrl": "grangran.data.unityweb",
+"wasmCodeUrl": "grangran.wasm.code.unityweb",
+"wasmFrameworkUrl": "grangran.wasm.framework.unityweb",
+"TOTAL_MEMORY": 2130706432,
+"graphicsAPI": ["WebGL 2.0"],
+"webglContextAttributes": {"preserveDrawingBuffer": false},
+"splashScreenStyle": "Dark",
+"backgroundColor": "#231F20"
+}

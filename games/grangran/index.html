@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Unity WebGL Player | Caudillgrangran</title>
+    <script src="Build/UnityLoader.js"></script>
+    <style>
+      /* --- FULL SCREEN SETUP --- */
+      html, body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden; /* No scrollbars */
+        background-color: #000;
+      }
+      #gameContainer {
+        width: 100% !important;
+        height: 100% !important;
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+
+      /* --- TUFF LOADING SCREEN STYLES --- */
+      #custom-loader {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #0a0a0a; /* Deep dark grey */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        font-family: "Courier New", Courier, monospace;
+        color: #00ff41; /* Hacker Green */
+        text-transform: uppercase;
+      }
+
+      /* CRT Scanline Effect Overlay */
+      #custom-loader::before {
+        content: " ";
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+        z-index: 2;
+        background-size: 100% 2px, 3px 100%;
+        pointer-events: none;
+      }
+
+      .loader-content {
+        z-index: 3;
+        width: 60%;
+        max-width: 600px;
+        text-align: center;
+      }
+
+      h1.title {
+        font-size: 3rem;
+        letter-spacing: 5px;
+        margin-bottom: 10px;
+        text-shadow: 0 0 10px #00ff41, 0 0 20px #00ff41;
+        font-weight: bold;
+      }
+
+      .status-text {
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+        letter-spacing: 2px;
+        color: #fff;
+        text-shadow: 0 0 5px #fff;
+      }
+
+      /* Progress Bar Container */
+      .progress-box {
+        width: 100%;
+        height: 30px;
+        border: 3px solid #00ff41;
+        box-shadow: 0 0 15px #00ff41;
+        padding: 4px;
+        position: relative;
+        background: #000;
+      }
+
+      /* The Moving Bar */
+      .progress-fill {
+        height: 100%;
+        width: 0%;
+        background-color: #00ff41;
+        box-shadow: inset 0 0 10px #000;
+        transition: width 0.1s linear;
+        position: relative;
+      }
+
+      /* Glitchy visual effect on the bar */
+      .progress-fill::after {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; bottom: 0; right: 0;
+        background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);
+        background-size: 20px 20px;
+      }
+
+    </style>
+  </head>
+  <body>
+    
+    <div id="gameContainer"></div>
+
+    <div id="custom-loader">
+      <div class="loader-content">
+        <h1 class="title">CAUDILL<br>GRANGRAN</h1>
+        <div id="loader-status" class="status-text">INITIALIZING SYSTEM...</div>
+        <div class="progress-box">
+          <div id="loader-bar" class="progress-fill"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // --- CONFIGURATION ---
+      var buildFolder = ""; // Change to "Build/" if files are in a subfolder
+
+      // --- UI HELPERS ---
+      var loaderBar = document.getElementById('loader-bar');
+      var loaderStatus = document.getElementById('loader-status');
+      var loaderDiv = document.getElementById('custom-loader');
+
+      function updateLoader(percent, message) {
+        loaderBar.style.width = (percent * 100) + "%";
+        if (message) loaderStatus.innerText = message;
+      }
+
+      // Helper to ensure Unity looks at the real server URL
+      function resolveUrl(filename) {
+        return new URL(buildFolder + filename, window.location.href).href;
+      }
+
+      // 1. The Configuration Object
+      var unityConfig = {
+        "companyName": "DefaultCompany",
+        "productName": "Caudillgrangran",
+        "dataUrl": "grangran.data.unityweb", 
+        "wasmCodeUrl": resolveUrl("grangran.wasm.code.unityweb"),
+        "wasmFrameworkUrl": resolveUrl("grangran.wasm.framework.unityweb"),
+        "TOTAL_MEMORY": 2130706432,
+        "graphicsAPI": ["WebGL 2.0"],
+        "webglContextAttributes": {"preserveDrawingBuffer": false},
+        "splashScreenStyle": "Dark",
+        "backgroundColor": "#231F20"
+      };
+
+      // 2. Settings for the split files
+      var splitFileSettings = {
+        baseName: buildFolder + "grangran.data.unityweb.part",
+        count: 33, 
+        start: 0
+      };
+
+      // 3. Main Logic
+      async function loadAndStitchData() {
+        console.log("Starting System...");
+        updateLoader(0, "ACCESSING SERVER...");
+        
+        var fetchPromises = [];
+        var partsLoaded = 0;
+        var totalParts = splitFileSettings.count;
+
+        // Loop to fetch parts
+        for (var i = splitFileSettings.start; i < totalParts; i++) {
+          var fileName = splitFileSettings.baseName + i;
+          
+          // Create a promise that updates the progress bar when done
+          var p = fetch(fileName).then(response => {
+            if (!response.ok) throw new Error("Failed to load " + fileName);
+            return response.arrayBuffer();
+          }).then(data => {
+            partsLoaded++;
+            // Calculate progress (0% to 80% is allocated for downloading)
+            var progress = (partsLoaded / totalParts) * 0.8; 
+            updateLoader(progress, "DOWNLOADING SEGMENT " + partsLoaded + "/" + totalParts);
+            return data;
+          });
+
+          fetchPromises.push(p);
+        }
+
+        try {
+          // Wait for all downloads
+          var parts = await Promise.all(fetchPromises);
+          
+          updateLoader(0.85, "STITCHING MEMORY BLOCKS...");
+          
+          // Stitch
+          var totalSize = 0;
+          parts.forEach(part => totalSize += part.byteLength);
+          console.log("Total size: " + (totalSize / (1024*1024)).toFixed(2) + " MB");
+
+          var combinedBuffer = new Uint8Array(totalSize);
+          var offset = 0;
+          parts.forEach(part => {
+            combinedBuffer.set(new Uint8Array(part), offset);
+            offset += part.byteLength;
+          });
+
+          // Create Blob
+          var dataBlob = new Blob([combinedBuffer]);
+          unityConfig.dataUrl = URL.createObjectURL(dataBlob);
+
+          // Config Blob
+          var configString = JSON.stringify(unityConfig);
+          var configBlob = new Blob([configString], { type: "application/json" });
+          var configUrl = URL.createObjectURL(configBlob);
+
+          updateLoader(0.9, "INITIALIZING ENGINE...");
+
+          // 4. Instantiate Unity with Custom Progress
+          var gameInstance = UnityLoader.instantiate("gameContainer", configUrl, {
+            onProgress: function(gameInstance, progress) {
+              // Map Unity's 0.0-1.0 progress to our bar's 90%-100%
+              var visualProgress = 0.9 + (progress * 0.1);
+              updateLoader(visualProgress, "LOADING ENGINE MODULES...");
+              
+              if (progress === 1) {
+                updateLoader(1, "SYSTEM READY.");
+                setTimeout(function() {
+                  // Fade out the loader
+                  loaderDiv.style.transition = "opacity 1s ease";
+                  loaderDiv.style.opacity = "0";
+                  setTimeout(() => { loaderDiv.style.display = "none"; }, 1000);
+                }, 500);
+              }
+            }
+          });
+
+        } catch (error) {
+          console.error("Error:", error);
+          loaderStatus.style.color = "red";
+          loaderBar.style.backgroundColor = "red";
+          updateLoader(1, "CRITICAL ERROR: CHECK CONSOLE");
+          alert("Failed to load game data. See console.");
+        }
+      }
+
+      loadAndStitchData();
+    </script>
+  </body>
+</html>
