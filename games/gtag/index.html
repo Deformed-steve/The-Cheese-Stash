@@ -76,36 +76,54 @@
     </div>
   </div>
 
-  <script>
-    const canvas = document.getElementById("unity-canvas");
-    const loadingBar = document.getElementById("unity-loading-bar");
-    const progressBar = document.getElementById("unity-progress-bar-full");
+<script>
+const canvas = document.getElementById("unity-canvas");
+const loadingBar = document.getElementById("unity-loading-bar");
+const progressBar = document.getElementById("unity-progress-bar-full");
 
-    const buildUrl = "Build";
-    const config = {
-      dataUrl: buildUrl + "/gorilla tag web port build.data.gz",
-      frameworkUrl: buildUrl + "/gorilla tag web port build.framework.js.gz",
-      codeUrl: buildUrl + "/gorilla tag web port build.wasm.gz",
-      streamingAssetsUrl: "StreamingAssets",
-      companyName: "boolonx",
-      productName: "gorilla tag web",
-      productVersion: "1.0"
-    };
+const parts = [
+  "Build/gorilla tag web port build.data.gz.part0",
+  "Build/gorilla tag web port build.data.gz.part1",
+  "Build/gorilla tag web port build.data.gz.part2",
+  "Build/gorilla tag web port build.data.gz.part3",
+  "Build/gorilla tag web port build.data.gz.part4",
+  "Build/gorilla tag web port build.data.gz.part5",
+  "Build/gorilla tag web port build.data.gz.part6",
+  "Build/gorilla tag web port build.data.gz.part7"
+];
 
-    const script = document.createElement("script");
-    script.src = buildUrl + "/gorilla tag web port build.loader.js";
-    script.onload = () => {
-      createUnityInstance(canvas, config, (progress) => {
-        progressBar.style.width = (100 * progress) + "%";
-      }).then(() => {
-        loadingBar.classList.add("hidden");
-      }).catch((error) => {
-        alert(error);
-      });
-    };
+async function loadDataBlob() {
+  const buffers = [];
+  for (const p of parts) {
+    const res = await fetch(p);
+    buffers.push(await res.arrayBuffer());
+  }
+  return new Blob(buffers, { type: "application/gzip" });
+}
 
-    document.body.appendChild(script);
-  </script>
+const script = document.createElement("script");
+script.src = "Build/gorilla tag web port build.loader.js";
+script.onload = async () => {
+  const dataBlob = await loadDataBlob();
+  const dataUrl = URL.createObjectURL(dataBlob);
+
+  createUnityInstance(canvas, {
+    dataUrl,
+    frameworkUrl: "Build/gorilla tag web port build.framework.js.gz",
+    codeUrl: "Build/gorilla tag web port build.wasm.gz",
+    streamingAssetsUrl: "StreamingAssets",
+    companyName: "boolonx",
+    productName: "gorilla tag web",
+    productVersion: "1.0"
+  }, p => progressBar.style.width = (p * 100) + "%")
+  .then(() => loadingBar.classList.add("hidden"))
+  .catch(alert);
+};
+
+document.body.appendChild(script);
+</script>
+
+
 </body>
 
 </html>
