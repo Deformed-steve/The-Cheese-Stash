@@ -1,38 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="stylesheet" href="banner.css">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Apps - The Cheese Stash</title>
+  <title>Apps 🧀 | The Cheese Stash</title>
+  <meta name="description" content="Useful apps and tools - Free utilities for your browsing needs!">
   <meta name="google-adsense-account" content="ca-pub-2206020823906967">
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2206020823906967" crossorigin="anonymous"></script>
   
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
   <style>
     :root {
-      --primary: #ff9800;
-      --primary-dark: #e68900;
+      --primary: #ff9e00;
+      --primary-dark: #e68a00;
+      --primary-light: #ffb733;
       --secondary: #4caf50;
-      --dark: #1a1a1a;
-      --darker: #0f0f0f;
-      --light: #f5f5f5;
-      --gray: #333;
-      --card-bg: rgba(30, 30, 30, 0.8);
-      --card-hover: rgba(40, 40, 40, 0.9);
+      --accent: #6c5ce7;
+      --accent-dark: #5a4fcf;
+      --dark: #0f1521;
+      --darker: #0a0e17;
+      --dark-card: #1a2236;
+      --dark-card-hover: #212b43;
+      --light: #f0f4ff;
+      --gray: #8a9bb8;
+      --gray-dark: #4a5568;
+      --success: #00c853;
+      --error: #ff5252;
+      
+      --gradient-primary: linear-gradient(135deg, var(--primary) 0%, #ff6b00 100%);
+      --gradient-dark: linear-gradient(135deg, var(--darker) 0%, #1a2b3c 100%);
+      --gradient-accent: linear-gradient(135deg, var(--accent) 0%, #8b78ff 100%);
+      
+      --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.1);
+      --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.15);
+      --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.25);
+      --shadow-glow: 0 0 20px rgba(255, 158, 0, 0.3);
+      
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 20px;
+      --radius-xl: 30px;
+      
+      --transition-fast: 0.2s ease;
+      --transition-medium: 0.3s ease;
+      --transition-slow: 0.5s ease;
     }
     
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     }
     
     body {
-      background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+      background: var(--gradient-dark);
       color: var(--light);
       min-height: 100vh;
       overflow-x: hidden;
+      position: relative;
+    }
+    
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 20% 80%, rgba(255, 158, 0, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(108, 92, 231, 0.05) 0%, transparent 50%);
+      z-index: -2;
     }
     
     #particles-js {
@@ -42,227 +83,682 @@
       z-index: -1;
     }
     
+    /* ===== HEADER ===== */
     header {
       text-align: center;
-      padding: 2rem 1rem;
-      background: rgba(10, 10, 10, 0.7);
-      backdrop-filter: blur(10px);
-      border-bottom: 2px solid var(--primary);
+      padding: 3rem 1rem 2rem;
       position: relative;
       z-index: 10;
     }
     
-    h1 {
-      font-size: 3rem;
-      margin-bottom: 0.5rem;
-      color: var(--primary);
-      text-shadow: 0 0 10px rgba(255, 152, 0, 0.5);
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
     }
     
-    header p {
-      font-size: 1.2rem;
-      margin-bottom: 1.5rem;
-      opacity: 0.9;
+    .logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 1rem;
+    }
+    
+    .logo-icon {
+      font-size: 3.5rem;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      filter: drop-shadow(0 0 10px rgba(255, 158, 0, 0.4));
+    }
+    
+    h1 {
+      font-size: 3.2rem;
+      background: linear-gradient(to right, #ff9e00, #ffcc33);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+    
+    .tagline {
+      font-size: 1.3rem;
+      margin-bottom: 2rem;
+      color: var(--gray);
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.5;
+    }
+    
+    .search-container {
+      position: relative;
+      max-width: 600px;
+      margin: 0 auto;
     }
     
     #search {
-      padding: 0.8rem 1.2rem;
+      padding: 1.2rem 1.5rem 1.2rem 3.5rem;
       border: none;
-      border-radius: 50px;
-      width: 90%;
-      max-width: 500px;
-      font-size: 1rem;
-      background: rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-xl);
+      width: 100%;
+      font-size: 1.05rem;
+      background: rgba(255, 255, 255, 0.08);
       color: white;
-      backdrop-filter: blur(5px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      transition: var(--transition-medium);
+      box-shadow: var(--shadow-md);
     }
     
     #search:focus {
       outline: none;
-      background: rgba(255, 255, 255, 0.15);
-      box-shadow: 0 0 15px rgba(255, 152, 0, 0.3);
+      background: rgba(255, 255, 255, 0.12);
+      border-color: var(--primary);
+      box-shadow: var(--shadow-glow);
     }
     
     #search::placeholder {
       color: rgba(255, 255, 255, 0.6);
     }
     
+    .search-icon {
+      position: absolute;
+      left: 1.2rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--primary);
+      font-size: 1.2rem;
+    }
+    
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-top: 1.5rem;
+      font-size: 0.95rem;
+      color: var(--gray);
+    }
+    
+    .stats span {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .stats i {
+      color: var(--primary);
+    }
+    
+    /* ===== NAVIGATION ===== */
+    .side-nav {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      background: rgba(26, 34, 54, 0.8);
+      backdrop-filter: blur(10px);
+      padding: 18px 12px;
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      z-index: 100;
+      box-shadow: var(--shadow-md);
+      transition: var(--transition-medium);
+    }
+    
+    .side-nav.right-nav {
+      right: 25px;
+      left: auto;
+    }
+    
+    .nav-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 56px;
+      height: 56px;
+      border-radius: var(--radius-md);
+      color: rgba(255, 255, 255, 0.7);
+      transition: var(--transition-medium);
+      text-decoration: none;
+      position: relative;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid transparent;
+    }
+    
+    .nav-icon:hover {
+      color: var(--primary);
+      background: rgba(255, 158, 0, 0.1);
+      transform: translateY(-5px) scale(1.05);
+      border-color: rgba(255, 158, 0, 0.2);
+    }
+    
+    .nav-icon img {
+      width: 30px;
+      height: 30px;
+      filter: brightness(0.9);
+      transition: var(--transition-medium);
+    }
+    
+    .nav-icon:hover img {
+      filter: brightness(1.2);
+      transform: scale(1.1);
+    }
+    
+    .nav-tooltip {
+      position: absolute;
+      right: 70px;
+      background: var(--dark-card);
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: var(--transition-fast);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .nav-icon:hover .nav-tooltip {
+      opacity: 1;
+      visibility: visible;
+      right: 65px;
+    }
+    
+    /* ===== APPS CONTAINER ===== */
     .apps-container {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 2rem;
       padding: 2rem;
       max-width: 1400px;
       margin: 0 auto;
     }
     
     .app {
-      background: var(--card-bg);
-      border-radius: 15px;
+      background: var(--dark-card);
+      border-radius: var(--radius-lg);
       overflow: hidden;
-      transition: all 0.3s ease;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      transition: var(--transition-medium);
+      box-shadow: var(--shadow-md);
       backdrop-filter: blur(5px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      position: relative;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .app::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: var(--gradient-accent);
+      z-index: 1;
     }
     
     .app:hover {
       transform: translateY(-10px);
-      background: var(--card-hover);
-      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
-      border-color: var(--primary);
+      background: var(--dark-card-hover);
+      box-shadow: var(--shadow-lg);
+      border-color: rgba(108, 92, 231, 0.2);
     }
     
     .app a {
       text-decoration: none;
       color: inherit;
-      display: block;
+      display: flex;
+      flex-direction: column;
       height: 100%;
+    }
+    
+    .app-thumbnail-container {
+      position: relative;
+      width: 100%;
+      height: 180px;
+      overflow: hidden;
     }
     
     .app-thumbnail {
       width: 100%;
-      height: 180px;
+      height: 100%;
       object-fit: cover;
       display: block;
-      transition: transform 0.3s ease;
+      transition: transform 0.5s ease;
     }
     
     .app:hover .app-thumbnail {
-      transform: scale(1.05);
+      transform: scale(1.08);
+    }
+    
+    .app-content {
+      padding: 1.5rem;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
     }
     
     .app-title {
-      display: block;
-      padding: 1rem;
-      font-weight: 600;
-      font-size: 1.1rem;
-      text-align: center;
-      background: rgba(0, 0, 0, 0.5);
+      font-weight: 700;
+      font-size: 1.3rem;
+      margin-bottom: 0.8rem;
+      color: var(--light);
+      transition: var(--transition-medium);
+    }
+    
+    .app:hover .app-title {
+      color: var(--primary-light);
     }
     
     .app-description {
-      display: block;
-      padding: 0.5rem 1rem 1rem;
-      font-size: 0.9rem;
-      text-align: center;
-      opacity: 0.8;
+      font-size: 0.95rem;
+      color: var(--gray);
+      line-height: 1.5;
+      margin-bottom: 1.5rem;
+      flex-grow: 1;
     }
     
+    .app-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: var(--gradient-accent);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      z-index: 2;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .app-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: auto;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .app-category {
+      font-size: 0.85rem;
+      color: var(--primary);
+      background: rgba(255, 158, 0, 0.1);
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+    
+    .app-launch-btn {
+      color: var(--accent);
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: var(--transition-fast);
+    }
+    
+    .app:hover .app-launch-btn {
+      color: var(--primary);
+    }
+    
+    /* ===== CATEGORIES ===== */
+    .categories {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      padding: 1rem 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    
+    .category-btn {
+      padding: 0.6rem 1.2rem;
+      border-radius: var(--radius-lg);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--gray);
+      cursor: pointer;
+      transition: var(--transition-medium);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .category-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--light);
+    }
+    
+    .category-btn.active {
+      background: var(--gradient-accent);
+      color: white;
+      border-color: transparent;
+      box-shadow: 0 0 15px rgba(108, 92, 231, 0.3);
+    }
+    
+    /* ===== FOOTER ===== */
     footer {
       text-align: center;
-      padding: 2rem;
-      background: rgba(10, 10, 10, 0.7);
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      margin-top: 2rem;
+      padding: 3rem 2rem;
+      background: rgba(10, 14, 23, 0.8);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      margin-top: 3rem;
+      backdrop-filter: blur(10px);
+    }
+    
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
     }
     
     footer p {
       margin: 0.5rem 0;
-      opacity: 0.8;
+      color: var(--gray);
     }
     
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-top: 1.5rem;
+    }
+    
+    .footer-links a {
+      color: var(--primary);
+      text-decoration: none;
+      transition: var(--transition-fast);
+    }
+    
+    .footer-links a:hover {
+      color: var(--primary-light);
+      text-decoration: underline;
+    }
+    
+    /* ===== NO RESULTS ===== */
     .no-results {
       grid-column: 1 / -1;
       text-align: center;
-      padding: 3rem;
+      padding: 4rem;
       font-size: 1.2rem;
-      opacity: 0.7;
+      color: var(--gray);
+    }
+    
+    .no-results i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      color: var(--primary);
+      opacity: 0.5;
+    }
+    
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 1200px) {
+      .apps-container {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      }
+    }
+    
+    @media (max-width: 992px) {
+      .apps-container {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        padding: 1.5rem;
+        gap: 1.5rem;
+      }
+      
+      h1 {
+        font-size: 2.8rem;
+      }
     }
     
     @media (max-width: 768px) {
+      .side-nav {
+        bottom: 20px;
+        top: auto;
+        left: 50%;
+        transform: translateX(-50%);
+        flex-direction: row;
+        width: auto;
+        padding: 15px 20px;
+      }
+      
+      .side-nav.right-nav {
+        right: auto;
+      }
+      
+      .nav-tooltip {
+        display: none;
+      }
+      
       .apps-container {
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
         padding: 1rem;
         gap: 1rem;
       }
       
       h1 {
-        font-size: 2.2rem;
+        font-size: 2.4rem;
       }
       
-      header p {
-        font-size: 1rem;
+      .tagline {
+        font-size: 1.1rem;
+      }
+      
+      .stats {
+        flex-direction: column;
+        gap: 0.8rem;
+      }
+      
+      .categories {
+        padding: 1rem;
+      }
+    }
+    
+    @media (max-width: 576px) {
+      .apps-container {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      }
+      
+      .app-thumbnail-container {
+        height: 150px;
+      }
+      
+      .app-content {
+        padding: 1.2rem;
+      }
+      
+      .app-title {
+        font-size: 1.1rem;
+      }
+      
+      .app-description {
+        font-size: 0.9rem;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+      
+      .logo-icon {
+        font-size: 2.8rem;
+      }
+      
+      header {
+        padding: 2rem 1rem 1.5rem;
       }
     }
     
     @media (max-width: 480px) {
       .apps-container {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
       }
       
-      .app-thumbnail {
-        height: 120px;
+      .app-thumbnail-container {
+        height: 130px;
       }
       
-      .app-title {
+      .category-btn {
+        padding: 0.5rem 1rem;
         font-size: 0.9rem;
-        padding: 0.8rem 0.5rem;
       }
       
-      .app-description {
-        font-size: 0.8rem;
-        padding: 0.5rem 0.5rem 0.8rem;
+      .app-footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.8rem;
       }
+    }
+    
+    /* ===== UTILITY CLASSES ===== */
+    .fade-in {
+      animation: fadeInUp 0.6s ease;
+    }
+    
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* ===== SCROLLBAR ===== */
+    ::-webkit-scrollbar {
+      width: 10px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.2);
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: var(--primary);
+      border-radius: 5px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--primary-light);
     }
   </style>
 </head>
 <body>
+  <!-- Particles Background -->
   <div id="particles-js"></div>
 
-  <header>
-    <h1>🧀 The Cheese Stash 🧀</h1>
-    <p>Useful Apps & Tools — Free utilities for your browsing needs!</p>
-    <input type="text" id="search" placeholder="Search apps..." />
-  </header>
-  <nav class="side-nav right-nav">
-  <a href="index.html" class="nav-icon" title="Games">
-    <img src="/icons/games.svg" alt="Games">
-  </a>
-  <a href="a.html" class="nav-icon" title="Apps">
-    <img src="/icons/apps.svg" alt="Apps">
-  </a>
-  <a href="apps/browser/browse.html" class="nav-icon" title="Browse">
-    <img src="/icons/browse.svg" alt="Browse">
-  </a>
-</nav>
+  <!-- Main Content -->
+  <div id="main-content">
+    <header>
+      <div class="header-content">
+        <div class="logo">
+          <div class="logo-icon">🧀</div>
+          <h1>The Cheese Stash</h1>
+        </div>
+        <p class="tagline">Premium Apps & Tools — Useful utilities for your browsing needs!</p>
+        
+        <div class="search-container">
+          <i class="fas fa-search search-icon"></i>
+          <input type="text" id="search" placeholder="Search apps by name..." />
+        </div>
+        
+        <div class="stats">
+          <span><i class="fas fa-mobile-alt"></i> <span id="app-count">0</span> Apps Available</span>
+          <span><i class="fas fa-tools"></i> Free Utilities</span>
+          <span><i class="fas fa-bolt"></i> Fast & Lightweight</span>
+        </div>
+      </div>
+    </header>
 
-  <main class="apps-container" id="app-list">
-    <!-- Apps will be dynamically inserted here -->
-  </main>
+    <!-- Right Navigation -->
+    <nav class="side-nav right-nav">
+      <a href="index.html" class="nav-icon" title="Games">
+        <img src="/icons/games.svg" alt="Games">
+        <span class="nav-tooltip">All Games</span>
+      </a>
+      <a href="a.html" class="nav-icon" title="Apps">
+        <img src="/icons/apps.svg" alt="Apps">
+        <span class="nav-tooltip">Apps</span>
+      </a>
+      <a href="anime.html" class="nav-icon" title="Anime">
+        <img src="/icons/anime.svg" alt="Anime">
+        <span class="nav-tooltip">Anime</span>
+      </a>
+      <a href="tv.html" class="nav-icon" title="TV">
+        <img src="/icons/tv.svg" alt="TV">
+        <span class="nav-tooltip">TV & Movies</span>
+      </a>
+      <a href="apps/browser/browse.html" class="nav-icon" title="Browse">
+        <img src="/icons/browse.svg" alt="Browse">
+        <span class="nav-tooltip">Web Browser</span>
+      </a>
+    </nav>
 
-  <footer>
-    <p>&copy; 2025 The Cheese Stash. All rights reserved.</p>
-    <p>Credits: Me obv, bobbywx for art/logo</p>
-  </footer>
+    <!-- App Categories -->
+    <div class="categories">
+      <button class="category-btn active" data-category="all">
+        <i class="fas fa-layer-group"></i> All Apps
+      </button>
+      <button class="category-btn" data-category="productivity">
+        <i class="fas fa-briefcase"></i> Productivity
+      </button>
+      <button class="category-btn" data-category="media">
+        <i class="fas fa-play-circle"></i> Media
+      </button>
+      <button class="category-btn" data-category="tools">
+        <i class="fas fa-tools"></i> Tools
+      </button>
+      <button class="category-btn" data-category="ai">
+        <i class="fas fa-robot"></i> AI & Tech
+      </button>
+    </div>
 
+    <!-- Apps Container -->
+    <main class="apps-container" id="app-list">
+      <!-- Apps will be dynamically inserted here -->
+    </main>
+
+    <!-- Footer -->
+    <footer>
+      <div class="footer-content">
+        <p>&copy; 2025 The Cheese Stash. All rights reserved.</p>
+        <p>Credits: Me obviously, bobbywx for art/logo, and the amazing community!</p>
+        <div class="footer-links">
+          <a href="#"><i class="fab fa-discord"></i> Discord</a>
+          <a href="#"><i class="fas fa-question-circle"></i> Help</a>
+          <a href="#"><i class="fas fa-envelope"></i> Contact</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Particles.js Library -->
   <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  
   <script>
     // Initialize the site
     document.addEventListener("DOMContentLoaded", () => {
-      // Initialize particles.js with new settings
+      // Initialize particles.js with modern settings
       particlesJS("particles-js", {
         particles: {
           number: {
-            value: 80,
+            value: 70,
             density: {
               enable: true,
-              value_area: 800
+              value_area: 1000
             }
           },
           color: {
-            value: ["#ff9800", "#4caf50", "#ffffff"]
+            value: ["#6c5ce7", "#ff9e00", "#4caf50", "#00cec9"]
           },
           shape: {
-            type: ["circle", "triangle", "polygon"],
+            type: "circle",
             stroke: {
               width: 0,
               color: "#000000"
-            },
-            polygon: {
-              nb_sides: 6
             }
           },
           opacity: {
@@ -271,7 +767,7 @@
             anim: {
               enable: true,
               speed: 1,
-              opacity_min: 0.1,
+              opacity_min: 0.2,
               sync: false
             }
           },
@@ -288,7 +784,7 @@
           line_linked: {
             enable: true,
             distance: 150,
-            color: "#ff9800",
+            color: "#6c5ce7",
             opacity: 0.2,
             width: 1
           },
@@ -341,83 +837,115 @@
           name: "Cheesy AI", 
           url: "apps/a-i/index.html", 
           img: "ai.png",
-          description: "AI assistant powered by cheese technology"
+          description: "AI assistant powered by advanced cheese technology for all your creative and productivity needs.",
+          category: "ai",
+          badge: "NEW"
         },
         { 
           name: "Music Player", 
           url: "apps/tidal/index.html", 
           img: "Music.png",
-          description: "Stream your favorite tunes"
+          description: "Stream your favorite tunes with high-quality audio and curated playlists.",
+          category: "media",
+          badge: "POPULAR"
         },
         { 
-          name: "Browser", 
+          name: "Web Browser", 
           url: "apps/browser/browse.html", 
           img: "browser.png",
-          description: "Lightweight web browser"
+          description: "Lightweight, fast web browser with privacy features and customization options.",
+          category: "tools",
+          badge: "ESSENTIAL"
         },
         { 
-          name: "Ruffle", 
+          name: "Ruffle Flash Emulator", 
           url: "apps/ruffle/index.html", 
           img: "Ruffle.png",
-          description: "Flash emulator for classic content"
-        },
-          { 
-          name: "CheeseCord (SHUTDOWN", 
-          url: "apps/cheesecord/index.html", 
-          img: "cheesecord.png",
-          description: "SHUTDOWN BC OF TEACHER WANTED IT TOO"
+          description: "Experience classic Flash content with modern security and performance.",
+          category: "tools"
         },
         { 
           name: "VibraFlix", 
           url: "apps/movie/index.html", 
           img: "img/Movie.png",
-          description: "Stream movies and shows, for completely free!!!"
+          description: "Stream movies and TV shows completely free with a vast library of content.",
+          category: "media",
+          badge: "POPULAR"
         },
-         { 
-          name: "Scratch", 
+        { 
+          name: "Scratch Editor", 
           url: "apps/scratch/index.html", 
           img: "img/scratch.png",
-          description: "tuff editor to make simple scratch games, and turn them into html5 files."
+          description: "Create simple Scratch games and export them as HTML5 files for sharing.",
+          category: "productivity",
+          badge: "CREATIVE"
         },
-          { 
+        { 
           name: "VibraFlix (Proxied)", 
           url: "apps/eggroll/index.html", 
           img: "img/Movie.png",
-          description: "Stream movies and shows, for completely free!!!"
+          description: "Alternative access to movies and shows with enhanced privacy features.",
+          category: "media"
         }
       ];
+
+      // Update app count
+      document.getElementById("app-count").textContent = apps.length;
 
       // Render apps
       const appList = document.getElementById("app-list");
       
-      apps.forEach(app => {
+      apps.forEach((app, index) => {
         const appElement = document.createElement("div");
-        appElement.className = "app";
+        appElement.className = "app fade-in";
         appElement.dataset.name = app.name;
+        appElement.dataset.category = app.category;
+        
+        // Add slight delay for staggered animation
+        appElement.style.animationDelay = `${index * 0.02}s`;
+        
+        // Determine badge
+        let badge = "";
+        if (app.badge) {
+          const badgeColor = app.badge === "NEW" ? "var(--gradient-primary)" : 
+                           app.badge === "POPULAR" ? "var(--gradient-accent)" : 
+                           "linear-gradient(135deg, #00c853, #00e676)";
+          badge = `<span class="app-badge" style="background: ${badgeColor};">${app.badge}</span>`;
+        }
         
         appElement.innerHTML = `
           <a href="${app.url}" target="_blank">
-            <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/${app.img}" alt="${app.name}" class="app-thumbnail" />
-            <span class="app-title">${app.name}</span>
-            <span class="app-description">${app.description}</span>
+            <div class="app-thumbnail-container">
+              ${badge}
+              <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/${app.img}" alt="${app.name}" class="app-thumbnail" />
+            </div>
+            <div class="app-content">
+              <h3 class="app-title">${app.name}</h3>
+              <p class="app-description">${app.description}</p>
+              <div class="app-footer">
+                <span class="app-category">${app.category.charAt(0).toUpperCase() + app.category.slice(1)}</span>
+                <span class="app-launch-btn">Launch App <i class="fas fa-external-link-alt"></i></span>
+              </div>
+            </div>
           </a>
         `;
         
         appList.appendChild(appElement);
       });
-      
 
       // Search functionality
       const searchInput = document.getElementById("search");
       
       searchInput.addEventListener("input", () => {
-        const searchTerm = searchInput.value.toLowerCase();
+        const searchTerm = searchInput.value.toLowerCase().trim();
         const appElements = document.querySelectorAll(".app");
         let visibleCount = 0;
         
         appElements.forEach(app => {
           const appName = app.dataset.name.toLowerCase();
-          if (appName.includes(searchTerm)) {
+          const appDescription = app.querySelector(".app-description").textContent.toLowerCase();
+          
+          if (appName.includes(searchTerm) || appDescription.includes(searchTerm)) {
             app.style.display = "block";
             visibleCount++;
           } else {
@@ -430,20 +958,47 @@
         if (visibleCount === 0 && !noResults) {
           noResults = document.createElement("div");
           noResults.className = "no-results";
-          noResults.textContent = "No apps found matching your search.";
+          noResults.innerHTML = `<i class="fas fa-apps"></i><p>No apps found matching "${searchTerm}"</p>`;
           appList.appendChild(noResults);
         } else if (visibleCount > 0 && noResults) {
           noResults.remove();
         }
       });
 
+      // Category filter functionality
+      const categoryButtons = document.querySelectorAll(".category-btn");
+      categoryButtons.forEach(button => {
+        button.addEventListener("click", () => {
+          // Remove active class from all buttons
+          categoryButtons.forEach(btn => btn.classList.remove("active"));
+          // Add active class to clicked button
+          button.classList.add("active");
+          
+          const category = button.dataset.category;
+          const appElements = document.querySelectorAll(".app");
+          
+          appElements.forEach(app => {
+            if (category === "all" || app.dataset.category === category) {
+              app.style.display = "block";
+            } else {
+              app.style.display = "none";
+            }
+          });
+          
+          // If search is active, reapply search filter
+          if (searchInput.value.trim() !== "") {
+            searchInput.dispatchEvent(new Event("input"));
+          }
+        });
+      });
+
       // Image caching system
       const baseLocal = `${window.location.origin}/img/`;
       const baseCDN = "https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/";
-      const cacheKey = "imageAvailabilityCache_v2";
+      const cacheKey = "appsImageCache_v3";
       const cache = JSON.parse(localStorage.getItem(cacheKey) || "{}");
 
-      document.querySelectorAll("img.app-thumbnail").forEach(img => {
+      document.querySelectorAll("img.app-thumbnail").forEach((img, index) => {
         const fileName = img.src.split("/").pop();
         const localUrl = baseLocal + fileName;
         const cdnUrl = baseCDN + fileName;
@@ -457,24 +1012,107 @@
           return;
         }
 
-        // Test and cache result
-        fetch(localUrl, { method: "HEAD" })
-          .then(res => {
-            if (res.ok) {
-              img.src = localUrl;
-              cache[fileName] = "local";
-            } else {
+        // Test and cache result with delay to avoid overwhelming
+        setTimeout(() => {
+          fetch(localUrl, { method: "HEAD" })
+            .then(res => {
+              if (res.ok) {
+                img.src = localUrl;
+                cache[fileName] = "local";
+              } else {
+                img.src = cdnUrl;
+                cache[fileName] = "cdn";
+              }
+              localStorage.setItem(cacheKey, JSON.stringify(cache));
+            })
+            .catch(() => {
               img.src = cdnUrl;
               cache[fileName] = "cdn";
-            }
-            localStorage.setItem(cacheKey, JSON.stringify(cache));
-          })
-          .catch(() => {
-            img.src = cdnUrl;
-            cache[fileName] = "cdn";
-            localStorage.setItem(cacheKey, JSON.stringify(cache));
-          });
+              localStorage.setItem(cacheKey, JSON.stringify(cache));
+            });
+        }, index * 50);
       });
+      
+      // Add hover effect to all app links
+      document.querySelectorAll('.app a').forEach(link => {
+        link.addEventListener('mouseenter', function() {
+          this.style.textDecoration = 'none';
+        });
+      });
+    });
+    
+    // Sigma iframe easter egg (same as games page)
+    let cCount = 0;
+    let lastCTime = 0;
+    
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'c' || e.key === 'C') {
+        const currentTime = Date.now();
+        
+        // Reset count if more than 1 second between presses
+        if (currentTime - lastCTime > 1000) {
+          cCount = 0;
+        }
+        
+        cCount++;
+        lastCTime = currentTime;
+        
+        // If 3 C presses in rapid succession
+        if (cCount >= 3) {
+          cCount = 0; // Reset for future use
+          
+          // Create fullscreen iframe
+          const iframe = document.createElement('iframe');
+          iframe.src = 'sigma.html';
+          iframe.style.position = 'fixed';
+          iframe.style.top = '0';
+          iframe.style.left = '0';
+          iframe.style.width = '100vw';
+          iframe.style.height = '100vh';
+          iframe.style.border = 'none';
+          iframe.style.zIndex = '99999';
+          iframe.style.background = 'white';
+          
+          // Add close button
+          const closeBtn = document.createElement('button');
+          closeBtn.innerHTML = '<i class="fas fa-times"></i>';
+          closeBtn.style.position = 'fixed';
+          closeBtn.style.top = '20px';
+          closeBtn.style.right = '20px';
+          closeBtn.style.zIndex = '100000';
+          closeBtn.style.background = 'var(--primary)';
+          closeBtn.style.color = 'white';
+          closeBtn.style.border = 'none';
+          closeBtn.style.borderRadius = '50%';
+          closeBtn.style.width = '50px';
+          closeBtn.style.height = '50px';
+          closeBtn.style.fontSize = '24px';
+          closeBtn.style.cursor = 'pointer';
+          closeBtn.style.boxShadow = '0 2px 10px rgba(0,0,0,0.3)';
+          closeBtn.style.display = 'flex';
+          closeBtn.style.alignItems = 'center';
+          closeBtn.style.justifyContent = 'center';
+          closeBtn.style.transition = 'all 0.3s ease';
+          
+          closeBtn.addEventListener('mouseenter', () => {
+            closeBtn.style.transform = 'scale(1.1)';
+            closeBtn.style.background = 'var(--error)';
+          });
+          
+          closeBtn.addEventListener('mouseleave', () => {
+            closeBtn.style.transform = 'scale(1)';
+            closeBtn.style.background = 'var(--primary)';
+          });
+          
+          closeBtn.addEventListener('click', () => {
+            iframe.remove();
+            closeBtn.remove();
+          });
+          
+          document.body.appendChild(iframe);
+          document.body.appendChild(closeBtn);
+        }
+      }
     });
   </script>
 </body>

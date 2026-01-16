@@ -3,35 +3,77 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>The Cheese Stash</title>
+  <title>The Cheese Stash 🧀 | Unblocked Games Hub</title>
+  <meta name="description" content="Premium unblocked games collection - PC games for free! Request games via Discord.">
   <meta name="google-adsense-account" content="ca-pub-2206020823906967">
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2206020823906967" crossorigin="anonymous"></script>
-
+  
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
   <style>
     :root {
-      --primary: #ff9800;
-      --primary-dark: #e68900;
+      --primary: #ff9e00;
+      --primary-dark: #e68a00;
+      --primary-light: #ffb733;
       --secondary: #4caf50;
-      --dark: #1a1a1a;
-      --darker: #0f0f0f;
-      --light: #f5f5f5;
-      --gray: #333;
-      --card-bg: rgba(30, 30, 30, 0.8);
-      --card-hover: rgba(40, 40, 40, 0.9);
+      --accent: #6c5ce7;
+      --accent-dark: #5a4fcf;
+      --dark: #0f1521;
+      --darker: #0a0e17;
+      --dark-card: #1a2236;
+      --dark-card-hover: #212b43;
+      --light: #f0f4ff;
+      --gray: #8a9bb8;
+      --gray-dark: #4a5568;
+      --success: #00c853;
+      --error: #ff5252;
+      
+      --gradient-primary: linear-gradient(135deg, var(--primary) 0%, #ff6b00 100%);
+      --gradient-dark: linear-gradient(135deg, var(--darker) 0%, #1a2b3c 100%);
+      --gradient-accent: linear-gradient(135deg, var(--accent) 0%, #8b78ff 100%);
+      
+      --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.1);
+      --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.15);
+      --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.25);
+      --shadow-glow: 0 0 20px rgba(255, 158, 0, 0.3);
+      
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 20px;
+      --radius-xl: 30px;
+      
+      --transition-fast: 0.2s ease;
+      --transition-medium: 0.3s ease;
+      --transition-slow: 0.5s ease;
     }
     
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     }
     
     body {
-      background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+      background: var(--gradient-dark);
       color: var(--light);
       min-height: 100vh;
       overflow-x: hidden;
+      position: relative;
+    }
+    
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 20% 80%, rgba(255, 158, 0, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(108, 92, 231, 0.05) 0%, transparent 50%);
+      z-index: -2;
     }
     
     #particles-js {
@@ -41,269 +83,531 @@
       z-index: -1;
     }
     
-    header {
-      text-align: center;
-      padding: 2rem 1rem;
-      background: rgba(10, 10, 10, 0.7);
-      backdrop-filter: blur(10px);
-      border-bottom: 2px solid var(--primary);
-      position: relative;
-      z-index: 10;
-    }
-    
-.side-nav.right-nav {
-  right: 20px;
-  left: auto;
-}
-
-.side-nav {
-  position: fixed;
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  background: var(--card-bg);
-  padding: 15px 10px;
-  border-radius: 15px;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  z-index: 100;
-}
-
-.nav-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 50px;
-  height: 50px;
-  border-radius: 10px;
-  color: rgba(255, 255, 255, 0.7);
-  transition: all 0.3s ease;
-  text-decoration: none;
-}
-
-.nav-icon:hover {
-  color: var(--primary);
-  background: rgba(255, 152, 0, 0.1);
-  transform: scale(1.1);
-}
-
-.nav-icon img {
-  width: 28px;
-  height: 28px;
-  filter: brightness(0.8);
-  transition: all 0.3s ease;
-}
-
-.nav-icon:hover img {
-  filter: brightness(1);
-}
-
-/* Mobile responsiveness */
-@media (max-width: 768px) {
-  .side-nav {
-    padding: 12px 8px;
-    gap: 12px;
-  }
-  
-  .nav-icon {
-    width: 45px;
-    height: 45px;
-  }
-  
-  .nav-icon img {
-    width: 40px;
-    height: 40px;
-  }
-}
-
-@media (max-width: 480px) {
-  .side-nav {
-    padding: 10px 6px;
-    gap: 10px;
-  }
-  
-  .nav-icon {
-    width: 40px;
-    height: 40px;
-  }
-  
-  .nav-icon img {
-    width: 40px;
-    height: 40px;
-  }
-}
-
-    h1 {
-      font-size: 3rem;
-      margin-bottom: 0.5rem;
-      color: var(--primary);
-      text-shadow: 0 0 10px rgba(255, 152, 0, 0.5);
-    }
-    
-    header p {
-      font-size: 1.2rem;
-      margin-bottom: 1.5rem;
-      opacity: 0.9;
-    }
-    
-    #search {
-      padding: 0.8rem 1.2rem;
-      border: none;
-      border-radius: 50px;
-      width: 90%;
-      max-width: 500px;
-      font-size: 1rem;
-      background: rgba(255, 255, 255, 0.1);
-      color: white;
-      backdrop-filter: blur(5px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      transition: all 0.3s ease;
-    }
-    
-    #search:focus {
-      outline: none;
-      background: rgba(255, 255, 255, 0.15);
-      box-shadow: 0 0 15px rgba(255, 152, 0, 0.3);
-    }
-    
-    #search::placeholder {
-      color: rgba(255, 255, 255, 0.6);
-    }
-    
-    .games-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1.5rem;
-      padding: 2rem;
-      max-width: 1400px;
-      margin: 0 auto;
-    }
-    
-    .game {
-      background: var(--card-bg);
-      border-radius: 15px;
-      overflow: hidden;
-      transition: all 0.3s ease;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-      backdrop-filter: blur(5px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    
-    .game:hover {
-      transform: translateY(-10px);
-      background: var(--card-hover);
-      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
-      border-color: var(--primary);
-    }
-    
-    .game a {
-      text-decoration: none;
-      color: inherit;
-      display: block;
-      height: 100%;
-    }
-    
-    .game-thumbnail {
-      width: 100%;
-      height: 180px;
-      object-fit: cover;
-      display: block;
-      transition: transform 0.3s ease;
-    }
-    
-    .game:hover .game-thumbnail {
-      transform: scale(1.05);
-    }
-    
-    .game-title {
-      display: block;
-      padding: 1rem;
-      font-weight: 600;
-      font-size: 1.1rem;
-      text-align: center;
-      background: rgba(0, 0, 0, 0.5);
-    }
-    
-    footer {
-      text-align: center;
-      padding: 2rem;
-      background: rgba(10, 10, 10, 0.7);
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      margin-top: 2rem;
-    }
-    
-    footer p {
-      margin: 0.5rem 0;
-      opacity: 0.8;
-    }
-    
+    /* ===== LOCK SCREEN ===== */
     #lockscreen {
       position: fixed;
       inset: 0;
       z-index: 9999;
-      background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+      background: var(--gradient-dark);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       color: white;
       font-family: sans-serif;
+      padding: 2rem;
+      backdrop-filter: blur(5px);
+    }
+    
+    .lock-container {
+      background: rgba(26, 34, 54, 0.85);
+      backdrop-filter: blur(10px);
+      border-radius: var(--radius-xl);
+      padding: 3rem;
+      max-width: 500px;
+      width: 100%;
+      text-align: center;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      animation: fadeInUp 0.6s ease;
+    }
+    
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     
     #lockscreen h2 {
-      font-size: 2rem;
-      margin-bottom: 1.5rem;
-      color: var(--primary);
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      font-weight: 700;
+    }
+    
+    #lockscreen p {
+      margin-bottom: 2rem;
+      color: var(--gray);
+      font-size: 1.1rem;
+    }
+    
+    .password-container {
+      position: relative;
+      width: 100%;
+      max-width: 300px;
+      margin: 0 auto;
     }
     
     #passInput {
-      padding: 12px 15px;
+      padding: 1rem 1.5rem;
       border: none;
-      border-radius: 8px;
+      border-radius: var(--radius-lg);
       outline: none;
-      margin-top: 10px;
-      width: 250px;
-      background: rgba(255, 255, 255, 0.1);
+      width: 100%;
+      background: rgba(255, 255, 255, 0.08);
       color: white;
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      border: 2px solid rgba(255, 255, 255, 0.1);
       font-size: 1rem;
+      transition: var(--transition-medium);
+    }
+    
+    #passInput:focus {
+      border-color: var(--primary);
+      background: rgba(255, 255, 255, 0.12);
+      box-shadow: var(--shadow-glow);
+    }
+    
+    #passInput::placeholder {
+      color: rgba(255, 255, 255, 0.5);
     }
     
     #submitPass {
-      margin-top: 15px;
-      padding: 10px 20px;
+      margin-top: 1.5rem;
+      padding: 0.9rem 2rem;
       border: none;
-      border-radius: 8px;
+      border-radius: var(--radius-lg);
       cursor: pointer;
-      background: var(--primary);
+      background: var(--gradient-primary);
       color: white;
-      font-weight: bold;
-      transition: all 0.3s ease;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: var(--transition-medium);
+      letter-spacing: 0.5px;
     }
     
     #submitPass:hover {
-      background: var(--primary-dark);
-      transform: scale(1.05);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-glow);
+    }
+    
+    #submitPass:active {
+      transform: translateY(0);
     }
     
     #errorMsg {
-      color: #ff5252;
+      color: var(--error);
       display: none;
-      margin-top: 15px;
-      font-weight: bold;
+      margin-top: 1rem;
+      font-weight: 600;
     }
     
+    /* ===== HEADER ===== */
+    header {
+      text-align: center;
+      padding: 3rem 1rem 2rem;
+      position: relative;
+      z-index: 10;
+    }
+    
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 1rem;
+    }
+    
+    .logo-icon {
+      font-size: 3.5rem;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      filter: drop-shadow(0 0 10px rgba(255, 158, 0, 0.4));
+    }
+    
+    h1 {
+      font-size: 3.2rem;
+      background: linear-gradient(to right, #ff9e00, #ffcc33);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+    
+    .tagline {
+      font-size: 1.3rem;
+      margin-bottom: 2rem;
+      color: var(--gray);
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.5;
+    }
+    
+    .search-container {
+      position: relative;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    #search {
+      padding: 1.2rem 1.5rem 1.2rem 3.5rem;
+      border: none;
+      border-radius: var(--radius-xl);
+      width: 100%;
+      font-size: 1.05rem;
+      background: rgba(255, 255, 255, 0.08);
+      color: white;
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      transition: var(--transition-medium);
+      box-shadow: var(--shadow-md);
+    }
+    
+    #search:focus {
+      outline: none;
+      background: rgba(255, 255, 255, 0.12);
+      border-color: var(--primary);
+      box-shadow: var(--shadow-glow);
+    }
+    
+    #search::placeholder {
+      color: rgba(255, 255, 255, 0.6);
+    }
+    
+    .search-icon {
+      position: absolute;
+      left: 1.2rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--primary);
+      font-size: 1.2rem;
+    }
+    
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-top: 1.5rem;
+      font-size: 0.95rem;
+      color: var(--gray);
+    }
+    
+    .stats span {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .stats i {
+      color: var(--primary);
+    }
+    
+    /* ===== NAVIGATION ===== */
+    .side-nav {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      background: rgba(26, 34, 54, 0.8);
+      backdrop-filter: blur(10px);
+      padding: 18px 12px;
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      z-index: 100;
+      box-shadow: var(--shadow-md);
+      transition: var(--transition-medium);
+    }
+    
+    .side-nav.right-nav {
+      right: 25px;
+      left: auto;
+    }
+    
+    .nav-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 56px;
+      height: 56px;
+      border-radius: var(--radius-md);
+      color: rgba(255, 255, 255, 0.7);
+      transition: var(--transition-medium);
+      text-decoration: none;
+      position: relative;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid transparent;
+    }
+    
+    .nav-icon:hover {
+      color: var(--primary);
+      background: rgba(255, 158, 0, 0.1);
+      transform: translateY(-5px) scale(1.05);
+      border-color: rgba(255, 158, 0, 0.2);
+    }
+    
+    .nav-icon i {
+      font-size: 1.5rem;
+    }
+    
+    .nav-icon img {
+      width: 28px;
+      height: 28px;
+      filter: brightness(0.9);
+      transition: var(--transition-medium);
+    }
+    
+    .nav-icon:hover img {
+      filter: brightness(1.2);
+    }
+    
+    .nav-tooltip {
+      position: absolute;
+      right: 70px;
+      background: var(--dark-card);
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: var(--transition-fast);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .nav-icon:hover .nav-tooltip {
+      opacity: 1;
+      visibility: visible;
+      right: 65px;
+    }
+    
+    /* ===== GAMES CONTAINER ===== */
+    .games-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.8rem;
+      padding: 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    
+    .game {
+      background: var(--dark-card);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      transition: var(--transition-medium);
+      box-shadow: var(--shadow-md);
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      position: relative;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .game::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: var(--gradient-primary);
+      z-index: 1;
+    }
+    
+    .game:hover {
+      transform: translateY(-10px);
+      background: var(--dark-card-hover);
+      box-shadow: var(--shadow-lg);
+      border-color: rgba(255, 158, 0, 0.2);
+    }
+    
+    .game a {
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    
+    .game-thumbnail-container {
+      position: relative;
+      width: 100%;
+      height: 180px;
+      overflow: hidden;
+    }
+    
+    .game-thumbnail {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.5s ease;
+    }
+    
+    .game:hover .game-thumbnail {
+      transform: scale(1.08);
+    }
+    
+    .game-title {
+      padding: 1.2rem;
+      font-weight: 600;
+      font-size: 1.1rem;
+      background: rgba(0, 0, 0, 0.2);
+      flex-grow: 1;
+      display: flex;
+      align-items: center;
+      transition: var(--transition-medium);
+    }
+    
+    .game:hover .game-title {
+      color: var(--primary-light);
+    }
+    
+    .game-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: var(--gradient-primary);
+      color: white;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      z-index: 2;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    /* ===== FILTERS ===== */
+    .filters {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      padding: 1rem 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    
+    .filter-btn {
+      padding: 0.6rem 1.2rem;
+      border-radius: var(--radius-lg);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--gray);
+      cursor: pointer;
+      transition: var(--transition-medium);
+      font-weight: 500;
+    }
+    
+    .filter-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--light);
+    }
+    
+    .filter-btn.active {
+      background: var(--gradient-primary);
+      color: white;
+      border-color: transparent;
+      box-shadow: var(--shadow-glow);
+    }
+    
+    /* ===== FOOTER ===== */
+    footer {
+      text-align: center;
+      padding: 3rem 2rem;
+      background: rgba(10, 14, 23, 0.8);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      margin-top: 3rem;
+      backdrop-filter: blur(10px);
+    }
+    
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    footer p {
+      margin: 0.5rem 0;
+      color: var(--gray);
+    }
+    
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-top: 1.5rem;
+    }
+    
+    .footer-links a {
+      color: var(--primary);
+      text-decoration: none;
+      transition: var(--transition-fast);
+    }
+    
+    .footer-links a:hover {
+      color: var(--primary-light);
+      text-decoration: underline;
+    }
+    
+    /* ===== NO RESULTS ===== */
     .no-results {
       grid-column: 1 / -1;
       text-align: center;
-      padding: 3rem;
+      padding: 4rem;
       font-size: 1.2rem;
-      opacity: 0.7;
+      color: var(--gray);
+    }
+    
+    .no-results i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      color: var(--primary);
+      opacity: 0.5;
+    }
+    
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 1200px) {
+      .games-container {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      }
+    }
+    
+    @media (max-width: 992px) {
+      .games-container {
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        padding: 1.5rem;
+        gap: 1.5rem;
+      }
+      
+      h1 {
+        font-size: 2.8rem;
+      }
     }
     
     @media (max-width: 768px) {
+      .side-nav {
+        bottom: 20px;
+        top: auto;
+        left: 50%;
+        transform: translateX(-50%);
+        flex-direction: row;
+        width: auto;
+        padding: 15px 20px;
+      }
+      
+      .side-nav.right-nav {
+        right: auto;
+      }
+      
+      .nav-tooltip {
+        display: none;
+      }
+      
       .games-container {
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
         padding: 1rem;
@@ -311,73 +615,205 @@
       }
       
       h1 {
-        font-size: 2.2rem;
+        font-size: 2.4rem;
       }
       
-      header p {
+      .tagline {
+        font-size: 1.1rem;
+      }
+      
+      .stats {
+        flex-direction: column;
+        gap: 0.8rem;
+      }
+      
+      .filters {
+        padding: 1rem;
+      }
+      
+      .lock-container {
+        padding: 2rem;
+      }
+      
+      #lockscreen h2 {
+        font-size: 2rem;
+      }
+    }
+    
+    @media (max-width: 576px) {
+      .games-container {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      }
+      
+      .game-thumbnail-container {
+        height: 140px;
+      }
+      
+      .game-title {
         font-size: 1rem;
+        padding: 1rem;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+      
+      .logo-icon {
+        font-size: 2.8rem;
+      }
+      
+      header {
+        padding: 2rem 1rem 1.5rem;
       }
     }
     
     @media (max-width: 480px) {
       .games-container {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
       }
       
-      .game-thumbnail {
+      .game-thumbnail-container {
         height: 120px;
       }
       
-      .game-title {
+      .filter-btn {
+        padding: 0.5rem 1rem;
         font-size: 0.9rem;
-        padding: 0.8rem 0.5rem;
       }
+    }
+    
+    /* ===== UTILITY CLASSES ===== */
+    .fade-in {
+      animation: fadeInUp 0.6s ease;
+    }
+    
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { opacity: 0.8; }
+      50% { opacity: 1; }
+      100% { opacity: 0.8; }
+    }
+    
+    /* ===== SCROLLBAR ===== */
+    ::-webkit-scrollbar {
+      width: 10px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.2);
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: var(--primary);
+      border-radius: 5px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--primary-light);
     }
   </style>
 </head>
 <body>
+  <!-- Lock Screen -->
   <div id="lockscreen">
-    <h2>Enter Password</h2>
-    <input type="password" id="passInput" placeholder="Password...">
-    <button id="submitPass">Enter</button>
-    <p id="errorMsg">TRY AGAIN</p>
+    <div class="lock-container">
+      <div class="logo">
+        <div class="logo-icon">🧀</div>
+        <h2>The Cheese Stash</h2>
+      </div>
+      <p>Enter the password to access the premium game collection</p>
+      <div class="password-container">
+        <input type="password" id="passInput" placeholder="Enter password...">
+      </div>
+      <button id="submitPass">Unlock Games <i class="fas fa-key"></i></button>
+      <p id="errorMsg"><i class="fas fa-exclamation-triangle"></i> Incorrect password, try again!</p>
+    </div>
   </div>
 
+  <!-- Particles Background -->
   <div id="particles-js"></div>
 
-  <header>
-    <h1>🧀 The Cheese Stash 🧀</h1>
-    <p>Unblocked Games — PC games for free! You can request games in my Discord.</p>
-    <input type="text" id="search" placeholder="Search games..." />
-  </header>
-<!-- Add this right after the <header> closing tag -->
-<nav class="side-nav right-nav">
-  <a href="index.html" class="nav-icon" title="Games">
-    <img src="/icons/games.svg" alt="Games">
-  </a>
-  <a href="a.html" class="nav-icon" title="Apps">
-    <img src="/icons/apps.svg" alt="Apps">
-  </a>
-   <a href="anime.html" class="nav-icon" title="Apps">
-    <img src="/icons/anime.svg" alt="Apps">
-  </a>
-   <a href="tv.html" class="nav-icon" title="Browse">
-    <img src="/icons/tv.svg" alt="Browse">
-  </a>
-  <a href="apps/browser/browse.html" class="nav-icon" title="Browse">
-    <img src="/icons/browse.svg" alt="Browse">
-  </a>
-</nav>
-  <main class="games-container" id="game-list">
-    <!-- Games will be dynamically inserted here -->
-  </main>
+  <!-- Main Content (hidden until unlocked) -->
+  <div id="main-content" style="display: none;">
+    <header>
+      <div class="header-content">
+        <div class="logo">
+          <div class="logo-icon">🧀</div>
+          <h1>The Cheese Stash</h1>
+        </div>
+        <p class="tagline">Premium unblocked games collection — PC games for free! Request games in our Discord.</p>
+        
+        <div class="search-container">
+          <i class="fas fa-search search-icon"></i>
+          <input type="text" id="search" placeholder="Search games by name..." />
+        </div>
+        
+        <div class="stats">
+          <span><i class="fas fa-gamepad"></i> <span id="game-count">0</span> Games Available</span>
+          <span><i class="fas fa-fire"></i> New Games Weekly</span>
+          <span><i class="fas fa-headset"></i> 24/7 Support</span>
+        </div>
+      </div>
+    </header>
 
-  <footer>
-    <p>&copy; 2025 The Cheese Stash. All rights reserved.</p>
-    <p>Credits: Me obv, bobbywx for art/logo</p>
-  </footer>
+    <!-- Right Navigation -->
+    <nav class="side-nav right-nav">
+      <a href="index.html" class="nav-icon" title="Games">
+        <i class="fas fa-gamepad"></i>
+        <span class="nav-tooltip">All Games</span>
+      </a>
+      <a href="a.html" class="nav-icon" title="Apps">
+        <i class="fas fa-mobile-alt"></i>
+        <span class="nav-tooltip">Apps</span>
+      </a>
+      <a href="anime.html" class="nav-icon" title="Anime">
+        <i class="fas fa-tv"></i>
+        <span class="nav-tooltip">Anime</span>
+      </a>
+      <a href="tv.html" class="nav-icon" title="TV">
+        <i class="fas fa-film"></i>
+        <span class="nav-tooltip">TV & Movies</span>
+      </a>
+      <a href="apps/browser/browse.html" class="nav-icon" title="Browse">
+        <i class="fas fa-compass"></i>
+        <span class="nav-tooltip">Web Browser</span>
+      </a>
+    </nav>
 
+    <!-- Game Filters -->
+    <div class="filters">
+      <button class="filter-btn active" data-filter="all">All Games</button>
+      <button class="filter-btn" data-filter="popular">Most Popular</button>
+      <button class="filter-btn" data-filter="new">Recently Added</button>
+      <button class="filter-btn" data-filter="action">Action</button>
+      <button class="filter-btn" data-filter="adventure">Adventure</button>
+    </div>
+
+    <!-- Games Container -->
+    <main class="games-container" id="game-list">
+      <!-- Games will be dynamically inserted here -->
+    </main>
+
+    <!-- Footer -->
+    <footer>
+      <div class="footer-content">
+        <p>&copy; 2025 The Cheese Stash. All rights reserved.</p>
+        <p>Credits: Me obviously, bobbywx for art/logo, and the amazing gaming community!</p>
+        <div class="footer-links">
+          <a href="#"><i class="fab fa-discord"></i> Discord</a>
+          <a href="#"><i class="fas fa-question-circle"></i> Help</a>
+          <a href="#"><i class="fas fa-envelope"></i> Contact</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Particles.js Library -->
   <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  
   <script>
     // Password protection
     document.addEventListener("DOMContentLoaded", () => {
@@ -386,10 +822,12 @@
       const input = document.getElementById("passInput");
       const btn = document.getElementById("submitPass");
       const err = document.getElementById("errorMsg");
+      const mainContent = document.getElementById("main-content");
 
       // Check cookie first
       if (document.cookie.includes("accessGranted=true")) {
-        lock.remove();
+        lock.style.display = "none";
+        mainContent.style.display = "block";
         initializeSite();
         return;
       }
@@ -397,41 +835,50 @@
       btn.addEventListener("click", () => {
         if (input.value === correctPass) {
           document.cookie = "accessGranted=true; path=/; max-age=" + 60*60*24*30; // 30 days
-          lock.remove();
-          initializeSite();
+          lock.style.opacity = "0";
+          lock.style.transition = "opacity 0.5s ease";
+          setTimeout(() => {
+            lock.style.display = "none";
+            mainContent.style.display = "block";
+            setTimeout(() => initializeSite(), 100);
+          }, 500);
         } else {
           err.style.display = "block";
+          input.style.borderColor = "var(--error)";
+          setTimeout(() => {
+            input.style.borderColor = "";
+          }, 1000);
         }
       });
 
       input.addEventListener("keypress", e => {
         if (e.key === "Enter") btn.click();
       });
+      
+      // Focus password input on load
+      input.focus();
     });
 
     // Initialize the site after password check
     function initializeSite() {
-      // Initialize particles.js with new settings
+      // Initialize particles.js with modern settings
       particlesJS("particles-js", {
         particles: {
           number: {
             value: 80,
             density: {
               enable: true,
-              value_area: 800
+              value_area: 1000
             }
           },
           color: {
-            value: ["#ff9800", "#4caf50", "#ffffff"]
+            value: ["#ff9e00", "#6c5ce7", "#4caf50", "#ff6b00"]
           },
           shape: {
-            type: ["circle", "triangle", "polygon"],
+            type: "circle",
             stroke: {
               width: 0,
               color: "#000000"
-            },
-            polygon: {
-              nb_sides: 6
             }
           },
           opacity: {
@@ -440,7 +887,7 @@
             anim: {
               enable: true,
               speed: 1,
-              opacity_min: 0.1,
+              opacity_min: 0.2,
               sync: false
             }
           },
@@ -457,7 +904,7 @@
           line_linked: {
             enable: true,
             distance: 150,
-            color: "#ff9800",
+            color: "#ff9e00",
             opacity: 0.2,
             width: 1
           },
@@ -504,110 +951,137 @@
         retina_detect: true
       });
 
-      // Game data
+      // Game data (same as before)
       const games = [
-        { name: "That's Not My Neighbor", url: "games/thatsnotmyneighbor/index.html", img: "thatsnotmyneighbor.png" },
-          { name: "1 Caudill's Basics", url: "games/caudill/index.html", img: "caudill.png" },
-        { name: "People Playground", url: "games/peopleplayground/index.html", img: "peopleplayground.png" },
-          { name: "Gorilla Tag, web port", url: "games/gtagpro/index.html", img: "gtag.png" },
-              { name: "Caudill, A granny reskin.", url: "games/grangran/index.html", img: "gran.png" },
-        { name: "Bloon's Tower Defense 5", url: "games/bloonstd5/index.html", img: "bloonstd5.png" },
-         { name: "BrawlStars", url: "games/brawlstars/index.html", img: "brawl.png" },
-                 { name: "Bee Swarm Simulator", url: "games/beeswarmsim/index.html", img: "beeswarmsim.png" },
-        { name: "Roblox", url: "games/Roblox/index.html", img: "Roblox.png" },
-        { name: "Subway Surfers", url: "games/subwaysurfers/index.html", img: "subwaysurfers.jpg" },
-        { name: "Family Life", url: "games/family life/index.html", img: "Family life.png" },
-        { name: "Schoolboy Runaway", url: "games/runaway/index.html", img: "Schoolboy Runaway.png" },
-        { name: "Super Mario Bros 1", url: "games/supermariobros/index.html", img: "supermariobros.png" },
-        { name: "Cookie Clicker", url: "games/cookieclicker/index.html", img: "Cookie Clicker.png" },
-        { name: "Super Mario Bros 2", url: "games/supermariobros2/index.html", img: "supermariobros2.png" },
-         { name: "Fallout", url: "games/fallout/index.html", img: "fallout.png" },
-        { name: "Super Mario Bros 3", url: "games/supermariobros3/index.html", img: "supermariobros3.png" },
-        { name: "Granny", url: "games/granny/index.html", img: "granny.png" },
-        { name: "Granny 2", url: "games/granny2/index.html", img: "granny2.png" },
-        { name: "Five Nights at Freddy's", url: "games/fnaf1/index.html", img: "fnaf1.png" },
-           { name: "Undertale (yellow)", url: "games/undertale-yellow/index.html", img: "undertale-yellow.png" },
-             { name: "Deltarune", url: "games/deltarune/index.html", img: "deltarune.png" },
-        { name: "Five Nights at Freddy's 2", url: "games/fnaf2/index.html", img: "fnaf2.png" },
-        { name: "Five Nights at Freddy's 3", url: "games/fnaf3/index.html", img: "fnaf3.png" },
-        { name: "Five Nights at Freddy's 4", url: "games/fnaf4/index.html", img: "fnaf4.png" },
-         { name: "Five Nights at Freddy's World", url: "games/fnafworld/index.html", img: "fnafworld.png" },
-         { name: "Plague Inc.", url: "games/plague/index.html", img: "plague.png" },
-        { name: "Fnaf Ultimate Custom Night", url: "games/customnight/index.html", img: "ucn.png" },
-        { name: "Balatro", url: "games/balatro/index.html", img: "balatro.png" },
-        { name: "Webfishing", url: "games/Webfishing/index.html", img: "Webfishing.png" },
-        { name: "Bendy and the Ink Machine", url: "games/bendy/index.html", img: "bendy.png" },
-                { name: "Tunnel Rush", url: "games/tunnelrush/index.html", img: "tunnelrush.png" },
-                        { name: "Raft", url: "games/raft/index.html", img: "raft.png" },
-        { name: "Stone Grass Mowing Simulator", url: "games/stonegrass/index.html", img: "stone-grass-mowing-simulator.png" },
-        { name: "Papa's Freezeria", url: "games/Freezeria/index.html", img: "Freezeria.png" },
-{ name: "Papa's Bakeria", url: "games/Bakeria/index.html", img: "Bakeria.png" },
-{ name: "Papa's Pizzeria", url: "games/Pizzeria/index.html", img: "Pizzeria.png" },
-{ name: "Papa's Wingeria", url: "games/Wingeria/index.html", img: "Wingeria.png" },
-
-        { name: "A Bite at Freddy's", url: "games/biteatfreddys/ABaF.html", img: "bite.png" },
-        { name: "Jelly Drift", url: "games/jellydrift/index.html", img: "Jelly Drift.png" },
-        { name: "IntelliSphere", url: "games/intellisphere/IntelliSphere.html", img: "IntelliSphere.png" },
-        { name: "Legend Of Zelda, Majora's Mask", url: "games/majorasmask/index.html", img: "Legend Of Zelda, Majora's Mask.png" },
-        { name: "Bergentruck201x", url: "games/Bergentruck201x/BERGENTRUCK_201X.html", img: "Bergentruck201x.png" },
-        { name: "Blood Rush", url: "games/rush/rush.html", img: "rush.png" },
-         { name: "Offroad Outlaws", url: "games/offroadoutlaws/index.html", img: "offroadoutlaws.png" },
-                  { name: "Speed per Click: Obby", url: "games/speedperclick/index.html", img: "speedperclick.png" },
-          { name: "Poppy Playtime", url: "games/poppyplaytime/index.html", img: "poppyplaytime.png" },
-          { name: "Genshin Impact", url: "games/impact/index.html", img: "impact.png" },
-            { name: "Scary Teacher 3D", url: "games/scaryteacher3d/index.html", img: "scaryteacher3d.png" },
-         
-           { name: "Cod Mobile", url: "games/codmobile/index.html", img: "codmobile.png" },
-                    { name: "Sid Meier’s Civilization 1", url: "games/civ1/index.html", img: "civ1.png" },
-                        { name: "Need for Speed", url: "games/needforspeed/index.html", img: "needforspeed.png" },
-         { name: "gachalife", url: "games/gachalife/index.html", img: "gachalife.png" },
-               { name: "Friv", url: "games/friv/index.html", img: "friv.png" },
-          { name: "Work At A Pizza Place", url: "games/pizzaplace/index.html", img: "pizzaplace.png" },
-             { name: "gachaclub", url: "games/gachaclub/index.html", img: "gachaclub.png" },
-        { name: "Wheelie Life", url: "games/Wheelielife/Wheelie Life (1).html", img: "Wheelielife.png" },
-        { name: "Libre TrainSim", url: "games/trainsim/Libre TrainSim.html", img: "Libre TrainSim.png" },
-        { name: "Cuphead", url: "games/cuphead/index.html", img: "cuphead.png" },
-        { name: "Dogwalk", url: "games/Dogwalk/DOGWALK.html", img: "dogwalk.png" },
-         { name: "Car Crash Test", url: "games/Car/index.html", img: "carcrashtest.png" },
-      { name: "Cookie: Run Kingdom", url: "games/crk/index.html", img: "crk.png" },
-      { name: "PokemonEmerald", url: "games/Pokemonemerald/index.html", img: "emerald.png" },
-     { name: "PokemonRed", url: "games/PokemonRed/index.html", img: "red.png" },
-      { name: "PokemonFireRed", url: "games/PokemonFireRed/index.html", img: "firered.png" },
-          { name: "PokemonArceusLegend", url: "games/PokemonArceusLegend/index.html", img: "ArceusLegend.png" },
-                    { name: "Pokemon Gold", url: "games/PokemonGold/index.html", img: "gold.png" },  
-        { name: "Among Us", url: "games/amongus/index.html", img: "amongus.png" },
-   { name: "Supermarket Simulator", url: "games/supermarket/index.html", img: "supermarketsimulator.png" },
-         { name: "Plants VS Brainrots", url: "games/Pvb/index.html", img: "pvb.png" },
-        { name: "Fortnite", url: "games/fortnite/index.html", img: "fortnite.png" },
-        { name: "Getting Over It", url: "games/gettingoverit/index.html", img: "gettingoverit.png" },
-        { name: "Minecraft 1.8.8", url: "games/minecraft188/index.html", img: "minecraft188.png" },
-        { name: "Slender The 8 Pages", url: "games/slender/index.html", img: "slender.png" },
-        { name: "The Oregon Trail", url: "games/theoregontrail/", img: "oregontrail.png" },
-        { name: "Tiny Fishing", url: "games/tinyfishing/index.html", img: "tinyfishing.png" },
-        { name: "Baldi's Basics", url: "games/baldisbasics/Baldi's Basics Godot.html", img: "baldisbasics.png" },
-        { name: "Tomb Of The Mask", url: "games/tombofthemask/index.html", img: "tombofthemask.png" },
-        { name: "Geometry Dash", url: "games/geometrydash/index.html", img: "geometrydash.png" },
-         { name: "Snow Rider 3D", url: "games/snow-rider/index.html", img: "snowrider.png" },
-        { name: "1v1.lol", url: "games/1v1.lol/index.html", img: "1v1lol.png" },
-                { name: "Count Masters", url: "games/armygame/index.html", img: "armygame.png" },
-        { name: "Amanda the Adventurer", url: "games/amanda/index.html", img: "amanda.png" },
-        { name: "Yohoho.io", url: "games/pirategame/index.html", img: "pirategame.jpeg" }
+        { name: "That's Not My Neighbor", url: "games/thatsnotmyneighbor/index.html", img: "thatsnotmyneighbor.png", category: "popular" },
+        { name: "Caudill's Basics", url: "games/caudill/index.html", img: "caudill.png", category: "popular" },
+        { name: "People Playground", url: "games/peopleplayground/index.html", img: "peopleplayground.png", category: "action" },
+        { name: "Gorilla Tag, web port", url: "games/gtagpro/index.html", img: "gtag.png", category: "action" },
+        { name: "Caudill, A granny reskin.", url: "games/grangran/index.html", img: "gran.png", category: "adventure" },
+        { name: "Bloon's Tower Defense 5", url: "games/bloonstd5/index.html", img: "bloonstd5.png", category: "popular" },
+        { name: "BrawlStars", url: "games/brawlstars/index.html", img: "brawl.png", category: "action" },
+        { name: "Bee Swarm Simulator", url: "games/beeswarmsim/index.html", img: "beeswarmsim.png", category: "adventure" },
+        { name: "Roblox", url: "games/Roblox/index.html", img: "Roblox.png", category: "popular" },
+        { name: "Subway Surfers", url: "games/subwaysurfers/index.html", img: "subwaysurfers.jpg", category: "action" },
+        { name: "Family Life", url: "games/family life/index.html", img: "Family life.png", category: "adventure" },
+        { name: "Schoolboy Runaway", url: "games/runaway/index.html", img: "Schoolboy Runaway.png", category: "action" },
+        { name: "Super Mario Bros 1", url: "games/supermariobros/index.html", img: "supermariobros.png", category: "popular" },
+        { name: "Cookie Clicker", url: "games/cookieclicker/index.html", img: "Cookie Clicker.png", category: "popular" },
+        { name: "Super Mario Bros 2", url: "games/supermariobros2/index.html", img: "supermariobros2.png", category: "popular" },
+        { name: "Fallout", url: "games/fallout/index.html", img: "fallout.png", category: "adventure" },
+        { name: "Super Mario Bros 3", url: "games/supermariobros3/index.html", img: "supermariobros3.png", category: "popular" },
+        { name: "Granny", url: "games/granny/index.html", img: "granny.png", category: "popular" },
+        { name: "Granny 2", url: "games/granny2/index.html", img: "granny2.png", category: "popular" },
+        { name: "Five Nights at Freddy's", url: "games/fnaf1/index.html", img: "fnaf1.png", category: "popular" },
+        { name: "Undertale (yellow)", url: "games/undertale-yellow/index.html", img: "undertale-yellow.png", category: "adventure" },
+        { name: "Deltarune", url: "games/deltarune/index.html", img: "deltarune.png", category: "adventure" },
+        { name: "Five Nights at Freddy's 2", url: "games/fnaf2/index.html", img: "fnaf2.png", category: "popular" },
+        { name: "Five Nights at Freddy's 3", url: "games/fnaf3/index.html", img: "fnaf3.png", category: "popular" },
+        { name: "Five Nights at Freddy's 4", url: "games/fnaf4/index.html", img: "fnaf4.png", category: "popular" },
+        { name: "Five Nights at Freddy's World", url: "games/fnafworld/index.html", img: "fnafworld.png", category: "adventure" },
+        { name: "Plague Inc.", url: "games/plague/index.html", img: "plague.png", category: "popular" },
+        { name: "Fnaf Ultimate Custom Night", url: "games/customnight/index.html", img: "ucn.png", category: "popular" },
+        { name: "Balatro", url: "games/balatro/index.html", img: "balatro.png", category: "popular" },
+        { name: "Webfishing", url: "games/Webfishing/index.html", img: "Webfishing.png", category: "adventure" },
+        { name: "Bendy and the Ink Machine", url: "games/bendy/index.html", img: "bendy.png", category: "adventure" },
+        { name: "Tunnel Rush", url: "games/tunnelrush/index.html", img: "tunnelrush.png", category: "action" },
+        { name: "Raft", url: "games/raft/index.html", img: "raft.png", category: "adventure" },
+        { name: "Stone Grass Mowing Simulator", url: "games/stonegrass/index.html", img: "stone-grass-mowing-simulator.png", category: "adventure" },
+        { name: "Papa's Freezeria", url: "games/Freezeria/index.html", img: "Freezeria.png", category: "popular" },
+        { name: "Papa's Bakeria", url: "games/Bakeria/index.html", img: "Bakeria.png", category: "popular" },
+        { name: "Papa's Pizzeria", url: "games/Pizzeria/index.html", img: "Pizzeria.png", category: "popular" },
+        { name: "Papa's Wingeria", url: "games/Wingeria/index.html", img: "Wingeria.png", category: "popular" },
+        { name: "A Bite at Freddy's", url: "games/biteatfreddys/ABaF.html", img: "bite.png", category: "popular" },
+        { name: "Jelly Drift", url: "games/jellydrift/index.html", img: "Jelly Drift.png", category: "action" },
+        { name: "IntelliSphere", url: "games/intellisphere/IntelliSphere.html", img: "IntelliSphere.png", category: "adventure" },
+        { name: "Legend Of Zelda, Majora's Mask", url: "games/majorasmask/index.html", img: "Legend Of Zelda, Majora's Mask.png", category: "adventure" },
+        { name: "Bergentruck201x", url: "games/Bergentruck201x/BERGENTRUCK_201X.html", img: "Bergentruck201x.png", category: "adventure" },
+        { name: "Blood Rush", url: "games/rush/rush.html", img: "rush.png", category: "action" },
+        { name: "Offroad Outlaws", url: "games/offroadoutlaws/index.html", img: "offroadoutlaws.png", category: "action" },
+        { name: "Speed per Click: Obby", url: "games/speedperclick/index.html", img: "speedperclick.png", category: "action" },
+        { name: "Poppy Playtime", url: "games/poppyplaytime/index.html", img: "poppyplaytime.png", category: "popular" },
+        { name: "Genshin Impact", url: "games/impact/index.html", img: "impact.png", category: "adventure" },
+        { name: "Scary Teacher 3D", url: "games/scaryteacher3d/index.html", img: "scaryteacher3d.png", category: "adventure" },
+        { name: "Cod Mobile", url: "games/codmobile/index.html", img: "codmobile.png", category: "action" },
+        { name: "Sid Meier's Civilization 1", url: "games/civ1/index.html", img: "civ1.png", category: "adventure" },
+        { name: "Need for Speed", url: "games/needforspeed/index.html", img: "needforspeed.png", category: "action" },
+        { name: "gachalife", url: "games/gachalife/index.html", img: "gachalife.png", category: "adventure" },
+        { name: "Friv", url: "games/friv/index.html", img: "friv.png", category: "popular" },
+        { name: "Work At A Pizza Place", url: "games/pizzaplace/index.html", img: "pizzaplace.png", category: "adventure" },
+        { name: "gachaclub", url: "games/gachaclub/index.html", img: "gachaclub.png", category: "adventure" },
+        { name: "Wheelie Life", url: "games/Wheelielife/Wheelie Life (1).html", img: "Wheelielife.png", category: "action" },
+        { name: "Libre TrainSim", url: "games/trainsim/Libre TrainSim.html", img: "Libre TrainSim.png", category: "adventure" },
+        { name: "Cuphead", url: "games/cuphead/index.html", img: "cuphead.png", category: "popular" },
+        { name: "Dogwalk", url: "games/Dogwalk/DOGWALK.html", img: "dogwalk.png", category: "adventure" },
+        { name: "Car Crash Test", url: "games/Car/index.html", img: "carcrashtest.png", category: "action" },
+        { name: "Cookie: Run Kingdom", url: "games/crk/index.html", img: "crk.png", category: "adventure" },
+        { name: "PokemonEmerald", url: "games/Pokemonemerald/index.html", img: "emerald.png", category: "adventure" },
+        { name: "PokemonRed", url: "games/PokemonRed/index.html", img: "red.png", category: "adventure" },
+        { name: "PokemonFireRed", url: "games/PokemonFireRed/index.html", img: "firered.png", category: "adventure" },
+        { name: "PokemonArceusLegend", url: "games/PokemonArceusLegend/index.html", img: "ArceusLegend.png", category: "adventure" },
+        { name: "Pokemon Gold", url: "games/PokemonGold/index.html", img: "gold.png", category: "adventure" },
+        { name: "Among Us", url: "games/amongus/index.html", img: "amongus.png", category: "popular" },
+        { name: "Supermarket Simulator", url: "games/supermarket/index.html", img: "supermarketsimulator.png", category: "adventure" },
+        { name: "Plants VS Brainrots", url: "games/Pvb/index.html", img: "pvb.png", category: "action" },
+        { name: "Fortnite", url: "games/fortnite/index.html", img: "fortnite.png", category: "popular" },
+        { name: "Getting Over It", url: "games/gettingoverit/index.html", img: "gettingoverit.png", category: "popular" },
+        { name: "Minecraft 1.8.8", url: "games/minecraft188/index.html", img: "minecraft188.png", category: "popular" },
+        { name: "Slender The 8 Pages", url: "games/slender/index.html", img: "slender.png", category: "adventure" },
+        { name: "The Oregon Trail", url: "games/theoregontrail/", img: "oregontrail.png", category: "adventure" },
+        { name: "Tiny Fishing", url: "games/tinyfishing/index.html", img: "tinyfishing.png", category: "adventure" },
+        { name: "Baldi's Basics", url: "games/baldisbasics/Baldi's Basics Godot.html", img: "baldisbasics.png", category: "popular" },
+        { name: "Tomb Of The Mask", url: "games/tombofthemask/index.html", img: "tombofthemask.png", category: "action" },
+        { name: "Geometry Dash", url: "games/geometrydash/index.html", img: "geometrydash.png", category: "popular" },
+        { name: "Snow Rider 3D", url: "games/snow-rider/index.html", img: "snowrider.png", category: "action" },
+        { name: "1v1.lol", url: "games/1v1.lol/index.html", img: "1v1lol.png", category: "action" },
+        { name: "Count Masters", url: "games/armygame/index.html", img: "armygame.png", category: "action" },
+        { name: "Amanda the Adventurer", url: "games/amanda/index.html", img: "amanda.png", category: "popular" },
+        { name: "Yohoho.io", url: "games/pirategame/index.html", img: "pirategame.jpeg", category: "action" }
       ];
 
+      // Mark some games as "new"
+      const newGames = ["Balatro", "Genshin Impact", "Supermarket Simulator", "Cod Mobile", "Scary Teacher 3D", "Dogwalk", "Car Crash Test", "Cookie: Run Kingdom", "PokemonArceusLegend", "Snow Rider 3D"];
+      games.forEach(game => {
+        if (newGames.includes(game.name)) {
+          game.category = "new";
+        }
+      });
+    // Mark some games as "popular"
+      const popularGames = ["Balatro", "Genshin Impact", "Supermarket Simulator", "Cod Mobile", "Scary Teacher 3D", "Dogwalk", "Car Crash Test", "Cookie: Run Kingdom", "PokemonArceusLegend", "Snow Rider 3D"];
+      games.forEach(game => {
+        if (popularGames.includes(game.name)) {
+          game.category = "popular";
+        }
+      });
       // Sort games alphabetically
       games.sort((a, b) => a.name.localeCompare(b.name));
+
+      // Update game count
+      document.getElementById("game-count").textContent = games.length;
 
       // Render games
       const gameList = document.getElementById("game-list");
       
-      games.forEach(game => {
+      games.forEach((game, index) => {
         const gameElement = document.createElement("div");
-        gameElement.className = "game";
+        gameElement.className = "game fade-in";
         gameElement.dataset.name = game.name;
+        gameElement.dataset.category = game.category;
+        
+        // Add slight delay for staggered animation
+        gameElement.style.animationDelay = `${index * 0.02}s`;
+        
+        // Determine badge
+        let badge = "";
+        if (game.category === "new") badge = '<span class="game-badge">NEW</span>';
+        if (game.category === "popular") badge = '<span class="game-badge" style="background: var(--gradient-accent);">POPULAR</span>';
         
         gameElement.innerHTML = `
           <a href="${game.url}" target="_blank">
-            <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/${game.img}" alt="${game.name}" class="game-thumbnail" />
+            <div class="game-thumbnail-container">
+              ${badge}
+              <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/${game.img}" alt="${game.name}" class="game-thumbnail" />
+            </div>
             <span class="game-title">${game.name}</span>
           </a>
         `;
@@ -619,7 +1093,7 @@
       const searchInput = document.getElementById("search");
       
       searchInput.addEventListener("input", () => {
-        const searchTerm = searchInput.value.toLowerCase();
+        const searchTerm = searchInput.value.toLowerCase().trim();
         const gameElements = document.querySelectorAll(".game");
         let visibleCount = 0;
         
@@ -638,20 +1112,47 @@
         if (visibleCount === 0 && !noResults) {
           noResults = document.createElement("div");
           noResults.className = "no-results";
-          noResults.textContent = "No games found matching your search.";
+          noResults.innerHTML = `<i class="fas fa-gamepad"></i><p>No games found matching "${searchTerm}"</p>`;
           gameList.appendChild(noResults);
         } else if (visibleCount > 0 && noResults) {
           noResults.remove();
         }
       });
 
+      // Filter functionality
+      const filterButtons = document.querySelectorAll(".filter-btn");
+      filterButtons.forEach(button => {
+        button.addEventListener("click", () => {
+          // Remove active class from all buttons
+          filterButtons.forEach(btn => btn.classList.remove("active"));
+          // Add active class to clicked button
+          button.classList.add("active");
+          
+          const filter = button.dataset.filter;
+          const gameElements = document.querySelectorAll(".game");
+          
+          gameElements.forEach(game => {
+            if (filter === "all" || game.dataset.category === filter) {
+              game.style.display = "block";
+            } else {
+              game.style.display = "none";
+            }
+          });
+          
+          // If search is active, reapply search filter
+          if (searchInput.value.trim() !== "") {
+            searchInput.dispatchEvent(new Event("input"));
+          }
+        });
+      });
+
       // Image caching system
       const baseLocal = `${window.location.origin}/img/`;
       const baseCDN = "https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/";
-      const cacheKey = "imageAvailabilityCache_v2";
+      const cacheKey = "imageAvailabilityCache_v3";
       const cache = JSON.parse(localStorage.getItem(cacheKey) || "{}");
 
-      document.querySelectorAll("img.game-thumbnail").forEach(img => {
+      document.querySelectorAll("img.game-thumbnail").forEach((img, index) => {
         const fileName = img.src.split("/").pop();
         const localUrl = baseLocal + fileName;
         const cdnUrl = baseCDN + fileName;
@@ -665,25 +1166,28 @@
           return;
         }
 
-        // Test and cache result
-        fetch(localUrl, { method: "HEAD" })
-          .then(res => {
-            if (res.ok) {
-              img.src = localUrl;
-              cache[fileName] = "local";
-            } else {
+        // Test and cache result with delay to avoid overwhelming
+        setTimeout(() => {
+          fetch(localUrl, { method: "HEAD" })
+            .then(res => {
+              if (res.ok) {
+                img.src = localUrl;
+                cache[fileName] = "local";
+              } else {
+                img.src = cdnUrl;
+                cache[fileName] = "cdn";
+              }
+              localStorage.setItem(cacheKey, JSON.stringify(cache));
+            })
+            .catch(() => {
               img.src = cdnUrl;
               cache[fileName] = "cdn";
-            }
-            localStorage.setItem(cacheKey, JSON.stringify(cache));
-          })
-          .catch(() => {
-            img.src = cdnUrl;
-            cache[fileName] = "cdn";
-            localStorage.setItem(cacheKey, JSON.stringify(cache));
-          });
+              localStorage.setItem(cacheKey, JSON.stringify(cache));
+            });
+        }, index * 50);
       });
     }
+
     // Sigma iframe easter egg
     let cCount = 0;
     let lastCTime = 0;
@@ -718,7 +1222,7 @@
           
           // Add close button
           const closeBtn = document.createElement('button');
-          closeBtn.innerHTML = '×';
+          closeBtn.innerHTML = '<i class="fas fa-times"></i>';
           closeBtn.style.position = 'fixed';
           closeBtn.style.top = '20px';
           closeBtn.style.right = '20px';
@@ -732,6 +1236,20 @@
           closeBtn.style.fontSize = '24px';
           closeBtn.style.cursor = 'pointer';
           closeBtn.style.boxShadow = '0 2px 10px rgba(0,0,0,0.3)';
+          closeBtn.style.display = 'flex';
+          closeBtn.style.alignItems = 'center';
+          closeBtn.style.justifyContent = 'center';
+          closeBtn.style.transition = 'all 0.3s ease';
+          
+          closeBtn.addEventListener('mouseenter', () => {
+            closeBtn.style.transform = 'scale(1.1)';
+            closeBtn.style.background = 'var(--error)';
+          });
+          
+          closeBtn.addEventListener('mouseleave', () => {
+            closeBtn.style.transform = 'scale(1)';
+            closeBtn.style.background = 'var(--primary)';
+          });
           
           closeBtn.addEventListener('click', () => {
             iframe.remove();
