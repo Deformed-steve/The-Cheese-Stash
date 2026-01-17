@@ -3,35 +3,81 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>The Cheese Stash</title>
+  <title>Special Games 🧀 | The Cheese Stash</title>
+  <meta name="description" content="Exclusive premium games collection - Special edition games for free!">
   <meta name="google-adsense-account" content="ca-pub-2206020823906967">
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2206020823906967" crossorigin="anonymous"></script>
-
+  
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
   <style>
     :root {
-      --primary: #ff9800;
-      --primary-dark: #e68900;
+      --primary: #ff9e00;
+      --primary-dark: #e68a00;
+      --primary-light: #ffb733;
       --secondary: #4caf50;
-      --dark: #1a1a1a;
-      --darker: #0f0f0f;
-      --light: #f5f5f5;
-      --gray: #333;
-      --card-bg: rgba(30, 30, 30, 0.8);
-      --card-hover: rgba(40, 40, 40, 0.9);
+      --accent: #6c5ce7;
+      --accent-dark: #5a4fcf;
+      --dark: #0f1521;
+      --darker: #0a0e17;
+      --dark-card: #1a2236;
+      --dark-card-hover: #212b43;
+      --light: #f0f4ff;
+      --gray: #8a9bb8;
+      --gray-dark: #4a5568;
+      --success: #00c853;
+      --error: #ff5252;
+      --special: #ff4081;
+      --special-dark: #e91e63;
+      
+      --gradient-primary: linear-gradient(135deg, var(--primary) 0%, #ff6b00 100%);
+      --gradient-dark: linear-gradient(135deg, var(--darker) 0%, #1a2b3c 100%);
+      --gradient-accent: linear-gradient(135deg, var(--accent) 0%, #8b78ff 100%);
+      --gradient-special: linear-gradient(135deg, var(--special) 0%, #ff6ec7 100%);
+      
+      --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.1);
+      --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.15);
+      --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.25);
+      --shadow-glow: 0 0 20px rgba(255, 158, 0, 0.3);
+      --shadow-special: 0 0 25px rgba(255, 64, 129, 0.4);
+      
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 20px;
+      --radius-xl: 30px;
+      
+      --transition-fast: 0.2s ease;
+      --transition-medium: 0.3s ease;
+      --transition-slow: 0.5s ease;
     }
     
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     }
     
     body {
-      background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+      background: var(--gradient-dark);
       color: var(--light);
       min-height: 100vh;
       overflow-x: hidden;
+      position: relative;
+    }
+    
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 20% 80%, rgba(255, 64, 129, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(108, 92, 231, 0.08) 0%, transparent 50%);
+      z-index: -2;
     }
     
     #particles-js {
@@ -41,403 +87,844 @@
       z-index: -1;
     }
     
+    /* ===== LOCK SCREEN ===== */
+    #lockscreen {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: var(--gradient-dark);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      padding: 2rem;
+      backdrop-filter: blur(5px);
+    }
+    
+    .lock-container {
+      background: rgba(26, 34, 54, 0.9);
+      backdrop-filter: blur(10px);
+      border-radius: var(--radius-xl);
+      padding: 3rem;
+      max-width: 500px;
+      width: 100%;
+      text-align: center;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      animation: fadeInUp 0.6s ease;
+      border-top: 4px solid var(--special);
+    }
+    
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    #lockscreen h2 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      background: var(--gradient-special);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      font-weight: 700;
+    }
+    
+    #lockscreen p {
+      margin-bottom: 2rem;
+      color: var(--gray);
+      font-size: 1.1rem;
+    }
+    
+    .password-container {
+      position: relative;
+      width: 100%;
+      max-width: 300px;
+      margin: 0 auto;
+    }
+    
+    #passInput {
+      padding: 1rem 1.5rem;
+      border: none;
+      border-radius: var(--radius-lg);
+      outline: none;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.08);
+      color: white;
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      font-size: 1rem;
+      transition: var(--transition-medium);
+    }
+    
+    #passInput:focus {
+      border-color: var(--special);
+      background: rgba(255, 255, 255, 0.12);
+      box-shadow: var(--shadow-special);
+    }
+    
+    #passInput::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+    
+    #submitPass {
+      margin-top: 1.5rem;
+      padding: 0.9rem 2rem;
+      border: none;
+      border-radius: var(--radius-lg);
+      cursor: pointer;
+      background: var(--gradient-special);
+      color: white;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: var(--transition-medium);
+      letter-spacing: 0.5px;
+    }
+    
+    #submitPass:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-special);
+    }
+    
+    #submitPass:active {
+      transform: translateY(0);
+    }
+    
+    #errorMsg {
+      color: var(--error);
+      display: none;
+      margin-top: 1rem;
+      font-weight: 600;
+    }
+    
+    /* ===== HEADER ===== */
     header {
       text-align: center;
-      padding: 2rem 1rem;
-      background: rgba(10, 10, 10, 0.7);
-      backdrop-filter: blur(10px);
-      border-bottom: 2px solid var(--primary);
+      padding: 3rem 1rem 2rem;
       position: relative;
       z-index: 10;
     }
     
-.side-nav.right-nav {
-  right: 20px;
-  left: auto;
-}
-
-.side-nav {
-  position: fixed;
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  background: var(--card-bg);
-  padding: 15px 10px;
-  border-radius: 15px;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  z-index: 100;
-}
-
-.nav-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 50px;
-  height: 50px;
-  border-radius: 10px;
-  color: rgba(255, 255, 255, 0.7);
-  transition: all 0.3s ease;
-  text-decoration: none;
-}
-
-.nav-icon:hover {
-  color: var(--primary);
-  background: rgba(255, 152, 0, 0.1);
-  transform: scale(1.1);
-}
-
-.nav-icon img {
-  width: 28px;
-  height: 28px;
-  filter: brightness(0.8);
-  transition: all 0.3s ease;
-}
-
-.nav-icon:hover img {
-  filter: brightness(1);
-}
-
-/* Mobile responsiveness */
-@media (max-width: 768px) {
-  .side-nav {
-    padding: 12px 8px;
-    gap: 12px;
-  }
-  
-  .nav-icon {
-    width: 45px;
-    height: 45px;
-  }
-  
-  .nav-icon img {
-    width: 40px;
-    height: 40px;
-  }
-}
-
-@media (max-width: 480px) {
-  .side-nav {
-    padding: 10px 6px;
-    gap: 10px;
-  }
-  
-  .nav-icon {
-    width: 40px;
-    height: 40px;
-  }
-  
-  .nav-icon img {
-    width: 40px;
-    height: 40px;
-  }
-}
-
-    h1 {
-      font-size: 3rem;
-      margin-bottom: 0.5rem;
-      color: var(--primary);
-      text-shadow: 0 0 10px rgba(255, 152, 0, 0.5);
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
     }
     
-    header p {
-      font-size: 1.2rem;
-      margin-bottom: 1.5rem;
-      opacity: 0.9;
+    .logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 1rem;
+    }
+    
+    .logo-icon {
+      font-size: 3.5rem;
+      background: var(--gradient-special);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      filter: drop-shadow(0 0 10px rgba(255, 64, 129, 0.4));
+    }
+    
+    h1 {
+      font-size: 3.2rem;
+      background: linear-gradient(to right, #ff4081, #ff9e00);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+    
+    .tagline {
+      font-size: 1.3rem;
+      margin-bottom: 2rem;
+      color: var(--gray);
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.5;
+    }
+    
+    .search-container {
+      position: relative;
+      max-width: 600px;
+      margin: 0 auto;
     }
     
     #search {
-      padding: 0.8rem 1.2rem;
+      padding: 1.2rem 1.5rem 1.2rem 3.5rem;
       border: none;
-      border-radius: 50px;
-      width: 90%;
-      max-width: 500px;
-      font-size: 1rem;
-      background: rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-xl);
+      width: 100%;
+      font-size: 1.05rem;
+      background: rgba(255, 255, 255, 0.08);
       color: white;
-      backdrop-filter: blur(5px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      transition: var(--transition-medium);
+      box-shadow: var(--shadow-md);
     }
     
     #search:focus {
       outline: none;
-      background: rgba(255, 255, 255, 0.15);
-      box-shadow: 0 0 15px rgba(255, 152, 0, 0.3);
+      background: rgba(255, 255, 255, 0.12);
+      border-color: var(--special);
+      box-shadow: var(--shadow-special);
     }
     
     #search::placeholder {
       color: rgba(255, 255, 255, 0.6);
     }
     
+    .search-icon {
+      position: absolute;
+      left: 1.2rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--special);
+      font-size: 1.2rem;
+    }
+    
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-top: 1.5rem;
+      font-size: 0.95rem;
+      color: var(--gray);
+    }
+    
+    .stats span {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .stats i {
+      color: var(--special);
+    }
+    
+    /* ===== NAVIGATION ===== */
+    .side-nav {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      background: rgba(26, 34, 54, 0.8);
+      backdrop-filter: blur(10px);
+      padding: 18px 12px;
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      z-index: 100;
+      box-shadow: var(--shadow-md);
+      transition: var(--transition-medium);
+    }
+    
+    .side-nav.right-nav {
+      right: 25px;
+      left: auto;
+    }
+    
+    .nav-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 56px;
+      height: 56px;
+      border-radius: var(--radius-md);
+      color: rgba(255, 255, 255, 0.7);
+      transition: var(--transition-medium);
+      text-decoration: none;
+      position: relative;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid transparent;
+    }
+    
+    .nav-icon:hover {
+      color: var(--special);
+      background: rgba(255, 64, 129, 0.1);
+      transform: translateY(-5px) scale(1.05);
+      border-color: rgba(255, 64, 129, 0.2);
+    }
+    
+    .nav-icon img {
+      width: 30px;
+      height: 30px;
+      filter: brightness(0.9);
+      transition: var(--transition-medium);
+    }
+    
+    .nav-icon:hover img {
+      filter: brightness(1.2);
+      transform: scale(1.1);
+    }
+    
+    .nav-tooltip {
+      position: absolute;
+      right: 70px;
+      background: var(--dark-card);
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: var(--transition-fast);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .nav-icon:hover .nav-tooltip {
+      opacity: 1;
+      visibility: visible;
+      right: 65px;
+    }
+    
+    /* ===== GAMES CONTAINER ===== */
     .games-container {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 2rem;
       padding: 2rem;
       max-width: 1400px;
       margin: 0 auto;
     }
     
     .game {
-      background: var(--card-bg);
-      border-radius: 15px;
+      background: var(--dark-card);
+      border-radius: var(--radius-lg);
       overflow: hidden;
-      transition: all 0.3s ease;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      transition: var(--transition-medium);
+      box-shadow: var(--shadow-md);
       backdrop-filter: blur(5px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      position: relative;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .game::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: var(--gradient-special);
+      z-index: 1;
     }
     
     .game:hover {
       transform: translateY(-10px);
-      background: var(--card-hover);
-      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
-      border-color: var(--primary);
+      background: var(--dark-card-hover);
+      box-shadow: var(--shadow-lg);
+      border-color: rgba(255, 64, 129, 0.3);
     }
     
     .game a {
       text-decoration: none;
       color: inherit;
-      display: block;
+      display: flex;
+      flex-direction: column;
       height: 100%;
+    }
+    
+    .game-thumbnail-container {
+      position: relative;
+      width: 100%;
+      height: 200px;
+      overflow: hidden;
     }
     
     .game-thumbnail {
       width: 100%;
-      height: 180px;
+      height: 100%;
       object-fit: cover;
       display: block;
-      transition: transform 0.3s ease;
+      transition: transform 0.5s ease;
     }
     
     .game:hover .game-thumbnail {
-      transform: scale(1.05);
+      transform: scale(1.08);
+    }
+    
+    .game-content {
+      padding: 1.5rem;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
     }
     
     .game-title {
-      display: block;
-      padding: 1rem;
-      font-weight: 600;
-      font-size: 1.1rem;
-      text-align: center;
-      background: rgba(0, 0, 0, 0.5);
+      font-weight: 700;
+      font-size: 1.4rem;
+      margin-bottom: 0.8rem;
+      color: var(--light);
+      transition: var(--transition-medium);
+      line-height: 1.3;
     }
     
+    .game:hover .game-title {
+      color: var(--special);
+    }
+    
+    .game-description {
+      font-size: 0.95rem;
+      color: var(--gray);
+      line-height: 1.5;
+      margin-bottom: 1.5rem;
+      flex-grow: 1;
+    }
+    
+    .game-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: var(--gradient-special);
+      color: white;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      z-index: 2;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .game-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: auto;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .game-type {
+      font-size: 0.85rem;
+      color: var(--special);
+      background: rgba(255, 64, 129, 0.1);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+    
+    .game-launch-btn {
+      color: var(--special);
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: var(--transition-fast);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .game:hover .game-launch-btn {
+      color: var(--primary-light);
+    }
+    
+    /* ===== FOOTER ===== */
     footer {
       text-align: center;
-      padding: 2rem;
-      background: rgba(10, 10, 10, 0.7);
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      margin-top: 2rem;
+      padding: 3rem 2rem;
+      background: rgba(10, 14, 23, 0.8);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      margin-top: 3rem;
+      backdrop-filter: blur(10px);
+    }
+    
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
     }
     
     footer p {
       margin: 0.5rem 0;
-      opacity: 0.8;
+      color: var(--gray);
     }
     
-    #lockscreen {
-      position: fixed;
-      inset: 0;
-      z-index: 9999;
-      background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+    .footer-links {
       display: flex;
-      flex-direction: column;
-      align-items: center;
       justify-content: center;
-      color: white;
-      font-family: sans-serif;
+      gap: 2rem;
+      margin-top: 1.5rem;
     }
     
-    #lockscreen h2 {
-      font-size: 2rem;
-      margin-bottom: 1.5rem;
-      color: var(--primary);
+    .footer-links a {
+      color: var(--special);
+      text-decoration: none;
+      transition: var(--transition-fast);
     }
     
-    #passInput {
-      padding: 12px 15px;
-      border: none;
-      border-radius: 8px;
-      outline: none;
-      margin-top: 10px;
-      width: 250px;
-      background: rgba(255, 255, 255, 0.1);
-      color: white;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      font-size: 1rem;
+    .footer-links a:hover {
+      color: var(--primary-light);
+      text-decoration: underline;
     }
     
-    #submitPass {
-      margin-top: 15px;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      background: var(--primary);
-      color: white;
-      font-weight: bold;
-      transition: all 0.3s ease;
-    }
-    
-    #submitPass:hover {
-      background: var(--primary-dark);
-      transform: scale(1.05);
-    }
-    
-    #errorMsg {
-      color: #ff5252;
-      display: none;
-      margin-top: 15px;
-      font-weight: bold;
-    }
-    
+    /* ===== NO RESULTS ===== */
     .no-results {
       grid-column: 1 / -1;
       text-align: center;
-      padding: 3rem;
+      padding: 4rem;
       font-size: 1.2rem;
-      opacity: 0.7;
+      color: var(--gray);
+    }
+    
+    .no-results i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      color: var(--special);
+      opacity: 0.5;
+    }
+    
+    /* ===== WELCOME MESSAGE ===== */
+    .welcome-message {
+      max-width: 800px;
+      margin: 0 auto 2rem;
+      padding: 1.5rem;
+      background: rgba(255, 64, 129, 0.1);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(255, 64, 129, 0.2);
+      text-align: center;
+      backdrop-filter: blur(5px);
+    }
+    
+    .welcome-message h3 {
+      color: var(--special);
+      margin-bottom: 0.5rem;
+      font-size: 1.4rem;
+    }
+    
+    .welcome-message p {
+      color: var(--gray);
+      line-height: 1.5;
+    }
+    
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 1200px) {
+      .games-container {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      }
+    }
+    
+    @media (max-width: 992px) {
+      .games-container {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        padding: 1.5rem;
+        gap: 1.5rem;
+      }
+      
+      h1 {
+        font-size: 2.8rem;
+      }
     }
     
     @media (max-width: 768px) {
+      .side-nav {
+        bottom: 20px;
+        top: auto;
+        left: 50%;
+        transform: translateX(-50%);
+        flex-direction: row;
+        width: auto;
+        padding: 15px 20px;
+      }
+      
+      .side-nav.right-nav {
+        right: auto;
+      }
+      
+      .nav-tooltip {
+        display: none;
+      }
+      
       .games-container {
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
         padding: 1rem;
         gap: 1rem;
       }
       
       h1 {
-        font-size: 2.2rem;
+        font-size: 2.4rem;
       }
       
-      header p {
-        font-size: 1rem;
+      .tagline {
+        font-size: 1.1rem;
+      }
+      
+      .stats {
+        flex-direction: column;
+        gap: 0.8rem;
+      }
+      
+      .welcome-message {
+        margin: 0 1rem 1.5rem;
+        padding: 1.2rem;
+      }
+    }
+    
+    @media (max-width: 576px) {
+      .games-container {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      }
+      
+      .game-thumbnail-container {
+        height: 170px;
+      }
+      
+      .game-content {
+        padding: 1.2rem;
+      }
+      
+      .game-title {
+        font-size: 1.2rem;
+      }
+      
+      .game-description {
+        font-size: 0.9rem;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+      
+      .logo-icon {
+        font-size: 2.8rem;
+      }
+      
+      header {
+        padding: 2rem 1rem 1.5rem;
+      }
+      
+      .lock-container {
+        padding: 2rem;
+      }
+      
+      #lockscreen h2 {
+        font-size: 2rem;
       }
     }
     
     @media (max-width: 480px) {
       .games-container {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
       }
       
-      .game-thumbnail {
-        height: 120px;
+      .game-thumbnail-container {
+        height: 150px;
       }
       
-      .game-title {
-        font-size: 0.9rem;
-        padding: 0.8rem 0.5rem;
+      .game-footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.8rem;
       }
+    }
+    
+    /* ===== UTILITY CLASSES ===== */
+    .fade-in {
+      animation: fadeInUp 0.6s ease;
+    }
+    
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { opacity: 0.8; }
+      50% { opacity: 1; }
+      100% { opacity: 0.8; }
+    }
+    
+    /* ===== SCROLLBAR ===== */
+    ::-webkit-scrollbar {
+      width: 10px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.2);
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: var(--special);
+      border-radius: 5px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--primary-light);
     }
   </style>
 </head>
 <body>
+  <!-- Lock Screen -->
   <div id="lockscreen">
-    <h2>Enter Password</h2>
-    <input type="password" id="passInput" placeholder="Password...">
-    <button id="submitPass">Enter</button>
-    <p id="errorMsg">TRY AGAIN</p>
+    <div class="lock-container">
+      <div class="logo">
+        <div class="logo-icon">🧀</div>
+        <h2>The Cheese Stash</h2>
+      </div>
+      <p>Enter the password to access exclusive premium games</p>
+      <div class="password-container">
+        <input type="password" id="passInput" placeholder="Enter special password...">
+      </div>
+      <button id="submitPass">Unlock Exclusive Games <i class="fas fa-lock-open"></i></button>
+      <p id="errorMsg"><i class="fas fa-exclamation-triangle"></i> Incorrect password, try again!</p>
+    </div>
   </div>
 
+  <!-- Particles Background -->
   <div id="particles-js"></div>
 
-  <header>
-    <h1>🧀 The Cheese Stash 🧀</h1>
-    <p>Unblocked Games — PC games for free! You can request games in my Discord.</p>
-    <input type="text" id="search" placeholder="Search games..." />
-  </header>
-<!-- Add this right after the <header> closing tag -->
-<nav class="side-nav right-nav">
-    <a href="index.html" class="nav-icon" title="Games">
-    <img src="/icons/games.svg" alt="Games">
-  </a>
-  <a href="a.html" class="nav-icon" title="Apps">
-    <img src="/icons/apps.svg" alt="Apps">
-  </a>
-   <a href="anime.html" class="nav-icon" title="Apps">
-    <img src="/icons/anime.svg" alt="Apps">
-  </a>
-   <a href="tv.html" class="nav-icon" title="Browse">
-    <img src="/icons/tv.svg" alt="Browse">
-  </a>
-  <a href="apps/browser/browse.html" class="nav-icon" title="Browse">
-    <img src="/icons/browse.svg" alt="Browse">
-  </a>
-</nav>
-  <main class="games-container" id="game-list">
-    <!-- Games will be dynamically inserted here -->
-  </main>
+  <!-- Main Content (hidden until unlocked) -->
+  <div id="main-content" style="display: none;">
+    <header>
+      <div class="header-content">
+        <div class="logo">
+          <div class="logo-icon">🧀</div>
+          <h1>The Cheese Stash</h1>
+        </div>
+        <p class="tagline">Exclusive Premium Games — Special edition games with unique features!</p>
+        
+        <div class="search-container">
+          <i class="fas fa-search search-icon"></i>
+          <input type="text" id="search" placeholder="Search exclusive games..." />
+        </div>
+        
+        <div class="stats">
+          <span><i class="fas fa-gamepad"></i> <span id="game-count">0</span> Exclusive Games</span>
+          <span><i class="fas fa-crown"></i> Premium Edition</span>
+          <span><i class="fas fa-star"></i> Special Features</span>
+        </div>
+      </div>
+    </header>
 
-  <footer>
-    <p>&copy; 2025 The Cheese Stash. All rights reserved.</p>
-    <p>Credits: Me obv, bobbywx for art/logo</p>
-  </footer>
+    <!-- Right Navigation -->
+    <nav class="side-nav right-nav">
+      <a href="index.html" class="nav-icon" title="Games">
+        <img src="/icons/games.svg" alt="Games">
+        <span class="nav-tooltip">All Games</span>
+      </a>
+      <a href="a.html" class="nav-icon" title="Apps">
+        <img src="/icons/apps.svg" alt="Apps">
+        <span class="nav-tooltip">Apps</span>
+      </a>
+      <a href="anime.html" class="nav-icon" title="Anime">
+        <img src="/icons/anime.svg" alt="Anime">
+        <span class="nav-tooltip">Anime</span>
+      </a>
+      <a href="tv.html" class="nav-icon" title="TV">
+        <img src="/icons/tv.svg" alt="TV">
+        <span class="nav-tooltip">TV & Movies</span>
+      </a>
+      <a href="apps/browser/browse.html" class="nav-icon" title="Browse">
+        <img src="/icons/browse.svg" alt="Browse">
+        <span class="nav-tooltip">Web Browser</span>
+      </a>
+    </nav>
 
+    <!-- Welcome Message -->
+    <div class="welcome-message">
+      <h3><i class="fas fa-crown"></i> Exclusive Games Collection</h3>
+      <p>Welcome to the special edition games page! These are premium, full-version games with unique features not available elsewhere. Enjoy!</p>
+    </div>
+
+    <!-- Games Container -->
+    <main class="games-container" id="game-list">
+      <!-- Games will be dynamically inserted here -->
+    </main>
+
+    <!-- Footer -->
+    <footer>
+      <div class="footer-content">
+        <p>&copy; 2025 The Cheese Stash. All rights reserved.</p>
+        <p>Credits: Special thanks to Quinn and Kolt for exclusive access!</p>
+        <div class="footer-links">
+          <a href="#"><i class="fab fa-discord"></i> Discord</a>
+          <a href="#"><i class="fas fa-question-circle"></i> Help</a>
+          <a href="#"><i class="fas fa-envelope"></i> Contact</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Particles.js Library -->
   <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  
   <script>
-    // Password protection (no cookies)
+    // Password protection (no cookies as requested)
     document.addEventListener("DOMContentLoaded", () => {
       const correctPass = "onlyquinnandkolt";
       const lock = document.getElementById("lockscreen");
       const input = document.getElementById("passInput");
       const btn = document.getElementById("submitPass");
       const err = document.getElementById("errorMsg");
+      const mainContent = document.getElementById("main-content");
 
       btn.addEventListener("click", () => {
         if (input.value === correctPass) {
-          lock.remove();
-          initializeSite();
+          lock.style.opacity = "0";
+          lock.style.transition = "opacity 0.5s ease";
+          setTimeout(() => {
+            lock.style.display = "none";
+            mainContent.style.display = "block";
+            setTimeout(() => initializeSite(), 100);
+          }, 500);
         } else {
           err.style.display = "block";
+          input.style.borderColor = "var(--error)";
+          setTimeout(() => {
+            input.style.borderColor = "";
+          }, 1000);
         }
       });
 
       input.addEventListener("keypress", e => {
         if (e.key === "Enter") btn.click();
       });
+      
+      // Focus password input on load
+      input.focus();
     });
 
     // Initialize the site after password check
     function initializeSite() {
-      // Initialize particles.js with new settings
+      // Initialize particles.js with special settings
       particlesJS("particles-js", {
         particles: {
           number: {
-            value: 80,
+            value: 70,
             density: {
               enable: true,
-              value_area: 800
+              value_area: 1000
             }
           },
           color: {
-            value: ["#ff9800", "#4caf50", "#ffffff"]
+            value: ["#ff4081", "#ff9e00", "#6c5ce7", "#00cec9"]
           },
           shape: {
-            type: ["circle", "triangle", "polygon"],
+            type: "circle",
             stroke: {
               width: 0,
               color: "#000000"
-            },
-            polygon: {
-              nb_sides: 6
             }
           },
           opacity: {
-            value: 0.5,
+            value: 0.6,
             random: true,
             anim: {
               enable: true,
               speed: 1,
-              opacity_min: 0.1,
+              opacity_min: 0.2,
               sync: false
             }
           },
           size: {
-            value: 3,
+            value: 4,
             random: true,
             anim: {
               enable: true,
@@ -449,13 +936,13 @@
           line_linked: {
             enable: true,
             distance: 150,
-            color: "#ff9800",
-            opacity: 0.2,
+            color: "#ff4081",
+            opacity: 0.3,
             width: 1
           },
           move: {
             enable: true,
-            speed: 2,
+            speed: 2.5,
             direction: "none",
             random: true,
             straight: false,
@@ -485,42 +972,101 @@
             grab: {
               distance: 140,
               line_linked: {
-                opacity: 0.5
+                opacity: 0.6
               }
             },
             push: {
-              particles_nb: 4
+              particles_nb: 6
             }
           }
         },
         retina_detect: true
       });
 
-      // Game data
+      // Game data (from your code)
       const games = [
-        { name: "NZ:P", url: "games/nzp/", img: "nzp.png" },
-          { name: "bitlife", url: "games/bitlife/", img: "bitlife.png" },
-           { name: "Hunting Simulator", url: "games/Hunter/", img: "hunter.png" },
-               { name: "HappyWheels (Full dont ask how i did this it was very VERY hard lol)", url: "games/wheelshappy/", img: "wheels.png" },
-            { name: "Geometry Dash (full 🤫)", url: "games/geodashfr/index.html", img: "geodashfr.png" },
-              { name: "Warfare: 1942", url: "games/Warfare1942/", img: "warfare.png" }
+        { 
+          name: "NZ:P", 
+          url: "games/nzp/", 
+          img: "nzp.png",
+          description: "Premium zombie survival game with enhanced graphics and gameplay.",
+          type: "Action",
+          badge: "PREMIUM"
+        },
+        { 
+          name: "BitLife", 
+          url: "games/bitlife/", 
+          img: "bitlife.png",
+          description: "Full life simulation game with all features unlocked. Live your virtual life!",
+          type: "Simulation",
+          badge: "FULL VERSION"
+        },
+        { 
+          name: "Hunting Simulator", 
+          url: "games/Hunter/", 
+          img: "hunter.png",
+          description: "Realistic hunting experience with advanced mechanics and environments.",
+          type: "Simulation",
+          badge: "REALISTIC"
+        },
+        { 
+          name: "Happy Wheels (Full Version)", 
+          url: "games/wheelshappy/", 
+          img: "wheels.png",
+          description: "Complete version of the popular physics-based racing game with all levels.",
+          type: "Racing",
+          badge: "COMPLETE"
+        },
+        { 
+          name: "Geometry Dash (Full Version)", 
+          url: "games/geodashfr/index.html", 
+          img: "geodashfr.png",
+          description: "The full Geometry Dash experience with all levels and features unlocked.",
+          type: "Rhythm",
+          badge: "FULL VERSION"
+        },
+        { 
+          name: "Warfare: 1942", 
+          url: "games/Warfare1942/", 
+          img: "warfare.png",
+          description: "Historical warfare simulation with authentic 1942 battle scenarios.",
+          type: "Strategy",
+          badge: "HISTORICAL"
+        }
       ];
 
       // Sort games alphabetically
       games.sort((a, b) => a.name.localeCompare(b.name));
 
+      // Update game count
+      document.getElementById("game-count").textContent = games.length;
+
       // Render games
       const gameList = document.getElementById("game-list");
       
-      games.forEach(game => {
+      games.forEach((game, index) => {
         const gameElement = document.createElement("div");
-        gameElement.className = "game";
+        gameElement.className = "game fade-in";
         gameElement.dataset.name = game.name;
+        gameElement.dataset.type = game.type;
+        
+        // Add slight delay for staggered animation
+        gameElement.style.animationDelay = `${index * 0.05}s`;
         
         gameElement.innerHTML = `
           <a href="${game.url}">
-            <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/${game.img}" alt="${game.name}" class="game-thumbnail" />
-            <span class="game-title">${game.name}</span>
+            <div class="game-thumbnail-container">
+              <span class="game-badge">${game.badge}</span>
+              <img src="https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/${game.img}" alt="${game.name}" class="game-thumbnail" />
+            </div>
+            <div class="game-content">
+              <h3 class="game-title">${game.name}</h3>
+              <p class="game-description">${game.description}</p>
+              <div class="game-footer">
+                <span class="game-type">${game.type}</span>
+                <span class="game-launch-btn">Play Now <i class="fas fa-play-circle"></i></span>
+              </div>
+            </div>
           </a>
         `;
         
@@ -531,13 +1077,16 @@
       const searchInput = document.getElementById("search");
       
       searchInput.addEventListener("input", () => {
-        const searchTerm = searchInput.value.toLowerCase();
+        const searchTerm = searchInput.value.toLowerCase().trim();
         const gameElements = document.querySelectorAll(".game");
         let visibleCount = 0;
         
         gameElements.forEach(game => {
           const gameName = game.dataset.name.toLowerCase();
-          if (gameName.includes(searchTerm)) {
+          const gameDescription = game.querySelector(".game-description").textContent.toLowerCase();
+          const gameType = game.dataset.type.toLowerCase();
+          
+          if (gameName.includes(searchTerm) || gameDescription.includes(searchTerm) || gameType.includes(searchTerm)) {
             game.style.display = "block";
             visibleCount++;
           } else {
@@ -550,7 +1099,7 @@
         if (visibleCount === 0 && !noResults) {
           noResults = document.createElement("div");
           noResults.className = "no-results";
-          noResults.textContent = "No games found matching your search.";
+          noResults.innerHTML = `<i class="fas fa-gamepad"></i><p>No games found matching "${searchTerm}"</p>`;
           gameList.appendChild(noResults);
         } else if (visibleCount > 0 && noResults) {
           noResults.remove();
@@ -560,10 +1109,10 @@
       // Image caching system
       const baseLocal = `${window.location.origin}/img/`;
       const baseCDN = "https://cdn.jsdelivr.net/gh/Deformed-steve/The-Cheese-Stash@main/img/";
-      const cacheKey = "imageAvailabilityCache_v2";
+      const cacheKey = "specialImageCache_v3";
       const cache = JSON.parse(localStorage.getItem(cacheKey) || "{}");
 
-      document.querySelectorAll("img.game-thumbnail").forEach(img => {
+      document.querySelectorAll("img.game-thumbnail").forEach((img, index) => {
         const fileName = img.src.split("/").pop();
         const localUrl = baseLocal + fileName;
         const cdnUrl = baseCDN + fileName;
@@ -577,25 +1126,108 @@
           return;
         }
 
-        // Test and cache result
-        fetch(localUrl, { method: "HEAD" })
-          .then(res => {
-            if (res.ok) {
-              img.src = localUrl;
-              cache[fileName] = "local";
-            } else {
+        // Test and cache result with delay to avoid overwhelming
+        setTimeout(() => {
+          fetch(localUrl, { method: "HEAD" })
+            .then(res => {
+              if (res.ok) {
+                img.src = localUrl;
+                cache[fileName] = "local";
+              } else {
+                img.src = cdnUrl;
+                cache[fileName] = "cdn";
+              }
+              localStorage.setItem(cacheKey, JSON.stringify(cache));
+            })
+            .catch(() => {
               img.src = cdnUrl;
               cache[fileName] = "cdn";
-            }
-            localStorage.setItem(cacheKey, JSON.stringify(cache));
-          })
-          .catch(() => {
-            img.src = cdnUrl;
-            cache[fileName] = "cdn";
-            localStorage.setItem(cacheKey, JSON.stringify(cache));
-          });
+              localStorage.setItem(cacheKey, JSON.stringify(cache));
+            });
+        }, index * 50);
+      });
+      
+      // Add hover effect to all game links
+      document.querySelectorAll('.game a').forEach(link => {
+        link.addEventListener('mouseenter', function() {
+          this.style.textDecoration = 'none';
+        });
       });
     }
+    
+    // Sigma iframe easter egg (special version)
+    let cCount = 0;
+    let lastCTime = 0;
+    
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'c' || e.key === 'C') {
+        const currentTime = Date.now();
+        
+        // Reset count if more than 1 second between presses
+        if (currentTime - lastCTime > 1000) {
+          cCount = 0;
+        }
+        
+        cCount++;
+        lastCTime = currentTime;
+        
+        // If 3 C presses in rapid succession
+        if (cCount >= 3) {
+          cCount = 0; // Reset for future use
+          
+          // Create fullscreen iframe
+          const iframe = document.createElement('iframe');
+          iframe.src = 'sigma.html';
+          iframe.style.position = 'fixed';
+          iframe.style.top = '0';
+          iframe.style.left = '0';
+          iframe.style.width = '100vw';
+          iframe.style.height = '100vh';
+          iframe.style.border = 'none';
+          iframe.style.zIndex = '99999';
+          iframe.style.background = 'white';
+          
+          // Add close button
+          const closeBtn = document.createElement('button');
+          closeBtn.innerHTML = '<i class="fas fa-times"></i>';
+          closeBtn.style.position = 'fixed';
+          closeBtn.style.top = '20px';
+          closeBtn.style.right = '20px';
+          closeBtn.style.zIndex = '100000';
+          closeBtn.style.background = 'var(--special)';
+          closeBtn.style.color = 'white';
+          closeBtn.style.border = 'none';
+          closeBtn.style.borderRadius = '50%';
+          closeBtn.style.width = '50px';
+          closeBtn.style.height = '50px';
+          closeBtn.style.fontSize = '24px';
+          closeBtn.style.cursor = 'pointer';
+          closeBtn.style.boxShadow = '0 2px 10px rgba(0,0,0,0.3)';
+          closeBtn.style.display = 'flex';
+          closeBtn.style.alignItems = 'center';
+          closeBtn.style.justifyContent = 'center';
+          closeBtn.style.transition = 'all 0.3s ease';
+          
+          closeBtn.addEventListener('mouseenter', () => {
+            closeBtn.style.transform = 'scale(1.1)';
+            closeBtn.style.background = 'var(--error)';
+          });
+          
+          closeBtn.addEventListener('mouseleave', () => {
+            closeBtn.style.transform = 'scale(1)';
+            closeBtn.style.background = 'var(--special)';
+          });
+          
+          closeBtn.addEventListener('click', () => {
+            iframe.remove();
+            closeBtn.remove();
+          });
+          
+          document.body.appendChild(iframe);
+          document.body.appendChild(closeBtn);
+        }
+      }
+    });
   </script>
 </body>
 </html>

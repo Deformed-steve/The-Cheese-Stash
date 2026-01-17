@@ -1,327 +1,45 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Movie & TV Browser</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>egg</title>
   <style>
-    body { background:#111; color:#fff; font-family:Arial, sans-serif; margin:0; }
-    header { display:flex; justify-content:space-between; align-items:center; padding:10px 20px; background:#222; flex-wrap:wrap; position:sticky; top:0; z-index:10; }
-    header h1 { margin:0; font-size:20px; }
-    nav, .categories { display:flex; align-items:center; margin-top:5px; flex-wrap:wrap; }
-    nav button, .categories button { margin:5px 5px 0 0; padding:5px 10px; background:#444; color:#fff; border:none; border-radius:4px; cursor:pointer; }
-    nav button.active, .categories button.active { background:#e50914; }
-    #searchBar { padding:5px; width:200px; border-radius:4px; border:none; }
-    .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:10px; padding:10px; }
-    img { width:100%; border-radius:8px; cursor:pointer; transition:transform 0.2s; }
-    img:hover { transform:scale(1.05); }
-    /* Overlay player */
-    #overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); display:none; justify-content:center; align-items:center; flex-direction:column; z-index:1000; }
-    #overlay iframe { width:100vw; height:100vh; border:none; border-radius:0; background:#000; }
-    #closeBtn { position:absolute; top:15px; right:15px; background:#e50914; color:#fff; border:none; border-radius:50%; width:28px; height:28px; font-size:16px; cursor:pointer; opacity:0.5; transition:opacity 0.2s; }
-    #closeBtn:hover { opacity:0.9; }
+    html,body{height:100%;margin:0}
+    #embedFrame{
+      width:100%;
+      height:100%;
+      border:0;
+      display:block;
+    }
+    /* optional: hide scrollbar if the embedded page uses it */
+    ::-webkit-scrollbar{display:none}
   </style>
 </head>
 <body>
-  <header>
-    <h1>🎬 Movie & TV Browser</h1>
-    <input id="searchBar" type="text" placeholder="Search...">
-    <nav>
-      <button id="moviesTab" class="active">Movies</button>
-      <button id="tvTab">TV Shows</button>
-      <button id="primeCatalogBtn">PrimeTv Catalog</button>
-      <button id="movies345CatalogBtn">345Movies Catalog</button>
-    </nav>
-    <div class="categories" id="categoriesDiv"></div>
-  </header>
-
-  <div id="content" class="grid"></div>
-
-  <!-- Overlay Player -->
-  <div id="overlay">
-    <button id="closeBtn">✖</button>
-    <div id="playerContainer" style="width:100%;height:100%;"></div>
-  </div>
+  <!-- Fallback link in case iframe is blocked -->
+  <a id="fallback" href="/s/embed.html#https://deformed-steve.github.io/cheeseima/" style="display:none">
+    Open embedded page
+  </a>
 
   <script>
-    const API_KEY = "a63b70ca6288b339b0b556535449d1b9";
-    let currentPage = 1;
-    let currentType = "movie";
-    let currentCategory = "now_playing";
-    let currentQuery = null;
-    const BATCH_SIZE = 33;
-
-    const contentDiv = document.getElementById("content");
-    const searchBar = document.getElementById("searchBar");
-    const overlay = document.getElementById("overlay");
-    const playerContainer = document.getElementById("playerContainer");
-    const closeBtn = document.getElementById("closeBtn");
-    const categoriesDiv = document.getElementById("categoriesDiv");
-
-    // TMDb categories
-    const categories = {
-      movie: [
-        { label: "In Theaters", value: "now_playing" },
-        { label: "Top Rated", value: "top_rated" },
-        { label: "Upcoming", value: "upcoming" }
-      ],
-      tv: [
-        { label: "Newest", value: "on_the_air" },
-        { label: "Top Rated", value: "top_rated" }
-      ]
-    };
-
-    // Load items
-    async function loadItems(reset=false){
-      if(reset) contentDiv.innerHTML = "";
-      if(!currentQuery) return;
-      let url = `https://api.themoviedb.org/3/search/${currentType}?api_key=${API_KEY}&query=${encodeURIComponent(currentQuery)}&page=${currentPage}&include_adult=false`;
-
-      try{
-        const res = await fetch(url);
-        const data = await res.json();
-        if(!data.results) return;
-
-        let count = 0;
-        for(let item of data.results){
-          if(!item.poster_path) continue;
-          const img = document.createElement("img");
-          img.src = `https://image.tmdb.org/t/p/w300${item.poster_path}`;
-          img.alt = currentType==="movie"?item.title:item.name;
-          img.onclick = () => {
-            if(currentType==="tv"){
-              showOverlay(item.id,1,1);
-            } else {
-              showOverlay(item.id);
-            }
-          };
-          contentDiv.appendChild(img);
-          count++;
-          if(count>=BATCH_SIZE) break;
-        }
-      } catch(e){ console.error(e); }
-    }
-
-    // Overlay player
-    function showOverlay(id, season=null, episode=null){
-      overlay.style.display="flex";
-      playerContainer.innerHTML = "";
-
-      const info = document.createElement("div");
-      info.id = "gettingProviders";
-      info.style.cssText = "color:#fff;font-size:20px;margin-bottom:20px;";
-      info.textContent = "Select a provider:";
-      playerContainer.appendChild(info);
-
-      const list = document.createElement("div");
-      list.style.display = "flex";
-      list.style.gap = "10px";
-      list.style.marginBottom = "20px";
-      playerContainer.appendChild(list);
-
-      const frameArea = document.createElement("div");
-      frameArea.id = "frameArea";
-      frameArea.style.cssText = "width:100%;height:100%;display:flex;justify-content:center;align-items:center;";
-      playerContainer.appendChild(frameArea);
-
-      const providers = [
-        {
-          name:"VidPlus",
-          url: currentType==="movie"
-            ? `https://player.vidplus.to/embed/movie/${id}?autoplay=true`
-            : `https://player.vidplus.to/embed/tv/${id}/${season}/${episode}?autoplay=true`,
-          sandbox:false
-        },
-        {
-          name:"Vidsrc v1",
-          url: `https://vidsrc.cc/v2/embed/${currentType}/${id}`,
-          sandbox:true
-        },
-        {
-          name:"Vidsrc v2",
-          url: currentType==="movie"
-            ? `https://vidsrc.to/embed/movie/${id}`
-            : `https://vidsrc.to/embed/tv/${id}`,
-          sandbox:true
-        },
-        {
-          name:"VidNest",
-          url: currentType==="movie"
-            ? `https://vidnest.fun/movie/${id}`
-            : `https://vidnest.fun/tv/${id}/${season}/${episode}`,
-          sandbox:true
-        },
-        {
-          name:"FMovies",
-          url: currentType==="movie"
-            ? `https://www.fmovies.gd/watch/movie/${id}`
-            : `https://www.fmovies.gd/watch/tv/${id}/${season}/${episode}`,
-          sandbox:true
-        },
-        {
-          name:"PrimeTv",
-          url: currentType==="movie"
-            ? `https://xprime.tv/watch/${id}`
-            : `https://xprime.tv/watch/${id}/${season}/${episode}`,
-          sandbox:true
-        },
-        {
-          name:"345Movies",
-          url: currentType==="movie"
-            ? `https://345movie.net/movies`
-            : `https://345movie.net/movies`,
-          sandbox:true
-        },
-        {
-          name:"SpenEmbed",
-          url: currentType==="movie"
-            ? `https://spencerdevs.xyz/movie/${id}`
-            : `https://spencerdevs.xyz/tv/${id}/${season}/${episode}`,
-          sandbox:true
-        },
-        {
-         name:"AllEmbed",
-         url: currentType==="movie"
-         ? `https://nhdapi.com/movie/player?id=${id}`
-         : `https://nhdapi.com/tv/player?id=${id}&season=${season}&ep=${episode}`,
-        sandbox:true
-        },
-        {
-          name:"Flixer",
-          url: currentType==="movie"
-            ? `https://flixer.su/watch/movie/${id}`
-            : `https://flixer.su/watch/tv/${id}/${season}/${episode}`,
-          sandbox:true
-        },
-        {
-          name:"Vidora (REALLY GOOD)",
-          url: currentType==="movie"
-            ? `https://watch.vidora.su/watch/movie/${id}`
-            : `https://watch.vidora.su/watch/tv/${id}/1/1`,
-          sandbox:true
-        }
-      ];
-
-      providers.forEach(p=>{
-        const btn = document.createElement("button");
-        btn.textContent = p.name;
-        btn.style.padding = "5px 10px";
-        btn.style.background="#e50914";
-        btn.style.color="#fff";
-        btn.style.border="none";
-        btn.style.borderRadius="4px";
-        btn.style.cursor="pointer";
-
-        btn.onclick = ()=>{
-          info.style.display = "none";
-          list.style.display = "none";
-          frameArea.innerHTML = "";
-          const iframe = document.createElement("iframe");
-          iframe.src = p.url;
-          iframe.style.cssText = `
-            margin:0;padding:0;display:block;
-            width:100vw;height:100vh;
-            border:none;
-            background:#000;
-          `;
-          iframe.allowFullscreen = true;
-          iframe.setAttribute("allow","autoplay; encrypted-media");
-          if(p.sandbox){
-            iframe.setAttribute("sandbox","allow-scripts allow-same-origin allow-presentation allow-forms");
-          }
-          frameArea.appendChild(iframe);
-        };
-        list.appendChild(btn);
-      });
-    }
-
-    closeBtn.onclick = () => {
-      overlay.style.display="none";
-      playerContainer.innerHTML="";
-    };
-
-    // Tabs
-    document.getElementById("moviesTab").onclick = () => switchType("movie");
-    document.getElementById("tvTab").onclick = () => switchType("tv");
-    function switchType(type){
-      currentType = type;
-      currentPage = 1;
-      currentQuery = null;
-      currentCategory = categories[type][0].value;
-      updateTabs();
-      renderCategories();
-      contentDiv.innerHTML = "";
-    }
-    function updateTabs(){
-      document.getElementById("moviesTab").classList.toggle("active", currentType==="movie");
-      document.getElementById("tvTab").classList.toggle("active", currentType==="tv");
-    }
-
-    // Categories
-    function renderCategories(){
-      categoriesDiv.innerHTML = "";
-      categories[currentType].forEach(cat=>{
-        const btn = document.createElement("button");
-        btn.textContent = cat.label;
-        btn.dataset.category = cat.value;
-        if(cat.value===currentCategory) btn.classList.add("active");
-        btn.onclick = ()=>{
-          currentCategory = cat.value;
-          currentPage = 1;
-          currentQuery = null;
-          document.querySelectorAll("#categoriesDiv button").forEach(b=>b.classList.remove("active"));
-          btn.classList.add("active");
-          contentDiv.innerHTML = "";
-        };
-        categoriesDiv.appendChild(btn);
-      });
-    }
-
-    // Search
-    searchBar.addEventListener("keypress", e=>{
-      if(e.key==="Enter"){
-        currentQuery = searchBar.value.trim();
-        currentPage = 1;
-        loadItems(true);
+    // Create and insert the iframe when the DOM is ready
+    document.addEventListener('DOMContentLoaded', function () {
+      const src = '/s/embed.html#https://deformed-steve.github.io/cheeseima/';
+      try {
+        const iframe = document.createElement('iframe');
+        iframe.id = 'embedFrame';
+        iframe.src = src;
+        // If you need the embed to be able to go fullscreen:
+        iframe.allow = 'fullscreen';
+        // append to body
+        document.body.appendChild(iframe);
+      } catch (e) {
+        // If iframe creation is blocked, reveal the fallback link
+        document.getElementById('fallback').style.display = 'inline-block';
+        console.error('Failed to create iframe:', e);
       }
     });
-
-    // PrimeTv Catalog
-    document.getElementById("primeCatalogBtn").onclick = () => {
-      overlay.style.display = "flex";
-      playerContainer.innerHTML = "";
-      const iframe = document.createElement("iframe");
-      iframe.src = "https://xprime.tv/";
-      iframe.style.cssText = `
-        margin:0;padding:0;display:block;
-        width:100vw;height:100vh;
-        border:none;
-        background:#000;
-      `;
-      iframe.setAttribute("sandbox","allow-scripts allow-same-origin allow-presentation allow-forms");
-      iframe.allowFullscreen = true;
-      playerContainer.appendChild(iframe);
-    };
-
-    // 345Movies Catalog
-    document.getElementById("movies345CatalogBtn").onclick = () => {
-      overlay.style.display = "flex";
-      playerContainer.innerHTML = "";
-      const iframe = document.createElement("iframe");
-      iframe.src = "https://345movie.net/movies";
-      iframe.style.cssText = `
-        margin:0;padding:0;display:block;
-        width:100vw;height:100vh;
-        border:none;
-        background:#000;
-      `;
-      iframe.setAttribute("sandbox","allow-same-origin");
-      iframe.allowFullscreen = true;
-      playerContainer.appendChild(iframe);
-    };
-
-    // Initial
-    renderCategories();
   </script>
 </body>
 </html>

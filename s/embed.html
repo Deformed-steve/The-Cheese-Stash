@@ -4,73 +4,116 @@
 <meta charset="UTF-8">
 <title>The Cheese Stash Loading...</title>
 <style>
-    body {
-        background: #111; /* dark background */
-        color: #ffd700; /* yellow text */
-        font-family: 'Fira Mono', 'Consolas', monospace;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        margin: 0;
-    }
+        :root {
+            --primary: #ff9e00;
+            --primary-dark: #e68a00;
+            --primary-light: #ffb733;
+            --accent: #6c5ce7;
+            --accent-dark: #5a4fcf;
+            --dark: #0f1521;
+            --darker: #0a0e17;
+            --light: #f0f4ff;
+            --gray: #8a9bb8;
+            --success: #00c853;
+            --error: #ff5252;
 
-    .loader-container {
-        position: relative;
-        width: 120px;
-        height: 120px;
-        display: flex;
-        justify-content: center;
-        align-items: flex-end;
-        margin-bottom: 20px;
-    }
+            --gradient-primary: linear-gradient(135deg, var(--primary) 0%, #ff6b00 100%);
+            --gradient-dark: linear-gradient(135deg, var(--darker) 0%, #1a2b3c 100%);
+            --gradient-accent: linear-gradient(135deg, var(--accent) 0%, #8b78ff 100%);
 
-    .cheese {
-        font-size: 100px;
-        position: absolute;
-        color: transparent; /* invisible inside */
-        visibility: ;
-        -webkit-text-stroke: 2px #000; /* black outline */
-    }
+            --shadow-glow: 0 0 20px rgba(255, 158, 0, 0.3);
+        }
 
-    .cheese-fill {
-        position: absolute;
-        bottom: 0;
-        width: 100%;
-        height: 0%;
-        overflow: hidden;
-        display: flex;
-        justify-content: center;
-        align-items: flex-end;
-    }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    .cheese-fill span {
-        font-size: 100px;
-        color: #ffd700; /* yellow fill */
-        line-height: 1;
-    }
+        body {
+            background: var(--gradient-dark);
+            color: var(--light);
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
 
-    .loading-text {
-        font-size: 1.3rem;
-        font-weight: 500;
-        margin-top: 8px;
-        color: #ffd633;
-        animation: fade 2s ease-in-out infinite;
-    }
+        .loader-container {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            margin-bottom: 30px;
+        }
 
-    @keyframes fade {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.4; }
-    }
+        .cheese {
+            font-size: 150px;
+            position: absolute;
+            color: transparent;
+            -webkit-text-stroke: 3px var(--primary);
+            filter: drop-shadow(0 0 10px rgba(255, 158, 0, 0.5));
+            visibility: hidden;
+        }
 
-    .tips {
-        margin-top: 8px;
-        font-size: 1rem;
-        color: rgba(255, 215, 0, 0.5);
-        text-align: center;
-    }
-</style>
+        .cheese-fill {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 0%;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+        }
+
+        .cheese-fill span {
+            font-size: 150px;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            line-height: 1;
+        }
+
+        .loading-text {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-top: 20px;
+            background: linear-gradient(to right, #ff9e00, #ffcc33);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: fade 2s ease-in-out infinite;
+        }
+
+        @keyframes fade {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .tips {
+            margin-top: 15px;
+            font-size: 1.1rem;
+            color: var(--gray);
+            text-align: center;
+            max-width: 500px;
+            line-height: 1.5;
+            padding: 0 20px;
+        }
+
+        .progress-text {
+            margin-top: 10px;
+            font-size: 1.2rem;
+            color: var(--primary);
+            font-weight: 600;
+        }
+    </style>
 <script src="uv/uv.bundle.js" defer></script>
 <script src="uv/uv.config.js" defer></script>
 <script src="register-sw.js" defer></script>
