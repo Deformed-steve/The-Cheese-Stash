@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+  <meta charset="utf-8">
+  <title>Mari0</title>
+
+  <style>
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: black;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      border: 0;
+    }
+  </style>
+</head>
+
+<body>
+
+  <canvas id="canvas" width="800" height="600"></canvas>
+  <canvas id="loadingCanvas" width="800" height="600"></canvas>
+
+  <script>
+    const canvas = document.getElementById("canvas");
+    const loadingCanvas = document.getElementById("loadingCanvas");
+    const loadingContext = loadingCanvas.getContext("2d");
+
+    function drawLoadingText(text) {
+      loadingContext.fillStyle = "white";
+      loadingContext.fillRect(0, 0, loadingCanvas.width, loadingCanvas.height);
+      loadingContext.fillStyle = "black";
+      loadingContext.font = "24px Arial";
+      loadingContext.textAlign = "center";
+      loadingContext.fillText(text, loadingCanvas.width / 2, loadingCanvas.height / 2);
+    }
+
+    function resizeAfterStart() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    window.addEventListener("resize", () => {
+      if (Module.calledRun) resizeAfterStart();
+    });
+
+    var Module = {
+      arguments: ["./"],
+      canvas: canvas,
+
+      didSyncFS: false,
+      totalDependencies: 0,
+      remainingDependencies: 0,
+
+      setStatus: function (text) {
+        if (text) drawLoadingText(text);
+
+        if (!text && this.didSyncFS && this.remainingDependencies === 0) {
+          this.callMain(this.arguments);
+          loadingCanvas.style.display = "none";
+        }
+      },
+
+      monitorRunDependencies: function (left) {
+        this.remainingDependencies = left;
+        this.totalDependencies = Math.max(this.totalDependencies, left);
+        this.setStatus(left ? "Preparing..." : "");
+      }
+    };
+
+    Module.setStatus("Downloading...");
+  </script>
+
+  <script src="game.js"></script>
+  <script async src="love.js"></script>
+
+</body>
+</html>
