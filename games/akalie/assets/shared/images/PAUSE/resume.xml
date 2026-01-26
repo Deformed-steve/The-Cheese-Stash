@@ -1,5 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<TextureAtlas imagePath="resume.png">
-<SubTexture name="resume select0000" x="0" y="0" width="365" height="118" frameX="-579" frameY="-217" frameWidth="1534" frameHeight="718" />
-<SubTexture name="resume unselect0000" x="365" y="0" width="367" height="111" frameX="-576" frameY="-232" frameWidth="1534" frameHeight="718" />
-</TextureAtlas>

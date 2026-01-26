@@ -1,5 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<TextureAtlas imagePath="restart.png">
-<SubTexture name="restart select0000" x="0" y="0" width="354" height="117" frameX="-591" frameY="-339" frameWidth="1534" frameHeight="718" />
-<SubTexture name="restart unselect0000" x="0" y="117" width="349" height="103" frameX="-588" frameY="-351" frameWidth="1534" frameHeight="718" />
-</TextureAtlas>
