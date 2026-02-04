@@ -1,6 +1,6 @@
 self.__uv$config = {
 	prefix: "/s/kibidi/sigma/",
-	bare: "https://mithral.vercel.app/fq/",
+	bare: "https://mithral-alpha.vercel.app/fq/",
 	encodeUrl: Ultraviolet.codec.xor.encode,
 	decodeUrl: Ultraviolet.codec.xor.decode,
 	handler: "/s/uv/uv.handler.js",
