@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>peak stuff right here</title>
+  <meta name="viewport" content="width=device-width">
+  <link href="y8-studio/unity/config/TemplateData57/style.css" rel="stylesheet">
+  <link href="y8-studio/unity/config/shared/style.css" rel="stylesheet">
+  <link href="y8-studio/unity/config/shared/gamebreak/gamebreak.css" rel="stylesheet">
+  
+  <style>
+    /* SICK LOADING SCREEN STYLES */
+    #custom-loader {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: #050505;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      font-family: 'Courier New', Courier, monospace;
+      color: #00ff41;
+      text-shadow: 0 0 10px #00ff41;
+      text-align: center;
+    }
+
+    .loader-text {
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+      animation: flicker 1.5s infinite;
+    }
+
+    .sub-text {
+      font-size: 0.9rem;
+      color: #008f11;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .progress-bar-wrap {
+      width: 300px;
+      height: 4px;
+      background: #111;
+      margin-top: 20px;
+      border: 1px solid #00ff41;
+    }
+
+    #inner-bar {
+      width: 0%;
+      height: 100%;
+      background: #00ff41;
+      box-shadow: 0 0 15px #00ff41;
+      transition: width 0.3s;
+    }
+
+    @keyframes flicker {
+      0% { opacity: 0.8; }
+      50% { opacity: 1; }
+      100% { opacity: 0.8; }
+    }
+  </style>
+
+  <script src="y8-studio/unity/config/shared/lib.js"></script>
+  <script src="y8-studio/unity/config/shared/browser_detector.js"></script>
+  <script src="y8-studio/unity/config/shared/sound_enabler.js"></script>
+  <script src="y8-studio/unity/config/shared/metrika.js"></script>
+  <script src="y8-studio/unity/config/shared/gamebreak/gamebreak.js"></script>
+  <script src="y8-studio/unity/config/TemplateData57/game.js"></script>
+  <script src="y8-studio/unity/config/TemplateData57/UnityProgress.js"></script>
+  <script src="Build/UnityLoader.js"></script>
+
+  <script>
+ async function initGame() {
+  const loader = document.getElementById('custom-loader');
+  const bar = document.getElementById('inner-bar');
+  const statusText = document.querySelector('.sub-text');
+
+  
+  const currentPath = window.location.href.substring(0, window.location.href.lastIndexOf('/'));
+  const buildFolderUrl = currentPath + '/Build/';
+
+  try {
+    statusText.innerText = "Downloading data chunks...";
+    
+   
+    const partNames = ['Build/MentallyDisturbedGrandpaTheAsylum.data.unityweb.part1', 'Build/MentallyDisturbedGrandpaTheAsylum.data.unityweb.part2'];
+    const responses = await Promise.all(partNames.map(url => fetch(url)));
+    
+    for (const res of responses) {
+      if (!res.ok) throw new Error(`Could not find ${res.url}`);
+    }
+
+    const buffers = await Promise.all(responses.map(r => r.arrayBuffer()));
+    const mergedDataUrl = URL.createObjectURL(new Blob(buffers, { type: 'application/octet-stream' }));
+    
+    bar.style.width = "40%";
+    statusText.innerText = "Patching absolute paths...";
+
+
+    const jsonResponse = await fetch("Build/MentallyDisturbedGrandpaTheAsylum.json");
+    const config = await jsonResponse.json();
+    
+  
+    for (let key in config) {
+      if (key.endsWith('Url')) {
+        if (key === 'dataUrl') {
+          config[key] = mergedDataUrl;
+        } else {
+          
+          config[key] = buildFolderUrl + config[key];
+        }
+      }
+    }
+
+
+    const configBlob = new Blob([JSON.stringify(config)], { type: 'application/json' });
+    const configBlobUrl = URL.createObjectURL(configBlob);
+
+    bar.style.width = "60%";
+    statusText.innerText = "Syncing system...";
+    
+
+    var unityInstance = UnityLoader.instantiate("unityContainer", configBlobUrl, {
+      onProgress: (instance, progress) => {
+        bar.style.width = (60 + (progress * 40)) + "%";
+        if (progress === 1) {
+          statusText.innerText = "Access Granted.";
+          setTimeout(() => loader.style.display = 'none', 500);
+        }
+      }
+    });
+
+  } catch (err) {
+    statusText.style.color = "#ff0033";
+    statusText.innerText = "RIP FAIL: " + err.message;
+    console.error(err);
+  }
+}
+
+window.onload = initGame;
+  </script>
+</head>
+
+<body>
+  <div id="custom-loader">
+    <div class="loader-text">Ripped by dude.<br>for (UGS), (Alexr Network)</div>
+    <div class="sub-text">Bypassing limits...</div>
+    <div class="progress-bar-wrap">
+      <div id="inner-bar"></div>
+    </div>
+  </div>
+
+  <div id="container" class="container webgl-content">
+    <div id="unityContainer" style="width: 960px; height: 600px"></div>
+    <div class="footer">
+      <div class="unity disable"></div>
+      <div class="webgl enable"></div>
+      <h1 class="game-name">Mentally Disturbed Grandpa: The Asylum</h1>
+      <div class="fullscreen" onclick="unityInstance.SetFullscreen(1)">Maximize</div>
+    </div>
+  </div>
+</body>
+</html>

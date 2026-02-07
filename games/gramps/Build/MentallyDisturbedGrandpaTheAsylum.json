@@ -1,0 +1,21 @@
+{
+  "companyName": "Poison Games",
+  "productName": "Mentally Disturbed Grandpa: The Asylum",
+  "productVersion": "1.0",
+  "dataUrl": "MentallyDisturbedGrandpaTheAsylum.data.unityweb",
+  "wasmCodeUrl": "MentallyDisturbedGrandpaTheAsylum.wasm.code.unityweb",
+  "wasmFrameworkUrl": "MentallyDisturbedGrandpaTheAsylum.wasm.framework.unityweb",
+  "graphicsAPI": [
+    "WebGL 2.0",
+    "WebGL 1.0"
+  ],
+  "webglContextAttributes": {
+    "preserveDrawingBuffer": false
+  },
+  "backgroundUrl": "MentallyDisturbedGrandpaTheAsylum.jpg",
+  "splashScreenStyle": "Dark",
+  "backgroundColor": "#FFFFFF",
+  "developmentBuild": false,
+  "multithreading": false,
+  "unityVersion": "2019.1.1f1"
+}
