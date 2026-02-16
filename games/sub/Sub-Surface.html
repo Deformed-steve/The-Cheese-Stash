@@ -113,16 +113,16 @@ body {
 <script>
 (function() {
 'use strict';
-const BASE_JS = "https://cdn.jsdelivr.net/gh/shayderrr/portsv4@06672782de36961983b66cdf43a8c415929ac992/web/";
-const BASE_PCK = "https://cdn.jsdelivr.net/gh/shayderrr/portsv4@06672782de36961983b66cdf43a8c415929ac992/web/pck/";
+const BASE_JS = "https://cdn.jsdelivr.net/gh/deformed-steve/the-cheese-stash@main/games/sub/";
+const BASE_PCK = "https://cdn.jsdelivr.net/gh/deformed-steve/the-cheese-stash@main/games/sub/";
 const originalFetch = window.fetch;
 const mergedData = {};
 const pendingRequests = {};
 
 window.fetch = function(url, ...args) {
     const u = url.toString();
-    if (u.includes("As Duty Demands.pck") || u.includes("As%20Duty%20Demands.pck") || u.includes("As Duty Demands.wasm") || u.includes("As%20Duty%20Demands.wasm")) {
-        const f = u.includes(".pck") ? "As Duty Demands.pck" : "As Duty Demands.wasm";
+    if (u.includes("Sub-Surface.pck") || u.includes("Sub-Surface.pck") || u.includes("Sub-Surface.wasm") || u.includes("Sub-Surface.wasm")) {
+        const f = u.includes(".pck") ? "Sub-Surface.pck" : "Sub-Surface.wasm";
         if (mergedData[f]) return Promise.resolve(new Response(mergedData[f]));
         return new Promise((resolve) => {
             if (!pendingRequests[f]) pendingRequests[f] = [];
@@ -156,7 +156,7 @@ async function merge(name, baseUrl, start, end, pad) {
 
 async function init() {
     try {
-        await merge("Sub-Surface.pck", BASE_PCK, 1, 79, true);
+        await merge("Sub-Surface.pck", BASE_PCK, 1, 12, true);
         await merge("Sub-Surface.wasm", BASE_JS, 1, 1, false);
         
         const s = document.createElement('script');
