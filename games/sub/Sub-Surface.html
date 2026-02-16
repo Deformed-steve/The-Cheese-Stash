@@ -97,7 +97,7 @@ async function init() {
         // Merge all split files
         await merge("Sub-Surface.pck", 1, 12, true);
         await merge("Sub-Surface.wasm", 1, 1, false);
-        await merge("Sub-Surface.side.wasm", 1, 1, false);
+        await merge("Sub-Surface.side.wasm", 1, 3, false);
 
         const script = document.createElement("script");
         script.src = BASE + "Sub-Surface.js";
