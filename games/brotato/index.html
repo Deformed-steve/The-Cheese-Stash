@@ -136,7 +136,7 @@
 		<div id='status-notice' class='godot' style='display: none;'></div>
 	</div>
 
-	<script type='text/javascript' src='index.js'></script>
+	
 	<script>
 (function() {
 'use strict';
@@ -177,7 +177,7 @@ async function merge(name, start, end) {
 
 async function init() {
     try {
-        await merge("index.pck", 1, 5);
+        await merge("index.pck", 1, 8);
         await merge("index.wasm", 1, 2);
         const s = document.createElement('script');
         s.src = BASE + encodeURIComponent("index.js");
