@@ -115,7 +115,37 @@ async function init() {
                 focusCanvas: true,
                 ensureCrossOriginIsolationHeaders: true
             });
+// Pointer Lock Setup
+const canvas = document.getElementById("canvas");
 
+function requestPointerLock() {
+    if (canvas.requestPointerLock) {
+        canvas.requestPointerLock();
+    }
+}
+
+function exitPointerLock() {
+    if (document.exitPointerLock) {
+        document.exitPointerLock();
+    }
+}
+
+// Lock on click
+canvas.addEventListener("click", () => {
+    if (document.pointerLockElement !== canvas) {
+        requestPointerLock();
+    }
+});
+
+// Optional: Unlock on ESC automatically handled by browser,
+// but this keeps state clean
+document.addEventListener("pointerlockchange", () => {
+    if (document.pointerLockElement === canvas) {
+        console.log("Pointer locked");
+    } else {
+        console.log("Pointer unlocked");
+    }
+});
             engine.startGame({
                 onProgress: (c, t) => {
                     if (t > 0)
